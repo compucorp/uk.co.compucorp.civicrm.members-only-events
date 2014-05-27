@@ -107,11 +107,11 @@ class CRM_Membersonlyevent_DAO_MembersOnlyEvent extends CRM_Core_DAO
    */
   public $contribution_page_id;
   /**
-   * If this box is ticked only the users with permission "Can register for Members only events" will be able to register for this event.
+   * If the value is other than 1, only users with "Can register for Members events" will be able to register for this event.
    *
-   * @var boolean
+   * @var int unsigned
    */
-  public $is_members_only_event;
+  public $members_event_type;
   /**
    * class constructor
    *
@@ -166,12 +166,12 @@ class CRM_Membersonlyevent_DAO_MembersOnlyEvent extends CRM_Core_DAO
           'type' => CRM_Utils_Type::T_INT,
           'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
         ) ,
-        'is_members_only_event' => array(
-          'name' => 'is_members_only_event',
-          'type' => CRM_Utils_Type::T_BOOLEAN,
-          'title' => ts('Is Members Only Event') ,
+        'members_event_type' => array(
+          'name' => 'members_event_type',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Event Type:') ,
           'html' => array(
-            'type' => 'CheckBox',
+            'type' => 'Radio',
           ) ,
         ) ,
       );
@@ -192,7 +192,7 @@ class CRM_Membersonlyevent_DAO_MembersOnlyEvent extends CRM_Core_DAO
         'id' => 'id',
         'event_id' => 'event_id',
         'contribution_page_id' => 'contribution_page_id',
-        'is_members_only_event' => 'is_members_only_event',
+        'members_event_type' => 'members_event_type',
       );
     }
     return self::$_fieldKeys;

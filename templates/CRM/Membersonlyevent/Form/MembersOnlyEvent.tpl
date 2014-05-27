@@ -25,18 +25,20 @@
   <script type="text/javascript">
   {literal}
     jQuery(document).ready(function(){
-      jQuery("#is_members_only_event input[type=checkbox]").click(function(){
+      jQuery("input[name='members_event_type']").click(function(){
         
-        if (jQuery(this).attr("checked") == true){
+        if (jQuery(this).val()==2){
           jQuery("#contribution_page_id").show();
-        }
-        else {
+        }else if(jQuery(this).val()==3){
+          jQuery("#contribution_page_id").show();
+          alert( "Show the extra fields for this." );
+        }else {
           jQuery("#contribution_page_id").hide();
         }
       
       });
       
-      if (jQuery("#is_members_only_event input[type=checkbox]").attr("checked") == false){
+      if (jQuery("input[name='members_event_type']").val()==1){
         jQuery("#contribution_page_id").hide();
       }
       

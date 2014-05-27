@@ -10,14 +10,12 @@ require_once 'CRM/Core/Form.php';
 class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEvent {
   function buildQuickForm() {
      
-    // add form elements
-    $this->add(
-      'checkbox', // field type
-      'is_members_only_event', // field name
-      ts('Is members only event?'), // field label
-      '',   // list of attributes
-      false // is required
-    );
+	//TODO: change hard coded options to civicrm option group
+	$members_event_type = array();
+    $members_event_type[] = &HTML_QuickForm::createElement('radio', NULL, NULL, 'Public Event', 1);
+    $members_event_type[] = &HTML_QuickForm::createElement('radio', NULL, NULL, 'Members Only Event', 2);
+    $members_event_type[] = &HTML_QuickForm::createElement('radio', NULL, NULL, 'Members and Non-members Event', 3);
+    $this->addGroup( $members_event_type, 'members_event_type', ( 'Members Event Type:' ) );
     
     // add form elements
     $this->add(
@@ -49,13 +47,14 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
   function setDefaultValues() {
       
     $defaults = array();
-    
+    $defaults['members_event_type'] = 1;
+	
     // Search for the Members Only Event object by the Event ID
     $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_id);
-    
+
     if(is_object($members_only_event)) {
     
-      $defaults['is_members_only_event'] = $members_only_event->is_members_only_event;
+      $defaults['members_event_type'] = $members_only_event->members_event_type;
       $defaults['contribution_page_id'] = $members_only_event->contribution_page_id;
     
     }
@@ -90,7 +89,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     
     $params['event_id'] = $passed_values['id'];
     $params['contribution_page_id'] = $passed_values['contribution_page_id'];
-    $params['is_members_only_event'] = isset($passed_values['is_members_only_event']) ? $passed_values['is_members_only_event'] : 0;
+    $params['members_event_type'] = $passed_values['members_event_type'];
     
     // Create or edit the values
     CRM_Membersonlyevent_BAO_MembersOnlyEvent::create($params);
