@@ -115,7 +115,7 @@ function membersonlyevent_civicrm_permission(&$permissions) {
     
   $prefix = ts('CiviEvent') . ': '; // name of extension or module
   $permissions = array(
-    'members only event registration' => $prefix . ts('Can register for Members only events'),
+    'members only event registration' => $prefix . ts('Can register for Members events'),
   );
   
 }
@@ -202,7 +202,7 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
   $infoText = 'You meet the condition for this event.';
   
   // Hide register now button, if the event is members only event and user has no permissions to register for the event
-  if (is_object($members_only_event) && $members_only_event->is_members_only_event == 1) {
+  if (is_object($members_only_event) && $members_only_event->members_event_type !== 1) {
   	
     if (!CRM_Core_Permission::check('members only event registration')||
     (CRM_Core_Permission::check('members only event registration')&&!$durationCheck)){
@@ -294,7 +294,7 @@ function membersonlyevent_civicrm_alterContent(&$content, $context, $tplName, &$
     // Search for the Members Only Event object by the Event ID
     $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($_GET['id']);
           
-    if (is_object($members_only_event) && $members_only_event->is_members_only_event == 1) {
+    if (is_object($members_only_event) && $members_only_event->members_event_type !== 1) {
        
       if (!CRM_Core_Permission::check('members only event registration')) {
         $content = ts('<p>You are not allowed to register for this event!</p>');      

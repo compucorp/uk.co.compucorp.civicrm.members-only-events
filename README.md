@@ -1,6 +1,6 @@
 civi-private-event-settings
 ===========================
 
-This extension will add a check box -> "Is members only event" and a Drupal permission "Can register for Members only events". If the "Is members only event" tick box is ticked, only a user with the "Can register for Members only events" can register for the Civi CRM Event.
+This extension will add a radio group -> "Members event type" and a Drupal permission "Can register for Members events". If the "Members event Type" is not 'Public event', only a user with the "Can register for Members events" can register for the CiviCRM Event.
 
-Online registration needs to be enabled, when creating the Event in Civi CRM.
+Online registration needs to be enabled, when creating the Event in CiviCRM.

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<table>
+  <base>CRM/Booking</base>
+  <class>BookingConfig</class>
+  <name>civicrm_booking_config</name>
+  <comment></comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment></comment>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>false</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>duration_check</name>
+    <type>tinyint</type>
+    <default>0</default>
+    <comment>Enable membership duration check</comment>
+  </field>
+
+</table>

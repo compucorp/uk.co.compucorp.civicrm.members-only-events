@@ -50,14 +50,14 @@
   </foreignKey>
   
   <field>
-    <name>is_members_only_event</name>
-    <type>boolean</type>
-    <title>Is Members Only Event</title>
+    <name>members_event_type</name>
+    <type>int unsigned</type>
+    <title>=Members Event Type</title>
     <default>0</default>
-    <comment>If this box is ticked only the users with permission &quot;Can register for Members only events&quot; will be able to register for this event.</comment>
+    <comment>If the value is other than 1, only users with &quot;Can register for Members events&quot; will be able to register for this event.</comment>
     <add>1.7</add>
     <html>
-      <type>CheckBox</type>
+      <type>Radio</type>
     </html>
   </field>
 
