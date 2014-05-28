@@ -183,7 +183,7 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
   $currentEventID = $members_only_event->event_id;
   $userID = $session->get('userID');
   $durationCheck = true;
-  $config = CRM_Membersonlyevent_BAO_MembershipConfig::getConfig();
+  $config = CRM_Membersonlyevent_BAO_MembersEventConfig::getConfig();
   if($config['duration_check'] == 1&&$userID){
   	$durationCheck = false;
     if(is_object($members_only_event)){
@@ -316,8 +316,8 @@ function membersonlyevent_civicrm_navigationMenu( &$params ) {
     $nextAdminMenuKey = $maxAdminMenuKey+1;
     $params[$administerMenuId]['child'][$nextAdminMenuKey] =  array(
         'attributes' => array(
-          'label' => ts('Members Event'),
-          'name' => 'members_event',
+          'label' => ts('Members Event Config'),
+          'name' => 'members_event_config',
           'url' => 'civicrm/admin/setting/preferences/members_event_config&reset=1',
           'permission' => null,
           'operator' => null,

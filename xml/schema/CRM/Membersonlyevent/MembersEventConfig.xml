@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
+
 <table>
-  <base>CRM/Booking</base>
-  <class>BookingConfig</class>
-  <name>civicrm_booking_config</name>
-  <comment></comment>
+  <base>CRM/Membersonlyevent</base>
+  <class>MembersEventConfig</class>
+  <name>civicrm_membersonlyevent_config</name>
+  <add>4.4</add>
   <log>true</log>
 
   <field>
     <name>id</name>
     <type>int unsigned</type>
     <required>true</required>
-    <comment></comment>
+    <comment>Unique MembersEventConfig ID</comment>
+    <add>4.4</add>
   </field>
   <primaryKey>
     <name>id</name>
@@ -19,9 +21,10 @@
 
   <field>
     <name>duration_check</name>
-    <type>tinyint</type>
+    <type>int unsigned</type>
     <default>0</default>
     <comment>Enable membership duration check</comment>
+    <add>4.4</add>
   </field>
 
 </table>
