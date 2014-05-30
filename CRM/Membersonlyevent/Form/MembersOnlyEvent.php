@@ -12,9 +12,9 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
      
 	//TODO: change hard coded options to civicrm option group
 	$members_event_type = array();
-    $members_event_type[] = &HTML_QuickForm::createElement('radio', NULL, NULL, 'Public Event', 1);
-    $members_event_type[] = &HTML_QuickForm::createElement('radio', NULL, NULL, 'Members Only Event', 2);
-    $members_event_type[] = &HTML_QuickForm::createElement('radio', NULL, NULL, 'Members and Non-members Event', 3);
+    $members_event_type[] = &HTML_QuickForm::createElement('radio', NULL, NULL, 'Public Event', '1');
+    $members_event_type[] = &HTML_QuickForm::createElement('radio', NULL, NULL, 'Members Only Event', '2');
+    $members_event_type[] = &HTML_QuickForm::createElement('radio', NULL, NULL, 'Members and Non-members Event', '3');
     $this->addGroup( $members_event_type, 'members_event_type', ( 'Members Event Type:' ) );
     
     // add form elements
@@ -23,20 +23,61 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
       'contribution_page_id', // field name
       ts('Contribution page used for membership signup'), // field label
       $this->getContributionPagesAsOptions(),   // list of attributes
-      false // is required
+      TRUE // is required
     );
     
-    $this->addButtons(array(
+	//getPriceOptions();
+    /*if (count($groups) <= 10) {
+      // setting minimum height to 2 since widget looks strange when size (height) is 1
+      $groupSize = max(count($groups), 2);
+    }
+    else {
+      $groupSize = 10;
+    }*/
+    $groups = array(
+	    1 => "Advisory Board",
+	    2 => "Case Resources",
+	    3 => "Newsletter Subscribers",
+	    4 => "Summer Program Volunteers",
+	);dpm($groups);
+    $inG = $this->addElement('advmultiselect', 'membersPrice',
+      ts('Members\' Price(s)') . ' ',
+      $groups,
       array(
-        'type' => 'submit',
-        'name' => ts('Submit'),
-        'isDefault' => TRUE,
-      ),
-    ));
-
+        'size' => 10,
+        'style' => 'width:auto; min-width:240px;',
+        'class' => 'advmultiselect',
+      )
+    );
+	
+	//as we are having hidden smart group so no need.
+    //if (!$this->_searchBasedMailing) {
+      $this->addRule('membersPrice', ts('Please select a group to be mailed.'), 'required');
+    //}
+	
+	$inG->setButtonAttributes('add', array('value' => ts('Add >>')));
+    $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
+	
+	// add form rules
+	$this->addFormRule(array('CRM_Membersonlyevent_Form_MembersOnlyEvent', 'rules'));
+	
     // export form elements
     $this->assign('elementNames', $this->getRenderableElementNames());
     parent::buildQuickForm();
+  }
+  
+  
+  protected static function rules($params, $files, $self) {
+    $errors = array();
+	$isPublicEvent = CRM_Utils_Array::value('members_event_type', $params);
+	$contributionPageID = CRM_Utils_Array::value('contribution_page_id', $params);
+	
+    if($isPublicEvent!=='1'){
+      if(!is_numeric($contributionPageID)){
+        $errors['contribution_page_id'] = ts('Please select a contribution page.');
+      }
+    }
+	return $errors;
   }
   
   /**
@@ -68,6 +109,17 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     
     $return_array = array();
     $return_array['NULL'] = ts('- Select contribution page -');
+    
+    foreach ($contribution_pages as $key => $contribution_object) {
+      $return_array[$contribution_object['id']] = $contribution_object['title'];
+    }
+    
+    return $return_array;
+  }
+  
+  function getPriceOptions() {
+    
+    $return_array = array();
     
     foreach ($contribution_pages as $key => $contribution_object) {
       $return_array[$contribution_object['id']] = $contribution_object['title'];
