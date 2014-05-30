@@ -8,6 +8,31 @@ require_once 'CRM/Core/Form.php';
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/QuickForm+Reference
  */
 class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEvent {
+	
+  /**
+   * the event ID of the event if we are resuming a event
+   *
+   * @var integer
+   */
+  protected $_eventID;
+  
+  /**
+   * Function to set variables up before form is built
+   *
+   * @return void
+   * @access public
+   */
+  //public function preProcess() {
+  	//$this->$_eventID = CRM_Utils_Request::retrieve('id', 'Integer', $this, FALSE, NULL);
+  	//dpm($_eventID);
+  //}
+  
+  /**
+   * Function to actually build the form
+   *
+   * @return None
+   * @access public
+   */
   function buildQuickForm() {
      
 	//TODO: change hard coded options to civicrm option group
@@ -34,12 +59,14 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     else {
       $groupSize = 10;
     }*/
+    
+    //TODO:match the key
     $groups = array(
-	    1 => "Advisory Board",
-	    2 => "Case Resources",
-	    3 => "Newsletter Subscribers",
-	    4 => "Summer Program Volunteers",
-	);dpm($groups);
+	    1 => "Platium Member",
+	    2 => "Golden Member",
+	    3 => "Silver Member",
+	    4 => "Public",
+	);
     $inG = $this->addElement('advmultiselect', 'membersPrice',
       ts('Members\' Price(s)') . ' ',
       $groups,
@@ -100,6 +127,33 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     
     }
     
+	//Member_price
+	/*if ($this->_id) {
+      $dao = new CRM_Mailing_DAO_MailingGroup();
+
+      $mailingGroups = array(
+        'civicrm_group' => array( ),
+        'civicrm_mailing' => array( )
+      );
+      $dao->mailing_id = $this->_mailingID;
+      $dao->find();
+      while ($dao->fetch()) {
+        // account for multi-lingual
+        // CRM-11431
+        $entityTable = 'civicrm_group';
+        if (substr($dao->entity_table, 0, 15) == 'civicrm_mailing') {
+          $entityTable = 'civicrm_mailing';
+        }
+        $mailingGroups[$entityTable][$dao->group_type][] = $dao->entity_id;
+      }
+
+      $defaults['includeGroups'] = $mailingGroups['civicrm_group']['Include'];
+
+      if (!empty($mailingGroups['civicrm_mailing'])) {
+        $defaults['includeMailings'] = CRM_Utils_Array::value('Include', $mailingGroups['civicrm_mailing']);
+      }
+    }*/
+	
     return $defaults;
   }
   
@@ -145,6 +199,13 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     
     // Create or edit the values
     CRM_Membersonlyevent_BAO_MembersOnlyEvent::create($params);
+	
+	$priceParams['event_id'] = $passed_values['id'];
+	foreach ($passed_values['membersPrice'] as $key => $value) {
+		$priceParams['price_value_id'] = $value;
+		$priceParams['is_member_price'] = 1;
+		CRM_Membersonlyevent_BAO_MembersEventPrice::create($priceParams);
+	}
     
     parent::postProcess();
   }

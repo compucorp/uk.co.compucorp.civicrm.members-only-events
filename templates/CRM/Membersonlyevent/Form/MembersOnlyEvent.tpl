@@ -26,10 +26,15 @@
   <script type="text/javascript">
   {literal}
     jQuery(document).ready(function(){
+      jQuery("#contribution_page_id").show();
+      jQuery("#membersPrice").hide();
+      
       if (jQuery("input[name='members_event_type']:checked").val()==1){
         jQuery("#contribution_page_id").hide();
-      }else{jQuery("#contribution_page_id").show();}
-      jQuery("#membersPrice").hide();
+      }else if(jQuery("input[name='members_event_type']:checked").val()==3){
+        jQuery("#membersPrice").show();
+      }
+      
       
       jQuery("input[name='members_event_type']").change(function(){
         

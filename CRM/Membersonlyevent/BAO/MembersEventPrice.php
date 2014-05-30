@@ -8,6 +8,7 @@ class CRM_Membersonlyevent_BAO_MembersEventPrice extends CRM_Membersonlyevent_DA
    * @param array $params key-value pairs
    * @return CRM_Membersonlyevent_DAO_MembersEventPrice|NULL
    *
+   */
   public static function create($params) {
     $className = 'CRM_Membersonlyevent_DAO_MembersEventPrice';
     $entityName = 'MembersEventPrice';
@@ -20,5 +21,18 @@ class CRM_Membersonlyevent_BAO_MembersEventPrice extends CRM_Membersonlyevent_DA
     CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
 
     return $instance;
-  } */
+  }
+  
+  //TODO: not complete
+  public static function getPriceValue($eventIDs){
+    $dao = new CRM_Membersonlyevent_DAO_MembersEventPrice();
+    $dao->find();
+    $results = array();
+	
+	while ($dao->fetch()) {
+      CRM_Core_DAO::storeValues($dao, $results[(int) $results->id]);
+    }
+    
+    return $results;
+  }
 }
