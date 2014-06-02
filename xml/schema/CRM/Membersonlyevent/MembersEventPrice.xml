@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Membersonlyevent</base>
+  <class>MembersEventPrice</class>
+  <name>civicrm_membersonlyevent_price</name>
+  <add>4.4</add>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique MembersEventPrice ID</comment>
+    <add>4.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>event_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Event</comment>
+    <add>4.4</add>
+  </field>
+  <foreignKey>
+    <name>event_id</name>
+    <table>civicrm_event</table>
+    <key>id</key>
+    <add>4.4</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  
+  <field>
+    <name>price_value_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Price Field Value</comment>
+    <add>4.4</add>
+  </field>
+  <foreignKey>
+    <name>price_value_id</name>
+    <table>civicrm_price_field_value</table>
+    <key>id</key>
+    <add>4.4</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  
+  <field>
+    <name>is_member_price</name>
+    <type>int unsigned</type>
+    <default>0</default>
+    <add>4.4</add>
+  </field>
+
+</table>

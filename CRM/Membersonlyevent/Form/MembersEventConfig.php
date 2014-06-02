@@ -14,7 +14,7 @@ class CRM_Membersonlyevent_Form_MembersEventConfig extends CRM_Core_Form {
     parent::preProcess();
     CRM_Utils_System::setTitle(ts('Settings - Members Only Event Configuration'));
 
-	$configValue = CRM_Membersonlyevent_BAO_MembershipConfig::getConfig();
+	$configValue = CRM_Membersonlyevent_BAO_MembersEventConfig::getConfig();
 	$this->_config = $configValue;
 
   }
@@ -57,7 +57,7 @@ class CRM_Membersonlyevent_Form_MembersEventConfig extends CRM_Core_Form {
 	  $params['duration_check'] = 0;
 	}
 	// submit to BAO for updating
-	  $set = CRM_Membersonlyevent_BAO_MembershipConfig::create($params);
+	  $set = CRM_Membersonlyevent_BAO_MembersEventConfig::create($params);
 
 	  //$url = CRM_Utils_System::url('civicrm/admin/setting/preferences/members_event_config', 'reset=1');
 	  // show message

@@ -1,1 +1,5 @@
 *.project
+.DS_Store
+bin/*
+build/*
+xml/schema/Schema.xml.inc
