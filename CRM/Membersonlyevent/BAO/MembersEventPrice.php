@@ -23,16 +23,30 @@ class CRM_Membersonlyevent_BAO_MembersEventPrice extends CRM_Membersonlyevent_DA
     return $instance;
   }
   
-  //TODO: not complete
-  public static function getPriceValue($eventIDs){
-    $dao = new CRM_Membersonlyevent_DAO_MembersEventPrice();
-    $dao->find();
-    $results = array();
-	
-	while ($dao->fetch()) {
-      CRM_Core_DAO::storeValues($dao, $results[(int) $results->id]);
+  public static function getPriceValue($eventId){
+  	
+    $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventId, NULL);
+    if ($priceSetId) {
+      if ($isQuick = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config')) {
+        $priceField = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $priceSetId, 'id', 'price_set_id');
+        $results = array();
+        $priceFieldOptions = CRM_Price_BAO_PriceFieldValue::getValues($priceField, $results, 'weight', true);
+      }
     }
     
+    return $results;
+  }
+  
+  public static function getMemberPrice($params){
+  	
+    $dao = new CRM_Membersonlyevent_DAO_MembersEventPrice();
+	$dao->copyValues($params);
+    $dao->find();
+    $results = array();
+ 	
+    while ($dao->fetch()) {
+      CRM_Core_DAO::storeValues($dao, $results[(int) $dao->id]);
+    }
     return $results;
   }
 }

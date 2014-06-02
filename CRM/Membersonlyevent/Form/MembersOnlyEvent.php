@@ -51,39 +51,21 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
       TRUE // is required
     );
     
-	//getPriceOptions();
-    /*if (count($groups) <= 10) {
-      // setting minimum height to 2 since widget looks strange when size (height) is 1
-      $groupSize = max(count($groups), 2);
-    }
-    else {
-      $groupSize = 10;
-    }*/
-    
-    //TODO:match the key
-    $groups = array(
-	    1 => "Platium Member",
-	    2 => "Golden Member",
-	    3 => "Silver Member",
-	    4 => "Public",
-	);
-    $inG = $this->addElement('advmultiselect', 'membersPrice',
+	$groups = $this->getPriceOptions();
+    $groupSize = max(count($groups), 2);
+ 
+    $inP = $this->addElement('advmultiselect', 'membersPrice',
       ts('Members\' Price(s)') . ' ',
       $groups,
       array(
-        'size' => 10,
+        'size' => $groupSize,
         'style' => 'width:auto; min-width:240px;',
         'class' => 'advmultiselect',
       )
     );
 	
-	//as we are having hidden smart group so no need.
-    //if (!$this->_searchBasedMailing) {
-      $this->addRule('membersPrice', ts('Please select a group to be mailed.'), 'required');
-    //}
-	
-	$inG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
+	$inP->setButtonAttributes('add', array('value' => ts('Add >>')));
+    $inP->setButtonAttributes('remove', array('value' => ts('<< Remove')));
 	
 	// add form rules
 	$this->addFormRule(array('CRM_Membersonlyevent_Form_MembersOnlyEvent', 'rules'));
@@ -98,10 +80,18 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     $errors = array();
 	$isPublicEvent = CRM_Utils_Array::value('members_event_type', $params);
 	$contributionPageID = CRM_Utils_Array::value('contribution_page_id', $params);
+	$memberPrice = CRM_Utils_Array::value('membersPrice', $params);
 	
-    if($isPublicEvent!=='1'){
+    if($isPublicEvent=='2'){
       if(!is_numeric($contributionPageID)){
         $errors['contribution_page_id'] = ts('Please select a contribution page.');
+      }
+    }else if($isPublicEvent=='3'){
+      if(!is_numeric($contributionPageID)){
+        $errors['contribution_page_id'] = ts('Please select a contribution page.');
+      }
+      if(!$memberPrice){
+      	$errors['membersPrice'] = ts('Please select at least one member ticket price.');
       }
     }
 	return $errors;
@@ -113,7 +103,8 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
    * @access public
    */
   function setDefaultValues() {
-      
+    $parentDefaults = parent::setDefaultValues();
+	
     $defaults = array();
     $defaults['members_event_type'] = 1;
 	
@@ -127,33 +118,19 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     
     }
     
-	//Member_price
-	/*if ($this->_id) {
-      $dao = new CRM_Mailing_DAO_MailingGroup();
-
-      $mailingGroups = array(
-        'civicrm_group' => array( ),
-        'civicrm_mailing' => array( )
-      );
-      $dao->mailing_id = $this->_mailingID;
-      $dao->find();
-      while ($dao->fetch()) {
-        // account for multi-lingual
-        // CRM-11431
-        $entityTable = 'civicrm_group';
-        if (substr($dao->entity_table, 0, 15) == 'civicrm_mailing') {
-          $entityTable = 'civicrm_mailing';
-        }
-        $mailingGroups[$entityTable][$dao->group_type][] = $dao->entity_id;
-      }
-
-      $defaults['includeGroups'] = $mailingGroups['civicrm_group']['Include'];
-
-      if (!empty($mailingGroups['civicrm_mailing'])) {
-        $defaults['includeMailings'] = CRM_Utils_Array::value('Include', $mailingGroups['civicrm_mailing']);
-      }
-    }*/
-	
+	//set default value for members price
+	if ($this->_id) {
+	  $params = array(
+	    'event_id' => $this->_id,
+	    'is_member_price' => 1
+	  );
+      $members_price = CRM_Membersonlyevent_BAO_MembersEventPrice::getMemberPrice($params);
+	  $selected_price = array();
+	  foreach ($members_price as $key => $value) {
+		  $selected_price[] = $value['price_value_id'];
+	  }
+      $defaults['membersPrice'] = $selected_price;
+    }
     return $defaults;
   }
   
@@ -172,13 +149,27 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
   }
   
   function getPriceOptions() {
-    
-    $return_array = array();
-    
-    foreach ($contribution_pages as $key => $contribution_object) {
-      $return_array[$contribution_object['id']] = $contribution_object['title'];
+
+    $eventId  = $this->_id;
+    $params   = array();
+	$return_array = array();
+
+    $price_set_id = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventId, NULL, 1);
+
+    if ($price_set_id) {
+    	//TODO:apply to price sets
+        //$defaults['price_set_id'] = $price_set_id;
     }
-    
+    else {
+      $options = CRM_Membersonlyevent_BAO_MembersEventPrice::getPriceValue($eventId);
+      foreach ($options as $optionId => $optionValue) {
+        $value = CRM_Utils_Money::format($optionValue['amount'], NULL, '%a');
+        $label = $optionValue['label'];
+        $value_id = $optionValue['id'];
+	    $return_array[$value_id] = $label.": ".$value;    
+      }
+    }
+
     return $return_array;
   }
 
@@ -200,13 +191,40 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     // Create or edit the values
     CRM_Membersonlyevent_BAO_MembersOnlyEvent::create($params);
 	
-	$priceParams['event_id'] = $passed_values['id'];
-	foreach ($passed_values['membersPrice'] as $key => $value) {
-		$priceParams['price_value_id'] = $value;
-		$priceParams['is_member_price'] = 1;
-		CRM_Membersonlyevent_BAO_MembersEventPrice::create($priceParams);
-	}
     
+		
+	$value_list = $this->getPriceOptions();
+	$priceCount = 1;
+	foreach ($passed_values['membersPrice'] as $priceKey => $priceValue) {
+		$priceParams[$priceCount]['event_id'] = $passed_values['id'];
+		$priceParams[$priceCount]['price_value_id'] = $priceValue;
+		$exist_price = CRM_Membersonlyevent_BAO_MembersEventPrice::getMemberPrice($priceParams[$priceCount]);
+		if($exist_price){
+		  foreach ($exist_price as $key => $value) {
+		    $priceParams[$priceCount]['id'] = $value['id'];
+	      }
+		}
+		$priceParams[$priceCount]['is_member_price'] = 1;
+		CRM_Membersonlyevent_BAO_MembersEventPrice::create($priceParams[$priceCount]);
+		unset($value_list[$priceValue]);
+		$priceCount++;
+	}
+	
+	var_dump($value_list);
+	
+	foreach ($value_list as $priceKey => $priceValue) {
+		$priceParams[$priceCount]['event_id'] = $passed_values['id'];
+        $priceParams[$priceCount]['price_value_id'] = $priceKey;
+		$exist_price = CRM_Membersonlyevent_BAO_MembersEventPrice::getMemberPrice($priceParams[$priceCount]);
+		if($exist_price){
+		  foreach ($exist_price as $key => $value) {
+		    $priceParams[$priceCount]['id'] = $value['id'];
+	      }
+		}
+		$priceParams[$priceCount]['is_member_price'] = 0;
+		CRM_Membersonlyevent_BAO_MembersEventPrice::create($priceParams[$priceCount]);
+		$priceCount++;
+	}
     parent::postProcess();
   }
 
