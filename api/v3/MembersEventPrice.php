@@ -10,6 +10,8 @@
  */
 function _civicrm_api3_members_event_price_create_spec(&$spec) {
   // $spec['some_parameter']['api.required'] = 1;
+  $spec['event_id']['api.required'] = 1;
+  $spec['price_value_id']['api.required'] = 1;
 }
 
 /**
