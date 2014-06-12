@@ -94,6 +94,8 @@
     {if $priceSet}
       {if ! $quickConfig}<fieldset id="priceset" class="crm-group priceset-group">
         <legend>{$event.fee_label}</legend>{/if}
+        
+        {* TODO: might add test here as well *}
       {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
       {include file="CRM/Price/Form/ParticipantCount.tpl"}
       {if ! $quickConfig}</fieldset>{/if}
@@ -137,7 +139,14 @@
     {* User account registration option. Displays if enabled for one of the profiles on this page. *}
     {include file="CRM/common/CMSUser.tpl"}
 
+    <div id="user_profile" name="user_profile" style="display:none;">
+
     {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+    
+    {* TODO: Finish profile switch *}
+    {include file="CRM/Event/Form/members-event-profile.tpl"}
+
+    </div>
 
     {if $form.payment_processor.label}
       <fieldset class="crm-group payment_options-group" style="display:none;">
@@ -157,7 +166,7 @@
       {/if}
     </div>
     {include file="CRM/common/paymentBlock.tpl"}
-
+    
     {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
 
     {if $isCaptcha}
@@ -176,6 +185,11 @@
   </div>
   <script type="text/javascript">
     {literal}
+
+    cj(document).ready(function(){
+      checkMemberPrice();
+    });
+
     function toggleConfirmButton() {
       var payPalExpressId = "{/literal}{$payPalExpressId}{literal}";
       var elementObj = cj('input[name="payment_processor"]');
@@ -228,8 +242,9 @@
     }
 
     cj('#priceset input, #priceset select').change(function () {
-      skipPaymentMethod();
-    });
+        checkMemberEvent();
+        skipPaymentMethod();
+      });
 
     {/literal}
   </script>
@@ -358,6 +373,117 @@
     }
   }
   {/literal}{/if}{literal}
+
+  //TODO:assign this argument from PHP
+  function checkMemberEvent() {
+
+    var event_id = '{/literal}{$event.id}{literal}';
+    var result = false;
+
+    CRM.api('MembersOnlyEvent', 'get', {'version' : '3', 'event_id' : event_id}
+      ,{
+        success:function(data){
+        if(data["values"] == undefined || data["values"] == null || data["values"].length == 0){
+          result = false;
+          fieldsAction(3);
+          cj('#user_profile').show();
+        }else{
+          cj.each(data['values'], function(key, value) {
+            if(value.members_event_type==1){
+              result = false;
+              fieldsAction(3);
+              cj('#user_profile').show();
+            }else{
+              result = true;
+              checkMemberPrice();
+            }
+          });
+        }
+      },
+
+      error: function(){
+        result = false;
+        fieldsAction(3);
+        cj('#user_profile').show();
+      }
+    });
+  }
+  //TODO:maybe add a configuration in admin to enable the switch of letting member email be used for additional participants as well
+
+  function checkMemberPrice() {
+
+    var event_id = '{/literal}{$event.id}{literal}';
+    var pfv_id = cj('#priceset input:checked').attr('value');
+    var result = false;
+
+    CRM.api('MembersEventPrice', 'get', {'version' : '3', 'event_id' : event_id, 'price_value_id' : pfv_id}
+      ,{success:function(data){
+        if(data["values"] == undefined || data["values"] == null || data["values"].length == 0){
+          fieldsAction(2);
+          fieldsAction(3);
+          cj('#members-only-event-profile').hide();
+          cj('#user_profile').show();
+          result = false;
+        }else{
+          cj.each(data['values'], function(key, value) {
+            if(value.is_member_price==1){
+              fieldsAction(1);
+              cj('#members-only-event-profile').show();
+              cj('#user_profile').show();
+              result = true;
+            }else{
+              fieldsAction(2);
+              fieldsAction(3);
+              cj('#members-only-event-profile').hide();
+              cj('#user_profile').show();
+              rresult = false;
+            }
+          });
+        }
+      },
+
+      error: function(){
+        fieldsAction(2);
+        fieldsAction(3);
+        cj('#members-only-event-profile').hide();
+        cj('#user_profile').show();
+        result = false;
+      }
+    });
+
+    return result;
+  }
+
+  function fieldsAction(test){
+    cj("[name='first_name']").val("");
+    cj("[name='last_name']").val("");
+    cj("[name='email-Primary']").val("");
+    cj("[name='member_ID']").val("");
+    cj("[name='member_name']").val("");
+    cj('#membership_result').hide(); 
+    cj('#editrow-mem_name').hide();
+    cj('#check_membership').attr('value', 'Check Membership');
+    cj("[name='member_ID']").removeAttr('disabled');
+    cj("[name='member_name']").removeAttr('disabled');
+    cj("[name='member_ID']").attr('style', 'background:white');
+    cj("[name='member_name']").attr('style', 'background:white');
+    if(test==1){
+      cj('#editrow-first_name').hide();
+      cj('#editrow-last_name').hide();
+      cj('#editrow-email-Primary').hide();
+    }else if(test==2){
+      cj("[name='first_name']").removeAttr('disabled');
+      cj("[name='last_name']").removeAttr('disabled');
+      cj("[name='email-Primary']").removeAttr('disabled');
+      cj("[name='first_name']").attr('style', 'background:white');
+      cj("[name='last_name']").attr('style', 'background:white');
+      cj("[name='email-Primary']").attr('style', 'background:white');
+    }else if(test==3){
+      cj('#editrow-first_name').show();
+      cj('#editrow-last_name').show();
+      cj('#editrow-email-Primary').show();
+    }
+  }
 
 </script>
 {/literal}
