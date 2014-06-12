@@ -330,3 +330,25 @@ function membersonlyevent_civicrm_navigationMenu( &$params ) {
 	);
   }
 }
+  
+ /**
+ * Implementation of hook_civicrm_entityTypes
+ */
+function membersonlyevent_civicrm_entityTypes(&$entityTypes) {
+  $entityTypes[] = array(
+    'name' => 'MembersOnlyEvent',
+    'class' => 'CRM_Membersonlyevent_DAO_MembersOnlyEvent',
+    'table' => 'civicrm_membersonlyevent',
+  );
+  $entityTypes[] = array(
+    'name' => 'MembersEventConfig',
+    'class' => 'CRM_Membersonlyevent_DAO_MembersEventConfig',
+    'table' => 'civicrm_membersonlyevent_config',
+  );
+  $entityTypes[] = array(
+    'name' => 'MembersEventPrice',
+    'class' => 'CRM_Membersonlyevent_DAO_MembersEventPrice',
+    'table' => 'civicrm_membersonlyevent_price',
+  );
+}
+

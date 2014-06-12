@@ -10,6 +10,9 @@
  */
 function _civicrm_api3_members_only_event_create_spec(&$spec) {
   // $spec['some_parameter']['api.required'] = 1;
+  $spec['event_id']['api.required'] = 1;
+  $spec['contribution_page_id']['api.required'] = 1;
+  $spec['members_event_type']['api.required'] = 1;
 }
 
 /**
