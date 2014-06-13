@@ -463,8 +463,8 @@
     cj('#membership_result').hide(); 
     cj('#editrow-mem_name').hide();
     cj('#check_membership').attr('value', 'Check Membership');
-    cj("[name='member_ID']").removeAttr('disabled');
-    cj("[name='member_name']").removeAttr('disabled');
+    cj("[name='member_ID']").removeAttr('readonly');
+    cj("[name='member_name']").removeAttr('readonly');
     cj("[name='member_ID']").attr('style', 'background:white');
     cj("[name='member_name']").attr('style', 'background:white');
     if(test==1){
@@ -472,9 +472,9 @@
       cj('#editrow-last_name').hide();
       cj('#editrow-email-Primary').hide();
     }else if(test==2){
-      cj("[name='first_name']").removeAttr('disabled');
-      cj("[name='last_name']").removeAttr('disabled');
-      cj("[name='email-Primary']").removeAttr('disabled');
+      cj("[name='first_name']").removeAttr('readonly');
+      cj("[name='last_name']").removeAttr('readonly');
+      cj("[name='email-Primary']").removeAttr('readonly');
       cj("[name='first_name']").attr('style', 'background:white');
       cj("[name='last_name']").attr('style', 'background:white');
       cj("[name='email-Primary']").attr('style', 'background:white');
