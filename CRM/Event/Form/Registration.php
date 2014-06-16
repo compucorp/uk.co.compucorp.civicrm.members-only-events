@@ -55,6 +55,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @protected
    */
   public $_eventId;
+  
+  /**
+   * the type of the event we are proceessing
+   *
+   * @var int
+   * @protected
+   */
+  public $_membersEventType;
 
   /**
    * the array of ids of all the participant we are proceessing
@@ -196,6 +204,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   function preProcess() {
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+	
+	//membersonlyevent
+	$this->_membersEventType = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_eventId)->members_event_type;
+	$this->assign('membersEventType', $this->_membersEventType);
 
     //CRM-4320
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);

@@ -139,14 +139,20 @@
     {* User account registration option. Displays if enabled for one of the profiles on this page. *}
     {include file="CRM/common/CMSUser.tpl"}
 
+    {if $membersEventType == 2 || $membersEventType == 3}
+
     <div id="user_profile" name="user_profile" style="display:none;">
+
+    {/if}
 
     {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
     
-    {* TODO: Finish profile switch *}
+    {if $membersEventType == 2 || $membersEventType == 3}
+
     {include file="CRM/Event/Form/members-event-profile.tpl"}
 
     </div>
+    {/if}
 
     {if $form.payment_processor.label}
       <fieldset class="crm-group payment_options-group" style="display:none;">
@@ -242,7 +248,7 @@
     }
 
     cj('#priceset input, #priceset select').change(function () {
-        checkMemberEvent();
+        checkMemberPrice();
         skipPaymentMethod();
       });
 

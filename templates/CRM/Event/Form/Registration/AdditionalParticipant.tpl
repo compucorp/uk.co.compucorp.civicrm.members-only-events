@@ -71,14 +71,21 @@
     </tr>
 </table>
 
+{if $membersEventType == 2 || $membersEventType == 3}
+
 <div id="user_profile" name="user_profile" style="display:none;">
+
+{/if}
 
     {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
     
-    {* TODO: Finish profile switch *}
+{if $membersEventType == 2 || $membersEventType == 3}
+
     {include file="CRM/Event/Form/members-event-profile.tpl"}
 
 </div>
+
+{/if}
 
 {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost}
 
@@ -95,7 +102,7 @@ cj(document).ready(function(){
 });
 
 cj('#priceset input, #priceset select').change(function () {
-        checkMemberEvent();
+        checkMemberPrice();
 });
 
 {/literal}

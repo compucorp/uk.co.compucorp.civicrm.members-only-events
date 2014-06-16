@@ -109,7 +109,7 @@ function search_membership(){
         });
 }
 
-//TODO:assign this argument from PHP
+/*TODO:assign this argument from PHP
   function checkMemberEvent() {
 
     var event_id = '{/literal}{$event.id}{literal}';
@@ -142,7 +142,8 @@ function search_membership(){
         cj('#user_profile').show();
       }
     });
-  }
+  }*/
+  
   //TODO:maybe add a configuration in admin to enable the switch of letting member email be used for additional participants as well
 
   function checkMemberPrice() {
@@ -171,7 +172,7 @@ function search_membership(){
               fieldsAction(3);
               cj('#members-only-event-profile').hide();
               cj('#user_profile').show();
-              rresult = false;
+              result = false;
             }
           });
         }
