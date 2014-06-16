@@ -139,7 +139,7 @@
     {* User account registration option. Displays if enabled for one of the profiles on this page. *}
     {include file="CRM/common/CMSUser.tpl"}
 
-    {if $membersEventType == 2 || $membersEventType == 3}
+    {if $membersEventType == 3}
 
     <div id="user_profile" name="user_profile" style="display:none;">
 
@@ -147,7 +147,7 @@
 
     {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
     
-    {if $membersEventType == 2 || $membersEventType == 3}
+    {if $membersEventType == 3}
 
     {include file="CRM/Event/Form/members-event-profile.tpl"}
 

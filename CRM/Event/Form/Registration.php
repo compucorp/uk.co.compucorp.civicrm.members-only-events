@@ -206,7 +206,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
 	
 	//membersonlyevent
-	$this->_membersEventType = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_eventId)->members_event_type;
+	$this->_membersEventType = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_eventId)->members_event_type;dpm($this->_membersEventType);
 	$this->assign('membersEventType', $this->_membersEventType);
 
     //CRM-4320

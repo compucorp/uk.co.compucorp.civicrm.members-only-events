@@ -2,12 +2,13 @@
 <div id="members-only-event-profile" name="members-only-event-profile">
   <div class="crm-section editrow_a-section form-item" id="editrow-mem_ID">
     <div class="label">
-      Membership ID:
+      {$form.member_ID.label}
       <span class="crm-marker" title="This field is required.">*</span>
     </div>
     <div class="content">
-      <input maxlength="64" size="30" name="member_ID" type="text" value="" id="member_ID" class="form-text big required">
-      <input type='button' id='check_membership' name='check_membership' value='Check Membership'>
+      {$form.member_ID.html}
+      <input type='button' id='check_membership' name='check_membership' value='Search Member'>
+      <input maxlength="64" size="30" name="exist_ID" type="text" value="" id="exist_ID" style="display:none" >
       <div id='membership_result'></div>  
     </div>
     <div class="clear"></div>
@@ -28,6 +29,7 @@
     cj(document).ready(function() {
         cj('#members-only-event-profile').hide();
         fieldsAction(1);
+        cj("[name='exist_ID']").attr('disabled','disabled');
 
         //result texts
         var checking_html = 'Checking...';  
@@ -35,7 +37,7 @@
         //when button is clicked  
         cj('#check_membership').click(function(){  
           //else show the cheking_text and run the function to check
-          if(cj(this).attr("value") == "Check Membership"){
+          if(cj(this).attr("value") == "Search Member"){
             cj('#membership_result').show(); 
             cj('#membership_result').html(checking_html);  
             search_membership();
@@ -43,6 +45,8 @@
             cj('#editrow-first_name').hide();
             cj('#editrow-last_name').hide();
             cj('#editrow-email-Primary').hide();
+            cj("[name='exist_ID']").attr('disabled','disabled');
+            cj("[name='exist_ID']").val("");
 
             fieldsAction(2);
           }
@@ -72,6 +76,8 @@ function search_membership(){
                 cj("[name='first_name']").val(value.first_name);
                 cj("[name='last_name']").val(value.last_name);
                 cj("[name='email-Primary']").val(value.email);
+                cj("[name='exist_ID']").val(value.id);
+                cj("[name='exist_ID']").removeAttr('disabled');
                 
                 cj('#editrow-mem_name').show();
 
@@ -198,7 +204,7 @@ function search_membership(){
     cj("[name='member_name']").val("");
     cj('#membership_result').hide(); 
     cj('#editrow-mem_name').hide();
-    cj('#check_membership').attr('value', 'Check Membership');
+    cj('#check_membership').attr('value', 'Search Member');
     cj("[name='member_ID']").removeAttr('readonly');
     cj("[name='member_name']").removeAttr('readonly');
     cj("[name='member_ID']").attr('style', 'background:white');
