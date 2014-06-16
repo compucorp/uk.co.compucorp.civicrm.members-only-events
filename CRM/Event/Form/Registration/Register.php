@@ -84,7 +84,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     //here we can't use parent $this->_allowWaitlist as user might
     //walk back and we maight set this value in this postProcess.
     //(we set when spaces < group count and want to allow become part of waiting )
-    $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId, FALSE, CRM_Utils_Array::value('has_waitlist', $this->_values['event']));//dpm($this);
+    $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId, FALSE, CRM_Utils_Array::value('has_waitlist', $this->_values['event']));
 
     // Get payment processors if appropriate for this event
     // We hide the payment fields if the event is full or requires approval,
@@ -775,7 +775,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {dpm($fields);
+  static function formRule($fields, $files, $self) {
     $errors = array();
     //check that either an email or firstname+lastname is included in the form(CRM-9587)
     self::checkProfileComplete($fields, $errors, $self->_eventId);

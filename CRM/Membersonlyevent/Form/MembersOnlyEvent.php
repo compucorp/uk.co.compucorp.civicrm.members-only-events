@@ -24,7 +24,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
    */
   //public function preProcess() {
   	//$this->$_eventID = CRM_Utils_Request::retrieve('id', 'Integer', $this, FALSE, NULL);
-  	//dpm($_eventID);
+  	
   //}
   
   /**
