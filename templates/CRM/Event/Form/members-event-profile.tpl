@@ -114,41 +114,6 @@ function search_membership(){
 
         });
 }
-
-/*TODO:assign this argument from PHP
-  function checkMemberEvent() {
-
-    var event_id = '{/literal}{$event.id}{literal}';
-    var result = false;
-
-    CRM.api('MembersOnlyEvent', 'get', {'version' : '3', 'event_id' : event_id}
-      ,{
-        success:function(data){
-        if(data["values"] == undefined || data["values"] == null || data["values"].length == 0){
-          result = false;
-          fieldsAction(3);
-          cj('#user_profile').show();
-        }else{
-          cj.each(data['values'], function(key, value) {
-            if(value.members_event_type==1){
-              result = false;
-              fieldsAction(3);
-              cj('#user_profile').show();
-            }else{
-              result = true;
-              checkMemberPrice();
-            }
-          });
-        }
-      },
-
-      error: function(){
-        result = false;
-        fieldsAction(3);
-        cj('#user_profile').show();
-      }
-    });
-  }*/
   
   //TODO:maybe add a configuration in admin to enable the switch of letting member email be used for additional participants as well
 
@@ -226,8 +191,6 @@ function search_membership(){
       cj('#editrow-email-Primary').show();
     }
   }
-//TODO: Fix required field for Membership ID (need to check membership before submit);
-//TODO: Fix duplicated ticket purchase checking;
 
 </script>
 {/literal}
