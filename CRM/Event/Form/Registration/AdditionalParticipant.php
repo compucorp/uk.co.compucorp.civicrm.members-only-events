@@ -365,6 +365,15 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
     }
     $this->addButtons($buttons);
+	
+	if($this->_membersEventType == 3){
+		$this->add(
+      		'text', // field type
+      		'member_ID', // field name
+      		ts('Membership ID: ')// field label
+    	);
+	}
+	
     $this->addFormRule(array('CRM_Event_Form_Registration_AdditionalParticipant', 'formRule'), $this);
   }
 
@@ -515,6 +524,23 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     elseif ($button == 'skip') {
       $self->set('forcePayement', TRUE);
     }
+
+	//membersonlyevent
+    if($self->_membersEventType == 3){
+    	$pfvId = key(CRM_Utils_Array::value('price_7', $fields));
+    	$pfvParams = array(
+    		'price_value_id' => $pfvId,
+    		'event_id' => $self->_eventId,
+		);
+		
+    	$priceFieldValues = CRM_Membersonlyevent_BAO_MembersEventPrice::getMemberPrice($pfvParams);
+		$priceFieldValue = current($priceFieldValues);
+        if($self->_membersEventType == 3 && $priceFieldValue["is_member_price"] == 1){
+            if(!CRM_Utils_Array::value('exist_ID', $fields)||!CRM_Utils_Array::value('member_ID', $fields)){
+            	$errors['member_ID'] = ts('Please enter a valid member ID and Search');
+            }
+		}
+	}
 
     return $errors;
   }

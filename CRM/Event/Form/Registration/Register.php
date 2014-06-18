@@ -84,7 +84,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     //here we can't use parent $this->_allowWaitlist as user might
     //walk back and we maight set this value in this postProcess.
     //(we set when spaces < group count and want to allow become part of waiting )
-    $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId, FALSE, CRM_Utils_Array::value('has_waitlist', $this->_values['event']));//dpm($this);
+    $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId, FALSE, CRM_Utils_Array::value('has_waitlist', $this->_values['event']));
 
     // Get payment processors if appropriate for this event
     // We hide the payment fields if the event is full or requires approval,
@@ -450,7 +450,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->assign('showHidePaymentInformation', $showHidePaymentInformation);
 
     $userID = $this->getContactID();
-
+//guanhuan:first
     if (!$userID) {
       $createCMSUser = FALSE;
 
@@ -521,6 +521,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         )
       );
     }
+	
+	if($this->_membersEventType == 3){
+		$this->add(
+      		'text', // field type
+      		'member_ID', // field name
+      		ts('Membership ID: ')// field label
+    	);
+	}
 
     $this->addFormRule(array('CRM_Event_Form_Registration_Register', 'formRule'), $this);
 
@@ -839,6 +847,20 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
+	//membersonlyevent (if the memeber is allowed to register for event more than once)
+	if($self->_membersEventType == 3){
+		CRM_Event_Form_Registration_Register::checkProfileComplete($fields, $errors, $self->_eventId);
+
+    	$isRegistered = CRM_Event_Form_Registration_Register::checkRegistration($fields, $self, TRUE);
+    	if ($isRegistered) {
+      		if ($self->_values['event']['allow_same_participant_emails']) {
+        		$errors['_qf_default'] = ts('A person is already registered for this event.');
+      		}else {
+        		$errors["email-{$self->_bltID}"] = ts('A person with this email address is already registered for this event.');
+      		}
+    	}
+	}
+
     if ($self->_values['event']['is_monetary']) {
       if (empty($self->_requireApproval) && $fields['amount'] > 0 && !isset($fields['payment_processor'])) {
         $errors['payment_processor'] = ts('Please select a Payment Method');
@@ -900,6 +922,23 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
       CRM_Core_Payment_Form::validateCreditCard($fields, $errors);
     }
+
+    //membersonlyevent
+    if($self->_membersEventType == 3){
+    	$pfvId = key(CRM_Utils_Array::value('price_7', $fields));
+    	$pfvParams = array(
+    		'price_value_id' => $pfvId,
+    		'event_id' => $self->_eventId,
+		);
+		
+    	$priceFieldValues = CRM_Membersonlyevent_BAO_MembersEventPrice::getMemberPrice($pfvParams);
+		$priceFieldValue = current($priceFieldValues);
+        if($self->_membersEventType == 3 && $priceFieldValue["is_member_price"] == 1){
+            if(!CRM_Utils_Array::value('exist_ID', $fields)||!CRM_Utils_Array::value('member_ID', $fields)){
+            	$errors['member_ID'] = ts('Please enter a valid member ID and Search');
+            }
+		}
+	}
 
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
       if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
@@ -1362,7 +1401,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return void
    * @access public
    */
-   //TODO: Add the verification for members as well
   static function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
     // CRM-3907, skip check for preview registrations
     // CRM-4320 participant need to walk wizard

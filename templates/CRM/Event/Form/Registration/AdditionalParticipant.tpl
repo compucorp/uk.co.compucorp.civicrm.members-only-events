@@ -71,7 +71,22 @@
     </tr>
 </table>
 
-{include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
+{if $membersEventType == 3}
+
+<div id="user_profile" name="user_profile" style="display:none;">
+
+{/if}
+
+    {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
+    
+{if $membersEventType == 3}
+
+    {include file="CRM/Event/Form/members-event-profile.tpl"}
+
+</div>
+
+{/if}
+
 {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost}
 
 <div id="crm-submit-buttons">
@@ -79,9 +94,22 @@
 </div>
 </div>
 
-{if $priceSet && $allowGroupOnWaitlist}
-{literal}
 <script type="text/javascript">
+{literal}
+
+cj(document).ready(function(){
+      checkMemberPrice();
+});
+
+cj('#priceset input, #priceset select').change(function () {
+        checkMemberPrice();
+});
+
+{/literal}
+</script>
+{if $priceSet && $allowGroupOnWaitlist}
+<script type="text/javascript">
+{literal}
 
 function allowGroupOnWaitlist( participantCount, currentCount )
 {
