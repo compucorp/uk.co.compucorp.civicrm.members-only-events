@@ -847,6 +847,20 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
+	//membersonlyevent (if the memeber is allowed to register for event more than once)
+	if($self->_membersEventType == 3){
+		CRM_Event_Form_Registration_Register::checkProfileComplete($fields, $errors, $self->_eventId);
+
+    	$isRegistered = CRM_Event_Form_Registration_Register::checkRegistration($fields, $self, TRUE);
+    	if ($isRegistered) {
+      		if ($self->_values['event']['allow_same_participant_emails']) {
+        		$errors['_qf_default'] = ts('A person is already registered for this event.');
+      		}else {
+        		$errors["email-{$self->_bltID}"] = ts('A person with this email address is already registered for this event.');
+      		}
+    	}
+	}
+
     if ($self->_values['event']['is_monetary']) {
       if (empty($self->_requireApproval) && $fields['amount'] > 0 && !isset($fields['payment_processor'])) {
         $errors['payment_processor'] = ts('Please select a Payment Method');
