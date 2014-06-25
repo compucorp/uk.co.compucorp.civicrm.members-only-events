@@ -119,44 +119,29 @@ function search_membership(){
 
   function checkMemberPrice() {
 
-    var event_id = '{/literal}{$event.id}{literal}';
+    var event_id = {/literal}{$event.id}{literal};
     var pfv_id = cj('#priceset input:checked').attr('value');
     var result = false;
-
-    CRM.api('MembersEventPrice', 'get', {'version' : '3', 'event_id' : event_id, 'price_value_id' : pfv_id}
-      ,{success:function(data){
-        if(data["values"] == undefined || data["values"] == null || data["values"].length == 0){
-          fieldsAction(2);
-          fieldsAction(3);
-          cj('#members-only-event-profile').hide();
-          cj('#user_profile').show();
-          result = false;
-        }else{
-          cj.each(data['values'], function(key, value) {
-            if(value.is_member_price==1){
-              fieldsAction(1);
-              cj('#members-only-event-profile').show();
-              cj('#user_profile').show();
-              result = true;
-            }else{
-              fieldsAction(2);
-              fieldsAction(3);
-              cj('#members-only-event-profile').hide();
-              cj('#user_profile').show();
-              result = false;
-            }
-          });
-        }
-      },
-
-      error: function(){
-        fieldsAction(2);
-        fieldsAction(3);
-        cj('#members-only-event-profile').hide();
-        cj('#user_profile').show();
-        result = false;
+    var pfv_type = 0;
+    {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
+      if(pfv_id=={/literal}{$priceId}{literal}){
+        pfv_type = {/literal}{$priceType}{literal};
       }
-    });
+    {/literal}{/foreach}{literal}
+    console.log({/literal}{$membersPriceOptions}{literal});
+
+    if(pfv_type==1){
+      fieldsAction(1);
+      cj('#members-only-event-profile').show();
+      cj('#user_profile').show();
+      result = true;
+    }else{
+      fieldsAction(2);
+      fieldsAction(3);
+      cj('#members-only-event-profile').hide();
+      cj('#user_profile').show();
+      result = false;
+    }
 
     return result;
   }

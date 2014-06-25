@@ -925,7 +925,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     //membersonlyevent
     if($self->_membersEventType == 3){
-    	$pfvId = key(CRM_Utils_Array::value('price_7', $fields));
+    	$pfvId = key(CRM_Utils_Array::value('price_'.$self->_priceFieldId, $fields));
     	$pfvParams = array(
     		'price_value_id' => $pfvId,
     		'event_id' => $self->_eventId,

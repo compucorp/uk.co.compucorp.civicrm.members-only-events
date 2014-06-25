@@ -63,6 +63,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @protected
    */
   public $_membersEventType;
+  
+  /**
+   * the price options of the event we are proceessing
+   *
+   * @var array
+   * @protected
+   */
+   
+  public $_membersEventPrices = array();
 
   /**
    * the array of ids of all the participant we are proceessing
@@ -70,6 +79,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @var int
    * @protected
    */
+ 
   protected $_participantIDS = NULL;
 
   /**
@@ -176,6 +186,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @protected
    */
   public $_priceSet;
+  
+  public $_priceFieldId;
 
   public $_action;
 
@@ -208,6 +220,16 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 	//membersonlyevent
 	$this->_membersEventType = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_eventId)->members_event_type;
 	$this->assign('membersEventType', $this->_membersEventType);
+	
+	$this->_membersEventPrices = CRM_Membersonlyevent_BAO_MembersEventPrice::getMemberPrice(array('event_id' => $this->_eventId));
+	$priceOptions = array();
+	foreach ($this->_membersEventPrices as $key => $value) {
+		$priceOptions[$value["price_value_id"]] = $value["is_member_price"];
+		$pfvId = $value["price_value_id"];
+	}
+	$this->assign('membersPriceOptions', $priceOptions);
+	$currentEvent = civicrm_api3('PriceFieldValue', 'get', array('id' => $pfvId));
+	$this->_priceFieldId = $currentEvent["values"][$pfvId]["price_field_id"];
 
     //CRM-4320
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
