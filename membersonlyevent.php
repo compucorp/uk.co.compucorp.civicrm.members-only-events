@@ -198,9 +198,6 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
     }
   }
   
-  $notification = 'Congratulations!';
-  $infoText = 'You meet the condition for this event.';
-  
   // Hide register now button, if the event is members only event and user has no permissions to register for the event
   if (is_object($members_only_event) && $members_only_event->members_event_type !== 1) {
   	
@@ -241,15 +238,11 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
         
         CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
           
-      }
+      }else{
 	  
 	  if(!CRM_Core_Permission::check('members only event registration')){
-	  	$notification = 'Sorry.';
-	  	$infoText = 'You need to become a member to for register this event.';
 		$button_text = ts('Become a member to register for this event');
 	  }else if((CRM_Core_Permission::check('members only event registration')&&!$durationCheck)){
-	  	$notification = 'Sorry.';
-	  	$infoText = 'Your membership expires before the event start. Please extend your membership to register for this event.';
 		$button_text = ts('Extend your membership to register for this event');
 	  }
     	
@@ -275,6 +268,7 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
       $snippet['weight'] = -10;
            
       CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
+      }
       
     }else{
     	if($members_only_event->members_event_type == 3){
@@ -310,7 +304,6 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
       CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
   	}
     }
-    CRM_Core_Session::setStatus(ts($infoText), ts($notification), 'error');
   }
 }
 
