@@ -29,7 +29,7 @@
     cj(document).ready(function() {
         cj('#members-only-event-profile').hide();
         fieldsAction(1);
-        cj("[name='exist_ID']").attr('disabled','disabled');
+        cj("[id='exist_ID']").attr('disabled','disabled');
 
         //result texts
         var checking_html = 'Checking...';  
@@ -45,8 +45,8 @@
             cj('#editrow-first_name').hide();
             cj('#editrow-last_name').hide();
             cj('#editrow-email-Primary').hide();
-            cj("[name='exist_ID']").attr('disabled','disabled');
-            cj("[name='exist_ID']").val("");
+            cj("[id='exist_ID']").attr('disabled','disabled');
+            cj("[id='exist_ID']").val("");
 
             fieldsAction(2);
           }
@@ -62,57 +62,48 @@ function search_membership(){
         if(!cj.isNumeric(memberID)){
           memberID = 0;
         }
-  
-        CRM.api('Contact','get',{'version' :'3', 'id' : memberID}
-          ,{ success:function (data){
-            if(data["values"] == undefined || data["values"] == null || data["values"].length == 0){
-              cj('#membership_result').html("Not a valid membership ID.");
-            }else{
-              cj.each(data['values'], function(key, value) {
-                //result texts
-                cj("[name='member_name']").val(value.display_name);
-                cj('#membership_result').html("Successful.");
 
-                cj("[name='first_name']").val(value.first_name);
-                cj("[name='last_name']").val(value.last_name);
-                cj("[name='email-Primary']").val(value.email);
-                cj("[name='exist_ID']").val(value.id);
-                cj("[name='exist_ID']").removeAttr('disabled');
+        if({/literal}{$calls->getContact(2)}{literal}==1){
+          cj("[id='mem_name']").val('{/literal}{$calls->_displayname}{literal}');
+          cj('#membership_result').html("Successful.");
+
+          cj("[id='first_name']").val('{/literal}{$calls->_firstname}{literal}');
+          cj("[id='last_name']").val('{/literal}{$calls->_lastname}{literal}');
+          cj("[id='email-Primary']").val('{/literal}{$calls->_email}{literal}');
+          cj("[id='exist_ID']").val(2);
+          cj("[id='exist_ID']").removeAttr('disabled');
                 
-                cj('#editrow-mem_name').show();
+          cj('#editrow-mem_name').show();
 
-                cj('#editrow-first_name').show();
-                cj('#editrow-last_name').show();
-                cj('#editrow-email-Primary').show();
+          cj('#editrow-first_name').show();
+          cj('#editrow-last_name').show();
+          cj('#editrow-email-Primary').show();
 
-                cj("[name='member_ID']").attr('readonly','readonly');
-                cj("[name='member_ID']").attr('style', 'background:#C0C0C0');
-                cj("[name='member_name']").attr('readonly','readonly');
-                cj("[name='member_name']").attr('style', 'background:#C0C0C0');
+          cj("[id='member_ID']").attr('readonly','readonly');
+          cj("[id='member_ID']").attr('style', 'background:#C0C0C0');
+          cj("[id='mem_name']").attr('readonly','readonly');
+          cj("[id='mem_name']").attr('style', 'background:#C0C0C0');
 
-                var fields = new Array(
-                  cj("[name='first_name']"),
-                  cj("[name='last_name']"),
-                  cj("[name='email-Primary']")
-                );
+          var fields = new Array(
+            cj("[id='first_name']"),
+            cj("[id='last_name']"),
+            cj("[id='email-Primary']")
+          );
 
-                cj.each(fields, function(key, value){
-                  if(cj.trim(value.val())){
-                    value.attr('readonly','readonly');
-                    value.attr('style', 'background:#C0C0C0');
-                  }
-                });
-
-                cj("#check_membership").attr('value', 'Reset');
-              });
+          cj.each(fields, function(key, value){
+            if(cj.trim(value.val())){
+              value.attr('readonly','readonly');
+              value.attr('style', 'background:#C0C0C0');
             }
-          },
-          error: function(){
-            //result texts
-            cj('#membership_result').html("Fail.");
-          }
+          });
 
-        });
+          cj("#check_membership").attr('value', 'Reset');
+          
+        }else{
+          cj('#membership_result').html("Not a valid membership ID.");
+          cj("[id='exist_ID']").attr('disabled','disabled');
+        }
+
 }
   
   //TODO:maybe add a configuration in admin to enable the switch of letting member email be used for additional participants as well
@@ -128,7 +119,6 @@ function search_membership(){
         pfv_type = {/literal}{$priceType}{literal};
       }
     {/literal}{/foreach}{literal}
-    console.log({/literal}{$membersPriceOptions}{literal});
 
     if(pfv_type==1){
       fieldsAction(1);
@@ -147,29 +137,29 @@ function search_membership(){
   }
 
   function fieldsAction(test){
-    cj("[name='first_name']").val("");
-    cj("[name='last_name']").val("");
-    cj("[name='email-Primary']").val("");
-    cj("[name='member_ID']").val("");
-    cj("[name='member_name']").val("");
+    cj("[id='first_name']").val("");
+    cj("[id='last_name']").val("");
+    cj("[id='email-Primary']").val("");
+    cj("[id='member_ID']").val("");
+    cj("[id='mem_name']").val("");
     cj('#membership_result').hide(); 
     cj('#editrow-mem_name').hide();
     cj('#check_membership').attr('value', 'Search Member');
-    cj("[name='member_ID']").removeAttr('readonly');
-    cj("[name='member_name']").removeAttr('readonly');
-    cj("[name='member_ID']").attr('style', 'background:white');
-    cj("[name='member_name']").attr('style', 'background:white');
+    cj("[id='member_ID']").removeAttr('readonly');
+    cj("[id='mem_name']").removeAttr('readonly');
+    cj("[id='member_ID']").attr('style', 'background:white');
+    cj("[id='mem_name']").attr('style', 'background:white');
     if(test==1){
       cj('#editrow-first_name').hide();
       cj('#editrow-last_name').hide();
       cj('#editrow-email-Primary').hide();
     }else if(test==2){
-      cj("[name='first_name']").removeAttr('readonly');
-      cj("[name='last_name']").removeAttr('readonly');
-      cj("[name='email-Primary']").removeAttr('readonly');
-      cj("[name='first_name']").attr('style', 'background:white');
-      cj("[name='last_name']").attr('style', 'background:white');
-      cj("[name='email-Primary']").attr('style', 'background:white');
+      cj("[id='first_name']").removeAttr('readonly');
+      cj("[id='last_name']").removeAttr('readonly');
+      cj("[id='email-Primary']").removeAttr('readonly');
+      cj("[id='first_name']").attr('style', 'background:white');
+      cj("[id='last_name']").attr('style', 'background:white');
+      cj("[id='email-Primary']").attr('style', 'background:white');
     }else if(test==3){
       cj('#editrow-first_name').show();
       cj('#editrow-last_name').show();

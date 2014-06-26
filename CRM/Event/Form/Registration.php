@@ -230,6 +230,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 	$this->assign('membersPriceOptions', $priceOptions);
 	$currentEvent = civicrm_api3('PriceFieldValue', 'get', array('id' => $pfvId));
 	$this->_priceFieldId = $currentEvent["values"][$pfvId]["price_field_id"];
+	
+	$call = new CRM_Membersonlyevent_Utils_Calls;
+	$this->assign("calls", $call);
 
     //CRM-4320
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
