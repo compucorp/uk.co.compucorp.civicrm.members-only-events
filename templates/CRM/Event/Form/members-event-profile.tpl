@@ -63,7 +63,12 @@ function search_membership(){
           memberID = 0;
         }
 
-        if({/literal}{$calls->getContact(2)}{literal}==1){
+        var postUrl = {/literal}"{crmURL p='civicrm/ajax//membersonlyevent/member' h=0 }"{literal};
+        cj.post( postUrl, { rmember_ID : memberID }, function( data ) {
+           console.log(data.id);
+          }
+        }, 'json' );
+        /*if({/literal}{$calls->getContact(2)}{literal}==1){
           cj("[id='mem_name']").val('{/literal}{$calls->_displayname}{literal}');
           cj('#membership_result').html("Successful.");
 
@@ -102,7 +107,7 @@ function search_membership(){
         }else{
           cj('#membership_result').html("Not a valid membership ID.");
           cj("[id='exist_ID']").attr('disabled','disabled');
-        }
+        }*/
 
 }
   
