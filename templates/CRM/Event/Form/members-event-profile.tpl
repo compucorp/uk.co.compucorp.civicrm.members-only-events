@@ -63,54 +63,53 @@ function search_membership(){
           memberID = 0;
         }
 
-        var postUrl = {/literal}"{crmURL p='civicrm/ajax//membersonlyevent/member' h=0 }"{literal};
-        cj.post( postUrl, { rmember_ID : memberID }, function( data ) {
-           console.log(data.id);
-          }
-        }, 'json' );
-        /*if({/literal}{$calls->getContact(2)}{literal}==1){
-          cj("[id='mem_name']").val('{/literal}{$calls->_displayname}{literal}');
-          cj('#membership_result').html("Successful.");
+        var postUrl = {/literal}"{crmURL p=$ajaxUrl}"{literal};
+        cj.post( postUrl, { member_Id: memberID }, function( contact ) {
+           if(contact.error==0){
+              cj("[id='mem_name']").val(contact.displayname);
+              cj('#membership_result').html("Successful.");
 
-          cj("[id='first_name']").val('{/literal}{$calls->_firstname}{literal}');
-          cj("[id='last_name']").val('{/literal}{$calls->_lastname}{literal}');
-          cj("[id='email-Primary']").val('{/literal}{$calls->_email}{literal}');
-          cj("[id='exist_ID']").val(2);
-          cj("[id='exist_ID']").removeAttr('disabled');
+              cj("[id='first_name']").val(contact.firstname);
+              cj("[id='last_name']").val(contact.lastname);
+              cj("[id='email-Primary']").val(contact.email);
+              cj("[id='exist_ID']").val(contact.id);
+              cj("[id='exist_ID']").removeAttr('disabled');
                 
-          cj('#editrow-mem_name').show();
+              cj('#editrow-mem_name').show();
 
-          cj('#editrow-first_name').show();
-          cj('#editrow-last_name').show();
-          cj('#editrow-email-Primary').show();
+              cj('#editrow-first_name').show();
+              cj('#editrow-last_name').show();
+              cj('#editrow-email-Primary').show();
 
-          cj("[id='member_ID']").attr('readonly','readonly');
-          cj("[id='member_ID']").attr('style', 'background:#C0C0C0');
-          cj("[id='mem_name']").attr('readonly','readonly');
-          cj("[id='mem_name']").attr('style', 'background:#C0C0C0');
+              cj("[id='member_ID']").attr('readonly','readonly');
+              cj("[id='member_ID']").attr('style', 'background:#C0C0C0');
+              cj("[id='mem_name']").attr('readonly','readonly');
+              cj("[id='mem_name']").attr('style', 'background:#C0C0C0');
 
-          var fields = new Array(
-            cj("[id='first_name']"),
-            cj("[id='last_name']"),
-            cj("[id='email-Primary']")
-          );
+              var fields = new Array(
+                cj("[id='first_name']"),
+                cj("[id='last_name']"),
+                cj("[id='email-Primary']")
+              );
 
-          cj.each(fields, function(key, value){
-            if(cj.trim(value.val())){
-              value.attr('readonly','readonly');
-              value.attr('style', 'background:#C0C0C0');
-            }
-          });
+              cj.each(fields, function(key, value){
+                if(cj.trim(value.val())){
+                  value.attr('readonly','readonly');
+                  value.attr('style', 'background:#C0C0C0');
+                }
+              });
 
-          cj("#check_membership").attr('value', 'Reset');
+              cj("#check_membership").attr('value', 'Reset');
           
-        }else{
-          cj('#membership_result').html("Not a valid membership ID.");
-          cj("[id='exist_ID']").attr('disabled','disabled');
-        }*/
+            }else{
+              cj('#membership_result').html("Not a valid membership ID.");
+              cj("[id='exist_ID']").attr('disabled','disabled');
+            }
+        }, "json" );
+        
 
 }
-  
+
   //TODO:maybe add a configuration in admin to enable the switch of letting member email be used for additional participants as well
 
   function checkMemberPrice() {

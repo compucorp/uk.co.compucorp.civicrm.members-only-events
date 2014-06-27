@@ -28,24 +28,44 @@ class CRM_Membersonlyevent_Utils_Calls{
 	}*/
 	
 	static function getMember() {
-    $cId = CRM_Utils_Type::escape($_GET['member_ID'], 'Integer');
-
-    $tags = array();
-
-    $query = "SELECT id, first_name, last_name, display_name FROM civicrm_contact WHERE id = {$cId}";
+    $cId = CRM_Utils_Type::escape($_POST['member_Id'], 'Integer');
+   
+    $query = "
+    	SELECT cc.id as id, 
+    	  cc.first_name as first_name, 
+    	  cc.last_name as last_name, 
+    	  cc.display_name as display_name,
+    	  ce.email as email
+    	FROM civicrm_contact cc
+    	left join civicrm_email ce on
+                ce.contact_id = cc.id
+    	WHERE cc.id = {$cId}
+    	";
     $dao = CRM_Core_DAO::executeQuery($query);
 
     while ($dao->fetch()) {
       // make sure we return tag name entered by user only if it does not exists in db
-      if ($cId == $dao->id) {
+      if ($cId == $dao->id) {dpm($dao);
 
       // escape double quotes, which break results js
       	$contact = array(
         	'id' => $dao->id,
         	'firstname' => $dao->first_name,
         	'lastname' => $dao->last_name,
-        	'displayname' => $dao->display_name
+        	'displayname' => $dao->display_name,
+        	'email' => $dao->email,
+        	'error' => 0
       	);
+		break;
+	  }else{
+	  	$contact = array(
+        	'id' => null,
+        	'firstname' => null,
+        	'lastname' => null,
+        	'displayname' => null,
+        	'email' => null,
+        	'error' => 1
+        );
 	  }
     }
 

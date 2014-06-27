@@ -231,11 +231,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 	$currentEvent = civicrm_api3('PriceFieldValue', 'get', array('id' => $pfvId));
 	$this->_priceFieldId = $currentEvent["values"][$pfvId]["price_field_id"];
 	
-	//$call = new CRM_Membersonlyevent_Utils_Calls;
-	//$this->assign("calls", $call);
-	
-	$ajaxUrl = 'civicrm/ajax/taglist';//CRM_Utils_System::url('civicrm/ajax/taglist', NULL, FALSE, NULL, FALSE);
-
+	$ajaxUrl = 'civicrm/membersonlyevent/ajax/member';
     $this->assign("ajaxUrl", $ajaxUrl);
 
     //CRM-4320

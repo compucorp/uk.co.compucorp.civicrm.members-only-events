@@ -13,7 +13,7 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
-     <path>civicrm/ajax/membersonlyevent/member</path>
+     <path>civicrm/membersonlyevent/ajax/member</path>
      <page_callback>CRM_Membersonlyevent_Utils_Calls::getMember</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
   </item>
