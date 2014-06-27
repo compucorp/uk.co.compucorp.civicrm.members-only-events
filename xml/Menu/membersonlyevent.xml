@@ -15,6 +15,6 @@
   <item>
      <path>civicrm/membersonlyevent/ajax/member</path>
      <page_callback>CRM_Membersonlyevent_Utils_Calls::getMember</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+     <access_arguments>members only event registration</access_arguments>
   </item>
 </menu>

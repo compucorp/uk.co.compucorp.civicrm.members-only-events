@@ -45,7 +45,7 @@ class CRM_Membersonlyevent_Utils_Calls{
 
     while ($dao->fetch()) {
       // make sure we return tag name entered by user only if it does not exists in db
-      if ($cId == $dao->id) {dpm($dao);
+      if ($cId == $dao->id) {
 
       // escape double quotes, which break results js
       	$contact = array(
