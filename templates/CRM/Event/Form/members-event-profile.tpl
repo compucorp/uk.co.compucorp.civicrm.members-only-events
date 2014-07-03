@@ -61,11 +61,22 @@ function search_membership(){
 
         if(!cj.isNumeric(memberID)){
           memberID = 0;
-        }
+        }console.log(memberID);
 
         var postUrl = {/literal}"{crmURL p=$ajaxUrl}"{literal};
         cj.post( postUrl, { member_Id: memberID }, function( contact ) {
-           if(contact.error==0){
+           if( memberID == 0 || !contact){
+
+              cj('#membership_result').html("Not a valid membership ID.");
+              cj("[id='exist_ID']").attr('disabled','disabled');
+          
+            }else if(contact.error!==0){
+
+              cj('#membership_result').html("Not a valid membership ID.");
+              cj("[id='exist_ID']").attr('disabled','disabled');
+
+            }else{
+
               cj("[id='mem_name']").val(contact.displayname);
               cj('#membership_result').html("Successful.");
 
@@ -100,10 +111,7 @@ function search_membership(){
               });
 
               cj("#check_membership").attr('value', 'Reset');
-          
-            }else{
-              cj('#membership_result').html("Not a valid membership ID.");
-              cj("[id='exist_ID']").attr('disabled','disabled');
+
             }
         }, "json" );
         
