@@ -195,13 +195,23 @@
       if(purchaseForOther){
         checkMemberPrice();
       }else{
-        cj("[id='noOfparticipants']").hide();
         {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
           if({/literal}{$priceType}{literal}==0){
             var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
-            var priceRadioId = cj(priceString).prop('id');
-            cj("[id^='"+priceRadioId+"']").hide();
-            cj("label[for='"+priceRadioId+"']").hide();
+            cj(priceString).prop("disabled", true);
+
+            var fields = new Array(
+                cj("[id='first_name']"),
+                cj("[id='last_name']"),
+                cj("[id='email-Primary']")
+              );
+
+              cj.each(fields, function(key, value){
+                if(cj.trim(value.val())){
+                  value.attr('readonly','readonly');
+                  value.attr('style', 'background:#C0C0C0');
+                }
+              });
           }
         {/literal}{/foreach}{literal}
       }
