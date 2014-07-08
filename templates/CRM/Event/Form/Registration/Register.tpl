@@ -61,9 +61,7 @@
 
     {if $contact_id}
       <div class="messages status no-popup" id="crm-event-register-different">
-        {ts 1=$display_name}Welcome %1{/ts}. (<a
-          href="{crmURL p='civicrm/event/register' q="cid=0&reset=1&id=`$event.id`"}"
-          title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
+        {ts 1=$display_name}Welcome %1{/ts}.
       </div>
     {/if}
     {if $event.intro_text}
@@ -139,7 +137,7 @@
     {* User account registration option. Displays if enabled for one of the profiles on this page. *}
     {include file="CRM/common/CMSUser.tpl"}
 
-    {if $membersEventType == 3}
+    {if $membersEventType == 3 && $purchaseForOther}
 
     <div id="user_profile" name="user_profile" style="display:none;">
 
@@ -147,7 +145,7 @@
 
     {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
     
-    {if $membersEventType == 3}
+    {if $membersEventType == 3 && $purchaseForOther}
 
     {include file="CRM/Event/Form/members-event-profile.tpl"}
 
@@ -193,7 +191,20 @@
     {literal}
 
     cj(document).ready(function(){
-      checkMemberPrice();
+      var purchaseForOther = {/literal}"{$purchaseForOther}"{literal};
+      if(purchaseForOther){
+        checkMemberPrice();
+      }else{
+        cj("[id='noOfparticipants']").hide();
+        {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
+          if({/literal}{$priceType}{literal}==0){
+            var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
+            var priceRadioId = cj(priceString).prop('id');
+            cj("[id^='"+priceRadioId+"']").hide();
+            cj("label[for='"+priceRadioId+"']").hide();
+          }
+        {/literal}{/foreach}{literal}
+      }
     });
 
     function toggleConfirmButton() {
@@ -248,7 +259,10 @@
     }
 
     cj('#priceset input, #priceset select').change(function () {
-        checkMemberPrice();
+        var purchaseForOther = {/literal}"{$purchaseForOther}"{literal};
+        if(purchaseForOther){
+          checkMemberPrice();
+        }
         skipPaymentMethod();
       });
 

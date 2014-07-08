@@ -187,6 +187,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public $_priceSet;
   
+  /**
+   * TRUE if user is purchasing for himself while the registration restriction is ticked
+   *
+   * @var array
+   * @protected
+   */
+  public $_purchaseForOther;
+  
   public $_priceFieldId;
 
   public $_action;
@@ -233,6 +241,19 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 	
 	$ajaxUrl = 'civicrm/membersonlyevent/ajax/member';
     $this->assign("ajaxUrl", $ajaxUrl);
+	
+	$isParticipant = FALSE;
+	$testConfiguration = TRUE;
+	$session = CRM_Core_Session::singleton();
+  	$currentEventID = $this->_eventId;
+  	$userID = $session->get('userID');
+	$purchaseRecords = civicrm_api3('Participant', 'get', array('event_id' => $currentEventID, 'contact_id' => $userID, 'sequential' => 1)); 
+	if(isset($purchaseRecords['values'][0]['participant_status_id'])){
+		$isParticipant = $purchaseRecords['values'][0]['participant_status_id'] == 1;
+	}
+	
+	$this->_purchaseForOther = !($testConfiguration&& !$isParticipant);
+	$this->assign("purchaseForOther", $this->_purchaseForOther);
 
     //CRM-4320
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);

@@ -27,6 +27,8 @@
 {literal}
 <script type="text/javascript">
     cj(document).ready(function() {
+      var purchaseForOther = {/literal}"{$purchaseForOther}"{literal};
+      if(purchaseForOther){
         cj('#members-only-event-profile').hide();
         fieldsAction(1);
         cj("[id='exist_ID']").attr('disabled','disabled');
@@ -34,12 +36,12 @@
         //result texts
         var checking_html = 'Checking...';  
   
-        //when button is clicked  
-        cj('#check_membership').click(function(){  
+        //when button is clicked
+        cj('#check_membership').click(function(){
           //else show the cheking_text and run the function to check
           if(cj(this).attr("value") == "Search Member"){
-            cj('#membership_result').show(); 
-            cj('#membership_result').html(checking_html);  
+            cj('#membership_result').show();
+            cj('#membership_result').html(checking_html);
             search_membership();
           }else{
             cj('#editrow-first_name').hide();
@@ -51,6 +53,7 @@
             fieldsAction(2);
           }
         });  
+      }
     });
   
 //function to check the existence of the membership  

@@ -527,19 +527,21 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
 	//membersonlyevent
     if($self->_membersEventType == 3){
-    	$pfvId = key(CRM_Utils_Array::value('price_'.$self->_priceFieldId, $fields));
-    	$pfvParams = array(
-    		'price_value_id' => $pfvId,
-    		'event_id' => $self->_eventId,
-		);
+    	if($self->_purchaseForOther){
+    		$pfvId = key(CRM_Utils_Array::value('price_'.$self->_priceFieldId, $fields));
+    		$pfvParams = array(
+    			'price_value_id' => $pfvId,
+    			'event_id' => $self->_eventId,
+			);
 		
-    	$priceFieldValues = CRM_Membersonlyevent_BAO_MembersEventPrice::getMemberPrice($pfvParams);
-		$priceFieldValue = current($priceFieldValues);
-        if($self->_membersEventType == 3 && $priceFieldValue["is_member_price"] == 1){
-            if(!CRM_Utils_Array::value('exist_ID', $fields)||!CRM_Utils_Array::value('member_ID', $fields)){
-            	$errors['member_ID'] = ts('Please enter a valid member ID and Search');
-            }
-		}
+    		$priceFieldValues = CRM_Membersonlyevent_BAO_MembersEventPrice::getMemberPrice($pfvParams);
+			$priceFieldValue = current($priceFieldValues);
+        	if($self->_membersEventType == 3 && $priceFieldValue["is_member_price"] == 1){
+            	if(!CRM_Utils_Array::value('exist_ID', $fields)||!CRM_Utils_Array::value('member_ID', $fields)){
+            		$errors['member_ID'] = ts('Please enter a valid member ID and search');
+            	}
+			}	
+    	}
 	}
 
     return $errors;
