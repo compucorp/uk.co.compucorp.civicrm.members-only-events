@@ -27,19 +27,18 @@
 {literal}
 <script type="text/javascript">
     cj(document).ready(function() {
-        cj('#members-only-event-profile').hide();
-        fieldsAction(1);
+      
         cj("[id='exist_ID']").attr('disabled','disabled');
 
         //result texts
         var checking_html = 'Checking...';  
   
-        //when button is clicked  
-        cj('#check_membership').click(function(){  
+        //when button is clicked
+        cj('#check_membership').click(function(){
           //else show the cheking_text and run the function to check
           if(cj(this).attr("value") == "Search Member"){
-            cj('#membership_result').show(); 
-            cj('#membership_result').html(checking_html);  
+            cj('#membership_result').show();
+            cj('#membership_result').html(checking_html);
             search_membership();
           }else{
             cj('#editrow-first_name').hide();
@@ -51,6 +50,7 @@
             fieldsAction(2);
           }
         });  
+      
     });
   
 //function to check the existence of the membership  
@@ -148,7 +148,7 @@ function search_membership(){
     return result;
   }
 
-  function fieldsAction(test){
+  function fieldsAction(action){
     cj("[id='first_name']").val("");
     cj("[id='last_name']").val("");
     cj("[id='email-Primary']").val("");
@@ -161,18 +161,18 @@ function search_membership(){
     cj("[id='mem_name']").removeAttr('readonly');
     cj("[id='member_ID']").attr('style', 'background:white');
     cj("[id='mem_name']").attr('style', 'background:white');
-    if(test==1){
+    if(action==1){
       cj('#editrow-first_name').hide();
       cj('#editrow-last_name').hide();
       cj('#editrow-email-Primary').hide();
-    }else if(test==2){
+    }else if(action==2){
       cj("[id='first_name']").removeAttr('readonly');
       cj("[id='last_name']").removeAttr('readonly');
       cj("[id='email-Primary']").removeAttr('readonly');
       cj("[id='first_name']").attr('style', 'background:white');
       cj("[id='last_name']").attr('style', 'background:white');
       cj("[id='email-Primary']").attr('style', 'background:white');
-    }else if(test==3){
+    }else if(action==3){
       cj('#editrow-first_name').show();
       cj('#editrow-last_name').show();
       cj('#editrow-email-Primary').show();

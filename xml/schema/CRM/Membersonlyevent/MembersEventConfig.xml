@@ -26,5 +26,13 @@
     <comment>Enable membership duration check</comment>
     <add>4.4</add>
   </field>
+  
+  <field>
+    <name>registration_restriction</name>
+    <type>int unsigned</type>
+    <default>1</default>
+    <comment>First ticket purchasing restricts to current user</comment>
+    <add>4.4</add>
+  </field>
 
 </table>

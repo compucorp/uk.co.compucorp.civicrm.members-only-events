@@ -61,9 +61,12 @@
 
     {if $contact_id}
       <div class="messages status no-popup" id="crm-event-register-different">
-        {ts 1=$display_name}Welcome %1{/ts}. (<a
-          href="{crmURL p='civicrm/event/register' q="cid=0&reset=1&id=`$event.id`"}"
-          title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
+        {ts 1=$display_name}Welcome %1{/ts}.
+        {if $membersEventType != 3}
+		(<a
+        href="{crmURL p='civicrm/event/register' q="cid=0&reset=1&id=`$event.id`"}"
+        title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
+     	{/if}
       </div>
     {/if}
     {if $event.intro_text}
@@ -97,6 +100,10 @@
         
         {* TODO: might add test here as well *}
       {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
+      <div class="messages status section continue_message-section">
+        <p>
+        The price you selected above is only for current participant, you can select <strong>different prices</strong> for other participants.</p>
+    </div>
       {include file="CRM/Price/Form/ParticipantCount.tpl"}
       {if ! $quickConfig}</fieldset>{/if}
     {/if}
@@ -139,7 +146,7 @@
     {* User account registration option. Displays if enabled for one of the profiles on this page. *}
     {include file="CRM/common/CMSUser.tpl"}
 
-    {if $membersEventType == 3}
+    {if $membersEventType == 3 && $purchaseForOther}
 
     <div id="user_profile" name="user_profile" style="display:none;">
 
@@ -147,7 +154,7 @@
 
     {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
     
-    {if $membersEventType == 3}
+    {if $membersEventType == 3 && $purchaseForOther}
 
     {include file="CRM/Event/Form/members-event-profile.tpl"}
 
@@ -193,7 +200,38 @@
     {literal}
 
     cj(document).ready(function(){
-      checkMemberPrice();
+      var purchaseForOther = {/literal}"{$purchaseForOther}"{literal};
+      if(purchaseForOther){
+        checkMemberPrice();
+      }else{
+        var defaultPrice = 0;
+        {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
+          var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
+          if({/literal}{$priceType}{literal}==0){
+            cj(priceString).attr("disabled", "disabled");
+            cj(priceString).removeAttr('checked');
+
+            var fields = new Array(
+                cj("[id='first_name']"),
+                cj("[id='last_name']"),
+                cj("[id='email-Primary']")
+              );
+
+              cj.each(fields, function(key, value){
+                if(cj.trim(value.val())){
+                  value.attr('readonly','readonly');
+                  value.attr('style', 'background:#C0C0C0');
+                }
+              });
+          }else{
+            if(!defaultPrice){
+              cj(priceString).attr("checked", "checked");
+              defaultPrice = 1;
+            }
+
+          }
+        {/literal}{/foreach}{literal}
+      }
     });
 
     function toggleConfirmButton() {
@@ -248,7 +286,10 @@
     }
 
     cj('#priceset input, #priceset select').change(function () {
-        checkMemberPrice();
+        var purchaseForOther = {/literal}"{$purchaseForOther}"{literal};
+        if(purchaseForOther){
+          checkMemberPrice();
+        }
         skipPaymentMethod();
       });
 

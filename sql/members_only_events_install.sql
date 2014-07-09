@@ -30,6 +30,8 @@ CREATE TABLE `civicrm_membersonlyevent_config` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique MembersEventConfig ID',
      `duration_check` int unsigned   DEFAULT 0 COMMENT 'Enable membership duration check'
 ,
+	 `registration_restriction` int unsigned   DEFAULT 1 COMMENT 'First ticket purchasing restricts to current user'
+,
     PRIMARY KEY ( `id` )
 
 
