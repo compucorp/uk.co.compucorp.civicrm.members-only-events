@@ -62,6 +62,11 @@
     {if $contact_id}
       <div class="messages status no-popup" id="crm-event-register-different">
         {ts 1=$display_name}Welcome %1{/ts}.
+        {if $membersEventType != 3}
+		(<a
+        href="{crmURL p='civicrm/event/register' q="cid=0&reset=1&id=`$event.id`"}"
+        title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
+     	{/if}
       </div>
     {/if}
     {if $event.intro_text}
@@ -195,10 +200,12 @@
       if(purchaseForOther){
         checkMemberPrice();
       }else{
+        var defaultPrice = 0;
         {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
+          var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
           if({/literal}{$priceType}{literal}==0){
-            var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
-            cj(priceString).prop("disabled", true);
+            cj(priceString).attr("disabled", "disabled");
+            cj(priceString).removeAttr('checked');
 
             var fields = new Array(
                 cj("[id='first_name']"),
@@ -212,6 +219,12 @@
                   value.attr('style', 'background:#C0C0C0');
                 }
               });
+          }else{
+            if(!defaultPrice){
+              cj(priceString).attr("checked", "checked");
+              defaultPrice = 1;
+            }
+
           }
         {/literal}{/foreach}{literal}
       }

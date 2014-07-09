@@ -243,7 +243,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->assign("ajaxUrl", $ajaxUrl);
 	
 	$isParticipant = FALSE;
-	$testConfiguration = TRUE;
+	$purchaseRestriction = TRUE;
 	$session = CRM_Core_Session::singleton();
   	$currentEventID = $this->_eventId;
   	$userID = $session->get('userID');
@@ -251,8 +251,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 	if(isset($purchaseRecords['values'][0]['participant_status_id'])){
 		$isParticipant = $purchaseRecords['values'][0]['participant_status_id'] == 1;
 	}
+	$config = CRM_Membersonlyevent_BAO_MembersEventConfig::getConfig();
+	$purchaseRestriction = $config['registration_restriction'];
 	
-	$this->_purchaseForOther = !($testConfiguration&& !$isParticipant);
+	$this->_purchaseForOther = !($purchaseRestriction&& !$isParticipant);
 	$this->assign("purchaseForOther", $this->_purchaseForOther);
 
     //CRM-4320

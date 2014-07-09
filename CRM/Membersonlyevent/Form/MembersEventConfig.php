@@ -27,6 +27,11 @@ class CRM_Membersonlyevent_Form_MembersEventConfig extends CRM_Core_Form {
       'check_duration', // field name
       'Check Membership Duration'// field label
     );
+	$this->add(
+      'checkbox', // field type
+      'registration_restriction', // field name
+      'First Ticket Purchasing Restricts to Current User?'// field label
+    );
     $this->addButtons(array(
       array(
         'type' => 'submit',
@@ -43,6 +48,7 @@ class CRM_Membersonlyevent_Form_MembersEventConfig extends CRM_Core_Form {
   function setDefaultValues() {
   	$defaults = array();
   	$defaults['check_duration'] = $this->_config['duration_check'];
+	$defaults['registration_restriction'] = $this->_config['registration_restriction'];
 	
 	return $defaults;
   }
@@ -51,11 +57,19 @@ class CRM_Membersonlyevent_Form_MembersEventConfig extends CRM_Core_Form {
   	CRM_Utils_System::flushCache();
     $values = $this->exportValues();
 	$params['id'] = $this->_config['id'];
+	
 	if(isset($values['check_duration'])){
 	  $params['duration_check'] = $values['check_duration'];
 	}else{
 	  $params['duration_check'] = 0;
 	}
+	
+	if(isset($values['registration_restriction'])){
+	  $params['registration_restriction'] = $values['registration_restriction'];
+	}else{
+	  $params['registration_restriction'] = 0;
+	}
+
 	// submit to BAO for updating
 	  $set = CRM_Membersonlyevent_BAO_MembersEventConfig::create($params);
 

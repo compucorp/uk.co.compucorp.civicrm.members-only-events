@@ -186,11 +186,12 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
   $config = CRM_Membersonlyevent_BAO_MembersEventConfig::getConfig();
   
   $isParticipant = FALSE;
-  $testConfiguration = TRUE;
+  $purchaseRestriction = TRUE;
   $purchaseRecords = civicrm_api3('Participant', 'get', array('event_id' => $currentEventID, 'contact_id' => $userID, 'sequential' => 1));
   $isParticipant = $purchaseRecords['values'][0]['participant_status_id'] == 1;
+  $purchaseRestriction = $config['registration_restriction'];
   
-  $testTest = !($testConfiguration&& !$isParticipant);
+  $purchaseForOther = !($purchaseRestriction&& !$isParticipant);
   
   if($config['duration_check'] == 1&&$userID){
   	$durationCheck = false;
@@ -288,7 +289,7 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
         		'disabled' => TRUE,
       		));
 		
-			if($testTest){
+			if($purchaseForOther){
 		  		$url = CRM_Utils_System::url('civicrm/event/register',
         			array('reset' => 1, 'id' => $currentEventID, 'cid' => 0),
         			FALSE, // absolute?
