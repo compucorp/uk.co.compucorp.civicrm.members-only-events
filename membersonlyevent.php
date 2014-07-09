@@ -184,6 +184,14 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
   $userID = $session->get('userID');
   $durationCheck = true;
   $config = CRM_Membersonlyevent_BAO_MembersEventConfig::getConfig();
+  
+  $isParticipant = FALSE;
+  $testConfiguration = TRUE;
+  $purchaseRecords = civicrm_api3('Participant', 'get', array('event_id' => $currentEventID, 'contact_id' => $userID, 'sequential' => 1));
+  $isParticipant = $purchaseRecords['values'][0]['participant_status_id'] == 1;
+  
+  $testTest = !($testConfiguration&& !$isParticipant);
+  
   if($config['duration_check'] == 1&&$userID){
   	$durationCheck = false;
     if(is_object($members_only_event)){
@@ -272,37 +280,46 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
       
     }else{
     	if($members_only_event->members_event_type == 3){
-  		CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->update('default', array(
-        'disabled' => TRUE,
-      ));
+  			CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->update('default', array(
+        		'disabled' => TRUE,
+      		));
       
-        CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->update('default', array(
-        'disabled' => TRUE,
-      ));
+        	CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->update('default', array(
+        		'disabled' => TRUE,
+      		));
 		
-  	    $url = CRM_Utils_System::url('civicrm/event/register',
-        array('reset' => 1, 'id' => $currentEventID, 'cid' => 0),
-        FALSE, // absolute?
-        NULL, // fragment
-        TRUE, // htmlize?
-        TRUE // is frontend?
-      );
-
-      $snippet = array(
-        'template' => 'CRM/Event/Page/members-event-button.tpl',
-        'button_text' => "Register Now",
-        'position' => 'top',
-        'url' => $url,
-        'weight' => -10,
-      );
+			if($testTest){
+		  		$url = CRM_Utils_System::url('civicrm/event/register',
+        			array('reset' => 1, 'id' => $currentEventID, 'cid' => 0),
+        			FALSE, // absolute?
+        			NULL, // fragment
+        			TRUE, // htmlize?
+        			TRUE // is frontend?	
+        		);
+			}else{
+		  		$url = CRM_Utils_System::url('civicrm/event/register',
+        			array('reset' => 1, 'id' => $currentEventID),
+        			FALSE, // absolute?
+        			NULL, // fragment
+        			TRUE, // htmlize?
+        			TRUE // is frontend?	
+        		);
+			}
+			$snippet = array(
+        			'template' => 'CRM/Event/Page/members-event-button.tpl',
+        			'button_text' => "Register Now",
+        			'position' => 'top',
+        			'url' => $url,
+        			'weight' => -10,
+      			);
       
-      CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->add($snippet);
+     		CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->add($snippet);
 
-      $snippet['position'] = 'bottom';
-      $snippet['weight'] = -10;
+      		$snippet['position'] = 'bottom';
+      		$snippet['weight'] = -10;
            
-      CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
-  	}
+      		CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
+  	    }
     }
   }
 }
