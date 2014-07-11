@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Membersonlyevent_BAO_MembershipConfig extends CRM_Membersonlyevent_DAO_MembershipConfig {
+class CRM_Membersonlyevent_BAO_MembersEventConfig extends CRM_Membersonlyevent_DAO_MembersEventConfig {
 
     /**
    * takes an associative array and creates a resource object
@@ -12,7 +12,7 @@ class CRM_Membersonlyevent_BAO_MembershipConfig extends CRM_Membersonlyevent_DAO
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
    *
-   * @return object CCRM_Membersonlyevent_BAO_MembershipConfig object
+   * @return object CCRM_Membersonlyevent_BAO_MembersEventConfig object
    * @access public
    * @static
    */
@@ -21,13 +21,13 @@ class CRM_Membersonlyevent_BAO_MembershipConfig extends CRM_Membersonlyevent_DAO
       //make sure we don't create new record
       return;
     }
-    $dao = new CRM_Membersonlyevent_DAO_MembershipConfig();
+    $dao = new CRM_Membersonlyevent_DAO_MembersEventConfig();
     $dao->copyValues($params);
     return $dao->save();
   }
 
   static function getConfig(){
-    $dao = new CRM_Membersonlyevent_DAO_MembershipConfig();
+    $dao = new CRM_Membersonlyevent_DAO_MembersEventConfig();
     $dao->find();
     $config = array();
     while ($dao->fetch()) {
