@@ -43,13 +43,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     $this->addGroup( $members_event_type, 'members_event_type', ( 'Members Event Type:' ) );
     
     // add form elements
-    $this->add(
-      'select', // field type
-      'contribution_page_id', // field name
-      ts('Contribution page used for membership signup'), // field label
-      $this->getContributionPagesAsOptions(),   // list of attributes
-      TRUE // is required
-    );
+    $this->add('text', 'membership_url', ts('Membership purchase URL'));
     
 	$groups = $this->getPriceOptions();
     $groupSize = max(count($groups), 2);
@@ -69,9 +63,10 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
 	
 	// add form rules
 	$this->addFormRule(array('CRM_Membersonlyevent_Form_MembersOnlyEvent', 'rules'));
-	
+	global $base_url;
+	$this->assign('BASE_URL', $base_url.'/');
     // export form elements
-    $this->assign('elementNames', $this->getRenderableElementNames());
+    //$this->assign('elementNames', $this->getRenderableElementNames());
     parent::buildQuickForm();
   }
   
@@ -79,16 +74,16 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
   protected static function rules($params, $files, $self) {
     $errors = array();
 	$isPublicEvent = CRM_Utils_Array::value('members_event_type', $params);
-	$contributionPageID = CRM_Utils_Array::value('contribution_page_id', $params);
+	$memberURL = CRM_Utils_Array::value('membership_url', $params);
 	$memberPrice = CRM_Utils_Array::value('membersPrice', $params);
 	
     if($isPublicEvent=='2'){
-      if(!is_numeric($contributionPageID)){
-        $errors['contribution_page_id'] = ts('Please select a contribution page.');
+      if(is_null($memberURL)){
+        $errors['membership_url'] = ts('Please set a membership purchasing url.');
       }
     }else if($isPublicEvent=='3'){
-      if(!is_numeric($contributionPageID)){
-        $errors['contribution_page_id'] = ts('Please select a contribution page.');
+      if(is_null($memberURL)){
+        $errors['membership_url'] = ts('Please set a membership purchasing url.');
       }
       if(!$memberPrice){
       	$errors['membersPrice'] = ts('Please select at least one member ticket price.');
@@ -114,7 +109,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     if(is_object($members_only_event)) {
     
       $defaults['members_event_type'] = $members_only_event->members_event_type;
-      $defaults['contribution_page_id'] = $members_only_event->contribution_page_id;
+      $defaults['membership_url'] = $members_only_event->membership_url;
     
     }
     
@@ -132,21 +127,6 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
       $defaults['membersPrice'] = $selected_price;
     }
     return $defaults;
-  }
-  
-  function getContributionPagesAsOptions() {
-      
-    $results = civicrm_api3('ContributionPage', 'get', array('sequential' => 1));
-    $contribution_pages = $results['values'];
-    
-    $return_array = array();
-    $return_array['NULL'] = ts('- Select contribution page -');
-    
-    foreach ($contribution_pages as $key => $contribution_object) {
-      $return_array[$contribution_object['id']] = $contribution_object['title'];
-    }
-    
-    return $return_array;
   }
   
   function getPriceOptions() {
@@ -186,7 +166,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     }
     
     $params['event_id'] = $this->_id;
-    $params['contribution_page_id'] = $passed_values['contribution_page_id'];
+    $params['membership_url'] = $passed_values['membership_url'];
     $params['members_event_type'] = $passed_values['members_event_type'];
     
     // Create or edit the values

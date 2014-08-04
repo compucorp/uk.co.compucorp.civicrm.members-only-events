@@ -387,7 +387,9 @@ function membersonlyevent_civicrm_alterContent(&$content, $context, $tplName, &$
       if (!CRM_Core_Permission::check('members only event registration')||
     (CRM_Core_Permission::check('members only event registration')&&!$durationCheck)){
     	global $base_url;
-		$link = "civicrm";
+		$members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($object->_eventId);
+		$link = $members_only_event->membership_url;
+		
 		$output = array(
 			'info'  => array(
 					'#type' 		=> 'markup',

@@ -9,14 +9,21 @@
     
   {* FIELDS: (AUTOMATIC LAYOUT) *}
 
-  {foreach from=$elementNames item=elementName}
-    <div class="crm-section" id="{$form.$elementName.id}">
-      <div class="label">{$form.$elementName.label}</div>
-      <div class="content">{$form.$elementName.html}</div>
+    <div class="crm-section" id="event_config_event_type">
+      <div class="label">{$form.members_event_type.label}</div>
+      <div class="content">{$form.members_event_type.html}</div>
       <div class="clear"></div>
     </div>
-  {/foreach}
-  
+  	<div class="crm-section" id="event_config_member_url">
+      <div class="label">{$form.membership_url.label}</div>      
+      <div class="content">{$BASE_URL}{$form.membership_url.html}</div>
+      <div class="clear"></div>
+    </div>
+    <div class="crm-section" id="event_config_member_price">
+      <div class="label">{$form.membersPrice.label}</div>
+      <div class="content">{$form.membersPrice.html}</div>
+      <div class="clear"></div>
+    </div>
   </div>
 
   {* FOOTER *}
@@ -28,27 +35,27 @@
   <script type="text/javascript">
   {literal}
     jQuery(document).ready(function(){
-      jQuery("#contribution_page_id").show();
-      jQuery("#membersPrice").hide();
+      jQuery("#event_config_member_url").show();
+      jQuery("#event_config_member_price").hide();
       
       if (jQuery("input[name='members_event_type']:checked").val()==1){
-        jQuery("#contribution_page_id").hide();
+        jQuery("#event_config_member_url").hide();
       }else if(jQuery("input[name='members_event_type']:checked").val()==3){
-        jQuery("#membersPrice").show();
+        jQuery("#event_config_member_price").show();
       }
       
       
       jQuery("input[name='members_event_type']").change(function(){
         
         if (jQuery(this).val()==2){
-          jQuery("#contribution_page_id").show();
-          jQuery("#membersPrice").hide();
+          jQuery("#event_config_member_url").show();
+          jQuery("#event_config_member_price").hide();
         }else if(jQuery(this).val()==3){
-          jQuery("#contribution_page_id").show();
-          jQuery("#membersPrice").show();
+          jQuery("#event_config_member_url").show();
+          jQuery("#event_config_member_price").show();
         }else {
-          jQuery("#contribution_page_id").hide();
-          jQuery("#membersPrice").hide();
+          jQuery("#event_config_member_url").hide();
+          jQuery("#event_config_member_price").hide();
         }
       
       });
