@@ -136,7 +136,8 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
   
   function getContributionPagesAsOptions() {
       
-    $contribution_pages = CRM_Contribute_BAO_ContributionPage::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage');
+    $results = civicrm_api3('ContributionPage', 'get', array('sequential' => 1));
+    $contribution_pages = $results['values'];
     
     $return_array = array();
     $return_array['NULL'] = ts('- Select contribution page -');
@@ -177,14 +178,14 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     $passed_values = $this->exportValues();
     
     // Search for the Members Only Event object by the Event ID
-    $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($passed_values['id']);
+    $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_id);
     
     if(is_object($members_only_event)) {
       // If we have the ID, edit operation will fire
       $params['id'] = $members_only_event->id;
     }
     
-    $params['event_id'] = $passed_values['id'];
+    $params['event_id'] = $this->_id;
     $params['contribution_page_id'] = $passed_values['contribution_page_id'];
     $params['members_event_type'] = $passed_values['members_event_type'];
     
@@ -196,7 +197,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
 	$value_list = $this->getPriceOptions();
 	$priceCount = 1;
 	foreach ($passed_values['membersPrice'] as $priceKey => $priceValue) {
-		$priceParams[$priceCount]['event_id'] = $passed_values['id'];
+		$priceParams[$priceCount]['event_id'] = $this->_id;
 		$priceParams[$priceCount]['price_value_id'] = $priceValue;
 		$exist_price = CRM_Membersonlyevent_BAO_MembersEventPrice::getMemberPrice($priceParams[$priceCount]);
 		if($exist_price){
@@ -213,7 +214,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
 	var_dump($value_list);
 	
 	foreach ($value_list as $priceKey => $priceValue) {
-		$priceParams[$priceCount]['event_id'] = $passed_values['id'];
+		$priceParams[$priceCount]['event_id'] = $this->_id;
         $priceParams[$priceCount]['price_value_id'] = $priceKey;
 		$exist_price = CRM_Membersonlyevent_BAO_MembersEventPrice::getMemberPrice($priceParams[$priceCount]);
 		if($exist_price){
@@ -225,7 +226,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
 		CRM_Membersonlyevent_BAO_MembersEventPrice::create($priceParams[$priceCount]);
 		$priceCount++;
 	}
-    parent::postProcess();
+    parent::endPostProcess();
   }
 
   /**

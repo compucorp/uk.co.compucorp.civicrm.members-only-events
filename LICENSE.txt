@@ -1,5 +1,5 @@
-Package: com.greg.membersonlyevent
-Copyright (C) 2014, Greg Meszaros <meszaros275@gmail.com>
+Package: com.compucorp.membersonlyevent
+Copyright (C) 2014, Compucorp Ltd. <info@compucorp.co.uk>
 Licensed under the GNU Affero Public License 3.0 (below).
 
 -------------------------------------------------------------------------------

@@ -532,7 +532,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     		'price_value_id' => $pfvId,
     		'event_id' => $self->_eventId,
 		);
-		
+
     	$priceFieldValues = CRM_Membersonlyevent_BAO_MembersEventPrice::getMemberPrice($pfvParams);
 		$priceFieldValue = current($priceFieldValues);
         if($self->_membersEventType == 3 && $priceFieldValue["is_member_price"] == 1){

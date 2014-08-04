@@ -36,18 +36,14 @@
   </foreignKey>
   
   <field>
-    <name>contribution_page_id</name>
-    <type>int unsigned</type>
-    <comment>Foreign key for the Contribution page</comment>
+    <name>membership_url</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>URL for purchasing membership</comment>
+    <title>Title</title>
+    <required>true</required>
     <add>4.4</add>
   </field>
-  <foreignKey>
-    <name>contribution_page_id</name>
-    <table>civicrm_contribution_page</table>
-    <key>id</key>
-    <add>4.4</add>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
   
   <field>
     <name>members_event_type</name>

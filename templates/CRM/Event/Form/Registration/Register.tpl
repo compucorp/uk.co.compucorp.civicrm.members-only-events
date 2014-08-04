@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -63,10 +63,10 @@
       <div class="messages status no-popup" id="crm-event-register-different">
         {ts 1=$display_name}Welcome %1{/ts}.
         {if $membersEventType != 3}
-		(<a
-        href="{crmURL p='civicrm/event/register' q="cid=0&reset=1&id=`$event.id`"}"
-        title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
-     	{/if}
+        (<a
+          href="{crmURL p='civicrm/event/register' q="cid=0&reset=1&id=`$event.id`"}"
+          title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
+      {/if}
       </div>
     {/if}
     {if $event.intro_text}
@@ -74,6 +74,7 @@
         <p>{$event.intro_text}</p>
       </div>
     {/if}
+
     {include file="CRM/common/cidzero.tpl"}
     {if $pcpSupporterText}
       <div class="crm-section pcpSupporterText-section">
@@ -94,16 +95,36 @@
       </div>
     {/if}
 
+    {* User account registration option. Displays if enabled for one of the profiles on this page. *}
+    {include file="CRM/common/CMSUser.tpl"}
+
+    {if $membersEventType == 3 && $purchaseForOther}
+
+    <div id="user_profile" name="user_profile" style="display:none;">
+
+    {/if}
+
+    {* Display "Top of page" profile immediately after the introductory text *}
+    {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+
+    {* TODO: Finish profile switch *}
+
+    {if $membersEventType == 3 && $purchaseForOther}
+
+    {include file="CRM/Event/Form/members-event-profile.tpl"}
+
+    {/if}
+
+    </div>
+
     {if $priceSet}
       {if ! $quickConfig}<fieldset id="priceset" class="crm-group priceset-group">
         <legend>{$event.fee_label}</legend>{/if}
-        
-        {* TODO: might add test here as well *}
       {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
       <div class="messages status section continue_message-section">
         <p>
         The price you selected above is only for current participant, you can select <strong>different prices</strong> for other participants.</p>
-    </div>
+      </div>
       {include file="CRM/Price/Form/ParticipantCount.tpl"}
       {if ! $quickConfig}</fieldset>{/if}
     {/if}
@@ -143,24 +164,6 @@
       </fieldset>
     {/if}
 
-    {* User account registration option. Displays if enabled for one of the profiles on this page. *}
-    {include file="CRM/common/CMSUser.tpl"}
-
-    {if $membersEventType == 3 && $purchaseForOther}
-
-    <div id="user_profile" name="user_profile" style="display:none;">
-
-    {/if}
-
-    {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
-    
-    {if $membersEventType == 3 && $purchaseForOther}
-
-    {include file="CRM/Event/Form/members-event-profile.tpl"}
-
-    </div>
-    {/if}
-
     {if $form.payment_processor.label}
       <fieldset class="crm-group payment_options-group" style="display:none;">
         <legend>{ts}Payment Options{/ts}</legend>
@@ -179,7 +182,7 @@
       {/if}
     </div>
     {include file="CRM/common/paymentBlock.tpl"}
-    
+
     {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
 
     {if $isCaptcha}
@@ -206,7 +209,7 @@
       }else{
         var defaultPrice = 0;
         {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
-          var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
+          var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";console.log(priceString);
           if({/literal}{$priceType}{literal}==0){
             cj(priceString).attr("disabled", "disabled");
             cj(priceString).removeAttr('checked');
@@ -223,13 +226,12 @@
                   value.attr('style', 'background:#C0C0C0');
                 }
               });
-          }else{
-            if(!defaultPrice){
-              cj(priceString).attr("checked", "checked");
-              defaultPrice = 1;
+            }else{
+              if(!defaultPrice){
+                cj(priceString).attr("checked", "checked");
+                defaultPrice = 1;
+              }
             }
-
-          }
         {/literal}{/foreach}{literal}
       }
     });
@@ -256,32 +258,36 @@
       toggleConfirmButton();
     });
 
-    cj(function () {
+    CRM.$(function($) {
       toggleConfirmButton();
       skipPaymentMethod();
     });
 
+    // Called from display() in Calculate.tpl, depends on display() having been called
     function skipPaymentMethod() {
       var symbol = '{/literal}{$currencySymbol}{literal}';
       var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
 
       var flag = 1;
-      if (isMultiple && cj("#additional_participants").val()) {
+      var payment_options = cj(".payment_options-group");
+      var payment_processor = cj("div.payment_processor-section");
+      var payment_information = cj("div#payment_information");
+
+      if (isMultiple && cj("#additional_participants").val() && cj('#pricevalue').text() !== symbol + " 0.00") {
         flag = 0;
       }
 
-      if (((cj('#priceset input:checked').attr('data-amount') == 0) ||
-        (cj('#pricevalue').text() == symbol + " 0.00" )) && flag) {
-        cj(".payment_options-group").hide();
-        cj("div.payment_processor-section").hide();
-        cj("div#payment_information").hide();
+      if ((cj('#pricevalue').text() == symbol + " 0.00") && flag) {
+        payment_options.hide();
+        payment_processor.hide();
+        payment_information.hide();
         // also unset selected payment methods
         cj('input[name="payment_processor"]').removeProp('checked');
       }
       else {
-        cj(".payment_options-group").show();
-        cj("div.payment_processor-section").show();
-        cj("div#payment_information").show();
+        payment_options.show();
+        payment_processor.show();
+        payment_information.show();
       }
     }
 
@@ -291,7 +297,7 @@
           checkMemberPrice();
         }
         skipPaymentMethod();
-      });
+    });
 
     {/literal}
   </script>

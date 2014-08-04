@@ -17,6 +17,8 @@
     </div>
   {/foreach}
   
+  </div>
+
   {* FOOTER *}
 
   <div class="crm-submit-buttons">
@@ -58,4 +60,3 @@
 {else}
     <div id="help">{ts}Online registration tab needs to be enabled for this event to set the members only event settings.{/ts}</div>
 {/if}
-</div>
