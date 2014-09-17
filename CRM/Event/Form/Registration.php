@@ -220,7 +220,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function preProcess() {dpm("fdwa");
+  function preProcess() {
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
 
@@ -228,7 +228,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
 	
 	//membersonlyevent
-	$this->_membersEventType = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_eventId)->members_event_type;dpm($this->_membersEventType);
+	$this->_membersEventType = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_eventId)->members_event_type;
 	if(is_null($this->_membersEventType)){
 		$this->_membersEventType = 1;
 	}
