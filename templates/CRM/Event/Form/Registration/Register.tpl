@@ -209,7 +209,7 @@
       }else{
         var defaultPrice = 0;
         {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
-          var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";console.log(priceString);
+          var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
           if({/literal}{$priceType}{literal}==0){
             cj(priceString).attr("disabled", "disabled");
             cj(priceString).removeAttr('checked');

@@ -9,6 +9,8 @@ class CRM_Membersonlyevent_Utils_Calls{
 	public $_displayname;
 	
 	public $_email;
+  
+  public $_organizationname;
 	
 	/*public function getMember($Id){
 		$currentContact = civicrm_api3('contact', 'get', array('id' => $Id));
@@ -35,6 +37,7 @@ class CRM_Membersonlyevent_Utils_Calls{
     	  cc.first_name as first_name, 
     	  cc.last_name as last_name, 
     	  cc.display_name as display_name,
+    	  cc.organization_name as organization_name,
     	  ce.email as email
     	FROM civicrm_contact cc
     	left join civicrm_email ce on
@@ -54,6 +57,7 @@ class CRM_Membersonlyevent_Utils_Calls{
         	'lastname' => $dao->last_name,
         	'displayname' => $dao->display_name,
         	'email' => $dao->email,
+        	'organizationname' => $dao->organization_name,
         	'error' => 0
       	);
 		break;
@@ -64,6 +68,7 @@ class CRM_Membersonlyevent_Utils_Calls{
         	'lastname' => null,
         	'displayname' => null,
         	'email' => null,
+        	'organizationname' => null,
         	'error' => 1
         );
 	  }

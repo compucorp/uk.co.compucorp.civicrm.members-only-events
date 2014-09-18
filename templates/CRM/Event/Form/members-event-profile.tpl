@@ -22,6 +22,15 @@
     </div>
     <div class="clear"></div>
   </div>
+  <div class="crm-section editrow_c-section form-item" id="editrow-company_name">
+    <div class="label">
+      Company name:
+    </div>
+    <div class="content">
+      <input maxlength="64" size="30" name="company_name" type="text" value="" id="company_name" class="form-text big">
+    </div>
+    <div class="clear"></div>
+  </div>
 </div>
 
 {literal}
@@ -61,7 +70,7 @@ function search_membership(){
 
         if(!cj.isNumeric(memberID)){
           memberID = 0;
-        }console.log(memberID);
+        }
 
         var postUrl = {/literal}"{crmURL p=$ajaxUrl}"{literal};
         cj.post( postUrl, { member_Id: memberID }, function( contact ) {
@@ -78,6 +87,7 @@ function search_membership(){
             }else{
 
               cj("[id='mem_name']").val(contact.displayname);
+              cj("[id='company_name']").val(contact.organizationname);
               cj('#membership_result').html("Successful.");
 
               cj("[id='first_name']").val(contact.firstname);
@@ -87,6 +97,7 @@ function search_membership(){
               cj("[id='exist_ID']").removeAttr('disabled');
                 
               cj('#editrow-mem_name').show();
+              cj('#editrow-company_name').show();
 
               cj('#editrow-first_name').show();
               cj('#editrow-last_name').show();
@@ -96,6 +107,8 @@ function search_membership(){
               cj("[id='member_ID']").attr('style', 'background:#C0C0C0');
               cj("[id='mem_name']").attr('readonly','readonly');
               cj("[id='mem_name']").attr('style', 'background:#C0C0C0');
+              cj("[id='company_name']").attr('readonly','readonly');
+              cj("[id='company_name']").attr('style', 'background:#C0C0C0');
 
               var fields = new Array(
                 cj("[id='first_name']"),
@@ -154,13 +167,17 @@ function search_membership(){
     cj("[id='email-Primary']").val("");
     cj("[id='member_ID']").val("");
     cj("[id='mem_name']").val("");
+    cj("[id='company_name']").val("");
     cj('#membership_result').hide(); 
     cj('#editrow-mem_name').hide();
+    cj('#editrow-company_name').hide();
     cj('#check_membership').attr('value', 'Search Member');
     cj("[id='member_ID']").removeAttr('readonly');
     cj("[id='mem_name']").removeAttr('readonly');
+    cj("[id='company_name']").removeAttr('readonly');
     cj("[id='member_ID']").attr('style', 'background:white');
     cj("[id='mem_name']").attr('style', 'background:white');
+    cj("[id='company_name']").attr('style', 'background:white');
     if(action==1){
       cj('#editrow-first_name').hide();
       cj('#editrow-last_name').hide();
