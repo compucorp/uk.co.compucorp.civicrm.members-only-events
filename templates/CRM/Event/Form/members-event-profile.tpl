@@ -42,6 +42,7 @@
             cj('#membership_result').html(checking_html);
             search_membership();
           }else{
+            cj('fieldset.crm-profile:first').hide();
             cj('#editrow-first_name').hide();
             cj('#editrow-last_name').hide();
             cj('#editrow-email-Primary').hide();
