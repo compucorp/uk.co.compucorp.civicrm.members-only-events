@@ -112,22 +112,13 @@
 
     {if $membersEventType == 3 && $purchaseForOther}
 
-    <div id="user_profile" name="user_profile" style="display:none;">
+    {include file="CRM/Event/Form/members-event-profile.tpl"}
 
     {/if}
 
     {* Display "Top of page" profile immediately after the introductory text *}
     {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
-
-    {* TODO: Finish profile switch *}
-
-    {if $membersEventType == 3 && $purchaseForOther}
-
-    {include file="CRM/Event/Form/members-event-profile.tpl"}
-
-    {/if}
-
-    </div>
+    
     {if $pcp && $is_honor_roll }
       <fieldset class="crm-group pcp-group">
         <div class="crm-section pcp-section">

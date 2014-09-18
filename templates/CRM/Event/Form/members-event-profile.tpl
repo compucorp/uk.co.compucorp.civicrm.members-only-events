@@ -1,5 +1,5 @@
-
-<div id="members-only-event-profile" name="members-only-event-profile">
+<fieldset class="mem-fieldset" id="mem-fieldset">
+<legend>Member Info</legend>
   <div class="crm-section editrow_a-section form-item" id="editrow-mem_ID">
     <div class="label">
       {$form.member_ID.label}
@@ -22,13 +22,14 @@
     </div>
     <div class="clear"></div>
   </div>
-</div>
+</fieldset>
 
 {literal}
 <script type="text/javascript">
     cj(document).ready(function() {
       
         cj("[id='exist_ID']").attr('disabled','disabled');
+        cj('fieldset.crm-profile:first').hide();
 
         //result texts
         var checking_html = 'Checking...';  
@@ -80,6 +81,7 @@ function search_membership(){
 
               cj("[id='mem_name']").val(contact.displayname);
               cj('#membership_result').html("Successful.");
+              cj('fieldset.crm-profile:first').show();
 
               cj("[id='first_name']").val(contact.firstname);
               cj("[id='last_name']").val(contact.lastname);
@@ -138,14 +140,20 @@ function search_membership(){
 
     if(pfv_type==1){
       fieldsAction(1);
-      cj('#members-only-event-profile').show();
-      cj('#user_profile').show();
+      var profileName = cj('fieldset.crm-profile').children('legend:first').text();
+      cj('fieldset.crm-profile:first').children('legend:first').text("");
+      cj('fieldset.mem-fieldset').children('legend:first').text(profileName);
+      cj('#mem-fieldset').show();
+      cj('fieldset.crm-profile:first').hide();
       result = true;
     }else{
+      var profileName = cj('fieldset.mem-fieldset').children('legend:first').text();
+      cj('fieldset.mem-fieldset').children('legend:first').text("");
+      cj('fieldset.crm-profile').children('legend:first').text(profileName);
       fieldsAction(2);
       fieldsAction(3);
-      cj('#members-only-event-profile').hide();
-      cj('#user_profile').show();
+      cj('#mem-fieldset').hide();
+      cj('fieldset.crm-profile:first').show();
       result = false;
     }
 

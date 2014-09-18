@@ -59,19 +59,11 @@
 
 {if $membersEventType == 3}
 
-<div id="user_profile" name="user_profile" style="display:none;">
+{include file="CRM/Event/Form/members-event-profile.tpl"}
 
 {/if}
 
-    {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
-    
-{if $membersEventType == 3}
-
-    {include file="CRM/Event/Form/members-event-profile.tpl"}
-
-</div>
-
-{/if}
+{include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
 
 {if $priceSet && $allowGroupOnWaitlist}
     {include file="CRM/Price/Form/ParticipantCount.tpl"}
