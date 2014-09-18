@@ -527,7 +527,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
 	//membersonlyevent
     if($self->_membersEventType == 3){
-    	$pfvId = key(CRM_Utils_Array::value('price_'.$self->_priceFieldId, $fields));
+    	$pfvId = CRM_Utils_Array::value('price_'.$self->_priceFieldId, $fields);
     	$pfvParams = array(
     		'price_value_id' => $pfvId,
     		'event_id' => $self->_eventId,

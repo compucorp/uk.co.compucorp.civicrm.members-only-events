@@ -86,9 +86,6 @@
     {include file="CRM/common/formButtons.tpl"}
 </div>
 </div>
-
-{if $priceSet && $allowGroupOnWaitlist}
-{literal}
 <script type="text/javascript">
 {literal}
 
@@ -101,6 +98,11 @@ cj('#priceset input, #priceset select').change(function () {
 });
 
 {/literal}
+</script>
+{if $priceSet && $allowGroupOnWaitlist}
+{literal}
+<script type="text/javascript">
+
 
 function allowGroupOnWaitlist( participantCount, currentCount )
 {
