@@ -82,6 +82,18 @@
       </div>
     {/if}
 
+    {if $priceSet}
+      {if ! $quickConfig}<fieldset id="priceset" class="crm-group priceset-group">
+        <legend>{$event.fee_label}</legend>{/if}
+      {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
+      <div class="messages status section continue_message-section">
+        <p>
+        The price you selected above is only for current participant, you can select <strong>different prices</strong> for other participants.</p>
+      </div>
+      {include file="CRM/Price/Form/ParticipantCount.tpl"}
+      {if ! $quickConfig}</fieldset>{/if}
+    {/if}
+
     {if $form.additional_participants.html}
       <div class="crm-section additional_participants-section" id="noOfparticipants">
         <div class="label">{$form.additional_participants.label}</div>
@@ -116,18 +128,6 @@
     {/if}
 
     </div>
-
-    {if $priceSet}
-      {if ! $quickConfig}<fieldset id="priceset" class="crm-group priceset-group">
-        <legend>{$event.fee_label}</legend>{/if}
-      {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
-      <div class="messages status section continue_message-section">
-        <p>
-        The price you selected above is only for current participant, you can select <strong>different prices</strong> for other participants.</p>
-      </div>
-      {include file="CRM/Price/Form/ParticipantCount.tpl"}
-      {if ! $quickConfig}</fieldset>{/if}
-    {/if}
     {if $pcp && $is_honor_roll }
       <fieldset class="crm-group pcp-group">
         <div class="crm-section pcp-section">

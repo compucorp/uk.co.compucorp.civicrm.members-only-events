@@ -22,15 +22,6 @@
     </div>
     <div class="clear"></div>
   </div>
-  <div class="crm-section editrow_c-section form-item" id="editrow-company_name">
-    <div class="label">
-      Company name:
-    </div>
-    <div class="content">
-      <input maxlength="64" size="30" name="company_name" type="text" value="" id="company_name" class="form-text big">
-    </div>
-    <div class="clear"></div>
-  </div>
 </div>
 
 {literal}
@@ -53,6 +44,7 @@
             cj('#editrow-first_name').hide();
             cj('#editrow-last_name').hide();
             cj('#editrow-email-Primary').hide();
+            cj('#editrow-current_employer').hide();
             cj("[id='exist_ID']").attr('disabled','disabled');
             cj("[id='exist_ID']").val("");
 
@@ -87,33 +79,32 @@ function search_membership(){
             }else{
 
               cj("[id='mem_name']").val(contact.displayname);
-              cj("[id='company_name']").val(contact.organizationname);
               cj('#membership_result').html("Successful.");
 
               cj("[id='first_name']").val(contact.firstname);
               cj("[id='last_name']").val(contact.lastname);
               cj("[id='email-Primary']").val(contact.email);
+              cj("[id='current_employer']").val(contact.organizationname);
               cj("[id='exist_ID']").val(contact.id);
               cj("[id='exist_ID']").removeAttr('disabled');
                 
               cj('#editrow-mem_name').show();
-              cj('#editrow-company_name').show();
 
               cj('#editrow-first_name').show();
               cj('#editrow-last_name').show();
               cj('#editrow-email-Primary').show();
+              cj('#editrow-current_employer').show();
 
               cj("[id='member_ID']").attr('readonly','readonly');
               cj("[id='member_ID']").attr('style', 'background:#C0C0C0');
               cj("[id='mem_name']").attr('readonly','readonly');
               cj("[id='mem_name']").attr('style', 'background:#C0C0C0');
-              cj("[id='company_name']").attr('readonly','readonly');
-              cj("[id='company_name']").attr('style', 'background:#C0C0C0');
 
               var fields = new Array(
                 cj("[id='first_name']"),
                 cj("[id='last_name']"),
-                cj("[id='email-Primary']")
+                cj("[id='email-Primary']"),
+                cj("[id='current_employer']")
               );
 
               cj.each(fields, function(key, value){
@@ -167,32 +158,33 @@ function search_membership(){
     cj("[id='email-Primary']").val("");
     cj("[id='member_ID']").val("");
     cj("[id='mem_name']").val("");
-    cj("[id='company_name']").val("");
+    cj("[id='current_employer']").val("");
     cj('#membership_result').hide(); 
     cj('#editrow-mem_name').hide();
-    cj('#editrow-company_name').hide();
     cj('#check_membership').attr('value', 'Search Member');
     cj("[id='member_ID']").removeAttr('readonly');
     cj("[id='mem_name']").removeAttr('readonly');
-    cj("[id='company_name']").removeAttr('readonly');
     cj("[id='member_ID']").attr('style', 'background:white');
     cj("[id='mem_name']").attr('style', 'background:white');
-    cj("[id='company_name']").attr('style', 'background:white');
     if(action==1){
       cj('#editrow-first_name').hide();
       cj('#editrow-last_name').hide();
       cj('#editrow-email-Primary').hide();
+      cj('#editrow-current_employer').hide();
     }else if(action==2){
       cj("[id='first_name']").removeAttr('readonly');
       cj("[id='last_name']").removeAttr('readonly');
       cj("[id='email-Primary']").removeAttr('readonly');
+      cj("[id='current_employer']").removeAttr('readonly');
       cj("[id='first_name']").attr('style', 'background:white');
       cj("[id='last_name']").attr('style', 'background:white');
       cj("[id='email-Primary']").attr('style', 'background:white');
+      cj("[id='current_employer']").attr('style', 'background:white');
     }else if(action==3){
       cj('#editrow-first_name').show();
       cj('#editrow-last_name').show();
       cj('#editrow-email-Primary').show();
+      cj('#editrow-current_employer').show();
     }
   }
 

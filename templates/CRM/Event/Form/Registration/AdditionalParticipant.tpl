@@ -41,6 +41,22 @@
     </div>
 {/if}
 
+{if $priceSet}
+     <fieldset id="priceset" class="crm-group priceset-group"><legend>{$event.fee_label}</legend>
+        {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
+    </fieldset>
+{else}
+    {if $paidEvent}
+        <table class="form-layout-compressed">
+            <tr class="crm-event-additionalparticipant-form-block-amount">
+                <td class="label nowrap">{$event.fee_label} <span class="marker">*</span></td>
+                <td>&nbsp;</td>
+                <td>{$form.amount.html}</td>
+            </tr>
+        </table>
+    {/if}
+{/if}
+
 {if $membersEventType == 3}
 
 <div id="user_profile" name="user_profile" style="display:none;">
@@ -64,21 +80,6 @@
 {/if}
 
 <div class="crm-block crm-event-additionalparticipant-form-block">
-{if $priceSet}
-     <fieldset id="priceset" class="crm-group priceset-group"><legend>{$event.fee_label}</legend>
-        {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
-    </fieldset>
-{else}
-    {if $paidEvent}
-        <table class="form-layout-compressed">
-            <tr class="crm-event-additionalparticipant-form-block-amount">
-                <td class="label nowrap">{$event.fee_label} <span class="marker">*</span></td>
-                <td>&nbsp;</td>
-                <td>{$form.amount.html}</td>
-            </tr>
-        </table>
-    {/if}
-{/if}
 
 {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost}
 
@@ -90,11 +91,13 @@
 {literal}
 
 cj(document).ready(function(){
-      checkMemberPrice();
+    cj("[id='editrow-custom_22']").hide();
+    cj("[id='custom_22_terms_and_conditions']").prop('checked', true);
+    checkMemberPrice();
 });
 
 cj('#priceset input, #priceset select').change(function () {
-        checkMemberPrice();
+    checkMemberPrice();
 });
 
 {/literal}
