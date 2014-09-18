@@ -194,6 +194,12 @@
     {literal}
 
     cj(document).ready(function(){
+      cj(':input','fieldset.billing_mode-group').not(':button, :submit, :reset, :hidden').val('');
+      cj(':input','fieldset.billing_mode-group').not(':button, :submit, :reset, :hidden').prop('checked', false);
+      cj(':input','fieldset.billing_mode-group').not(':button, :submit, :reset, :hidden').prop('selected', false);
+      cj(':input','fieldset.billing_name_address-group').not(':button, :submit, :reset, :hidden').val('');
+      cj(':input','fieldset.billing_name_address-group').not(':button, :submit, :reset, :hidden').prop('checked', false);
+      cj(':input','fieldset.billing_name_address-group').not(':button, :submit, :reset, :hidden').prop('selected', false);
       var purchaseForOther = {/literal}"{$purchaseForOther}"{literal};
       if(purchaseForOther){
         checkMemberPrice();
