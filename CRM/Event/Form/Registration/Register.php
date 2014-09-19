@@ -333,7 +333,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     // Build payment processor form
-    if ($this->_ppType) {
+    if ($this->_ppType || $this->_isBillingAddressRequiredForPayLater) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
       // Return if we are in an ajax callback
       if ($this->_snippet) {
@@ -970,15 +970,15 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 	}
 
     	foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
-      		if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
-        		$customizedValue = CRM_Core_OptionGroup::getValue($greeting, 'Customized', 'name');
-        		if ($customizedValue == $greetingType && empty($fields[$greeting . '_custom'])) {
-          			$errors[$customizedGreeting] = ts('Custom %1 is a required field if %1 is of type Customized.',
-            			array(1 => ucwords(str_replace('_', ' ', $greeting)))
-          			);
-        		}
-      		}
-    	}
+      if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
+        $customizedValue = CRM_Core_OptionGroup::getValue($greeting, 'Customized', 'name');
+        if ($customizedValue == $greetingType && empty($fields[$greeting . '_custom'])) {
+          $errors[$customizedGreeting] = ts('Custom %1 is a required field if %1 is of type Customized.',
+            array(1 => ucwords(str_replace('_', ' ', $greeting)))
+          );
+        }
+      }
+    }
     return empty($errors) ? TRUE : $errors;
   }
 
@@ -1016,7 +1016,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     //set as Primary participant
     $params['is_primary'] = 1;
 
-    if ($this->_values['event']['is_pay_later'] && !array_key_exists('hidden_processor', $params)) {
+    if ($this->_values['event']['is_pay_later']
+      && (!array_key_exists('hidden_processor', $params) || $params['payment_processor'] == 0)) {
       $params['is_pay_later'] = 1;
     }
     else {
@@ -1114,6 +1115,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       else {
         $lineItem = array();
         CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem);
+        if ($params['tax_amount']) {
+          $this->set('tax_amount', $params['tax_amount']);
+        }
         $this->set('lineItem', array($lineItem));
         $this->set('lineItemParticipantsCount', array($primaryParticipantCount));
       }
