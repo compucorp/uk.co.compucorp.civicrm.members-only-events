@@ -201,35 +201,38 @@
       cj(':input','fieldset.billing_name_address-group').not(':button, :submit, :reset, :hidden').prop('checked', false);
       cj(':input','fieldset.billing_name_address-group').not(':button, :submit, :reset, :hidden').prop('selected', false);
       var purchaseForOther = {/literal}"{$purchaseForOther}"{literal};
-      if(purchaseForOther){
-        checkMemberPrice();
-      }else{
-        var defaultPrice = 0;
-        {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
-          var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
-          if({/literal}{$priceType}{literal}==0){
-            cj(priceString).attr("disabled", "disabled");
-            cj(priceString).removeAttr('checked');
+      var membersEventType =  {/literal}"{$membersEventType}"{literal};
+      if(membersEventType == 3){
+        if(purchaseForOther){
+          checkMemberPrice();
+        }else{
+          var defaultPrice = 0;
+          {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
+            var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
+            if({/literal}{$priceType}{literal}==0){
+              cj(priceString).attr("disabled", "disabled");
+              cj(priceString).removeAttr('checked');
 
-            var fields = new Array(
-                cj("[id='first_name']"),
-                cj("[id='last_name']"),
-                cj("[id='email-Primary']")
-              );
+              var fields = new Array(
+                  cj("[id='first_name']"),
+                  cj("[id='last_name']"),
+                  cj("[id='email-Primary']")
+                );
 
-              cj.each(fields, function(key, value){
-                if(cj.trim(value.val())){
-                  value.attr('readonly','readonly');
-                  value.attr('style', 'background:#C0C0C0');
+                cj.each(fields, function(key, value){
+                  if(cj.trim(value.val())){
+                    value.attr('readonly','readonly');
+                    value.attr('style', 'background:#C0C0C0');
+                  }
+                });
+              }else{
+                if(!defaultPrice){
+                  cj(priceString).attr("checked", "checked");
+                  defaultPrice = 1;
                 }
-              });
-            }else{
-              if(!defaultPrice){
-                cj(priceString).attr("checked", "checked");
-                defaultPrice = 1;
               }
-            }
-        {/literal}{/foreach}{literal}
+          {/literal}{/foreach}{literal}
+        }
       }
     });
 

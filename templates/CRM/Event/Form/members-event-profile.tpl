@@ -30,6 +30,7 @@
       
         cj("[id='exist_ID']").attr('disabled','disabled');
         cj('fieldset.crm-profile:first').hide();
+        cj('#editrow-mem_name').hide();
 
         //result texts
         var checking_html = 'Checking...';  
@@ -148,9 +149,11 @@ function search_membership(){
       cj('fieldset.crm-profile:first').hide();
       result = true;
     }else{
-      var profileName = cj('fieldset.mem-fieldset').children('legend:first').text();
-      cj('fieldset.mem-fieldset').children('legend:first').text("");
-      cj('fieldset.crm-profile').children('legend:first').text(profileName);
+      if(cj('fieldset.crm-profile:first').children('legend:first').text()==""){
+        var profileName = cj('fieldset.mem-fieldset').children('legend:first').text();
+        cj('fieldset.mem-fieldset').children('legend:first').text("");
+        cj('fieldset.crm-profile').children('legend:first').text(profileName);
+      }
       fieldsAction(2);
       fieldsAction(3);
       cj('#mem-fieldset').hide();

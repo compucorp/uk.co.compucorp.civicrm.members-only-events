@@ -57,7 +57,7 @@
     {/if}
 {/if}
 
-{if $membersEventType == 3}
+{if $membersEventType != 1}
 
 {include file="CRM/Event/Form/members-event-profile.tpl"}
 
@@ -85,11 +85,19 @@
 cj(document).ready(function(){
     cj("[id='editrow-custom_22']").hide();
     cj("[id='custom_22_terms_and_conditions']").prop('checked', true);
+    {/literal}
+    {if $membersEventType == 3}
     checkMemberPrice();
+    {/if}
+    {literal}
 });
 
 cj('#priceset input, #priceset select').change(function () {
+    {/literal}
+    {if $membersEventType == 3}
     checkMemberPrice();
+    {/if}
+    {literal}
 });
 
 {/literal}

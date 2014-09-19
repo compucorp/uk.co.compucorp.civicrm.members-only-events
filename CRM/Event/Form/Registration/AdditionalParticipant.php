@@ -366,7 +366,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
     $this->addButtons($buttons);
 	
-	if($this->_membersEventType == 3){
+	if($this->_membersEventType != 1){
 		$this->add(
       		'text', // field type
       		'member_ID', // field name
@@ -541,6 +541,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
             	$errors['member_ID'] = ts('Please enter a valid member ID and search');
             }
 		}	
+	}else if($self->_membersEventType == 2){
+        if(!CRM_Utils_Array::value('exist_ID', $fields)||!CRM_Utils_Array::value('member_ID', $fields)){
+        	$errors['member_ID'] = ts('Please enter a valid member ID and search');
+        }
 	}
 
     return $errors;
