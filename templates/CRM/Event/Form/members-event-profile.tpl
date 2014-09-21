@@ -68,8 +68,8 @@ function search_membership(){
         }
 
         var postUrl = {/literal}"{crmURL p=$ajaxUrl}"{literal};
-        cj.post( postUrl, { member_Id: memberID }, function( contact ) {
-           if( memberID == 0 || !contact){
+        cj.post( postUrl, { member_Id: memberID }, function( contact ) {console.log(contact);
+           if( memberID == 0 || !contact || contact.validmember == 0 || contact.validmember == null){
 
               cj('#membership_result').html("Not a valid membership ID.");
               cj("[id='exist_ID']").attr('disabled','disabled');

@@ -202,6 +202,18 @@
         if(purchaseForOther){
           checkMemberPrice();
         }else{
+          var fields = new Array(
+            cj("[id='first_name']"),
+            cj("[id='last_name']"),
+            cj("[id='email-Primary']")
+          );
+
+          cj.each(fields, function(key, value){
+            if(cj.trim(value.val())){
+              value.attr('readonly','readonly');
+              value.attr('style', 'background:#C0C0C0');
+            }
+          });
           var defaultPrice = 0;
           {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
             var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
@@ -209,18 +221,6 @@
               cj(priceString).attr("disabled", "disabled");
               cj(priceString).removeAttr('checked');
 
-              var fields = new Array(
-                  cj("[id='first_name']"),
-                  cj("[id='last_name']"),
-                  cj("[id='email-Primary']")
-                );
-
-                cj.each(fields, function(key, value){
-                  if(cj.trim(value.val())){
-                    value.attr('readonly','readonly');
-                    value.attr('style', 'background:#C0C0C0');
-                  }
-                });
               }else{
                 if(!defaultPrice){
                   cj(priceString).attr("checked", "checked");
