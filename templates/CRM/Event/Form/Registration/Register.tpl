@@ -106,7 +106,7 @@
     {* User account registration option. Displays if enabled for one of the profiles on this page. *}
     {include file="CRM/common/CMSUser.tpl"}
 
-    {if $membersEventType == 3 && $purchaseForOther}
+    {if $membersEventType !== 1 && $purchaseForOther}
 
     {include file="CRM/Event/Form/members-event-profile.tpl"}
 
@@ -288,7 +288,9 @@
     cj('#priceset input, #priceset select').change(function () {
         var purchaseForOther = {/literal}"{$purchaseForOther}"{literal};
         if(purchaseForOther){
-          checkMemberPrice();
+          {/literal}{if $membersEventType == 3}{literal}
+          	checkMemberPrice();
+          {/literal}{/if}{literal}
         }
     });
 

@@ -535,8 +535,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         )
       );
     }
-	
-	if($this->_membersEventType == 3){
+
+	if($this->_membersEventType != 1){
 		$this->add(
       		'text', // field type
       		'member_ID', // field name
@@ -876,7 +876,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
 	//membersonlyevent (if the memeber is allowed to register for event more than once)
-	if($self->_membersEventType == 3){
+	if($self->_membersEventType != 1){
 		CRM_Event_Form_Registration_Register::checkProfileComplete($fields, $errors, $self->_eventId);
 
     	$isRegistered = CRM_Event_Form_Registration_Register::checkRegistration($fields, $self, TRUE);
@@ -958,7 +958,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     			'price_value_id' => $pfvId,
     			'event_id' => $self->_eventId,
 			);
-			
+
     		$priceFieldValues = CRM_Membersonlyevent_BAO_MembersEventPrice::getMemberPrice($pfvParams);
 			$priceFieldValue = current($priceFieldValues);
         	if($self->_membersEventType == 3 && $priceFieldValue["is_member_price"] == 1){
@@ -967,7 +967,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             	}
 			}
 		}
-	}
+	}else if($self->_membersEventType == 2){
+        if(!CRM_Utils_Array::value('exist_ID', $fields)||!CRM_Utils_Array::value('member_ID', $fields)){
+          $errors['member_ID'] = ts('Please enter a valid member ID and search');
+        }
+  }
 
     	foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
       if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {

@@ -43,6 +43,7 @@
         cj('#check_membership').click(function(){
           //else show the cheking_text and run the function to check
           if(cj(this).attr("value") == "Search Member"){
+            cj('#editrow-email-Primary').hide();
             cj('#membership_result').show();
             cj('#membership_result').html(checking_html);
             search_membership();
