@@ -1,5 +1,9 @@
 <fieldset class="mem-fieldset" id="mem-fieldset">
 <legend>Member Info</legend>
+  <div class="crm-section editrow_a-section form-item" id="editrow-link">
+  	Find your colleague's Member ID <a href="/members/member-directory" target="_blank">here</a>
+  	<div class="clear"></div>
+  </div>
   <div class="crm-section editrow_a-section form-item" id="editrow-mem_ID">
     <div class="label">
       {$form.member_ID.label}
