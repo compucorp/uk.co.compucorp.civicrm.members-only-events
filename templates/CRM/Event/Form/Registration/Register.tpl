@@ -196,8 +196,8 @@
 
       var purchaseForOther = {/literal}"{$purchaseForOther}"{literal};
       var membersEventType =  {/literal}"{$membersEventType}"{literal};
-      if(membersEventType == 3){
-        if(purchaseForOther){
+      if(membersEventType !== 1){
+        if(membersEventType === 3 && purchaseForOther){
           checkMemberPrice();
         }else{
           var fields = new Array(
@@ -212,20 +212,23 @@
               value.attr('style', 'background:#C0C0C0');
             }
           });
-          var defaultPrice = 0;
-          {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
-            var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
-            if({/literal}{$priceType}{literal}==0){
-              cj(priceString).attr("disabled", "disabled");
-              cj(priceString).removeAttr('checked');
+          
+          if(membersEventType === 3){
+	          var defaultPrice = 0;
+	          {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
+	            var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
+	            if({/literal}{$priceType}{literal}==0){
+	              cj(priceString).attr("disabled", "disabled");
+	              cj(priceString).removeAttr('checked');
 
-              }else{
-                if(!defaultPrice){
-                  cj(priceString).attr("checked", "checked");
-                  defaultPrice = 1;
-                }
-              }
-          {/literal}{/foreach}{literal}
+	              }else{
+	                if(!defaultPrice){
+	                  cj(priceString).attr("checked", "checked");
+	                  defaultPrice = 1;
+	                }
+	              }
+	          {/literal}{/foreach}{literal}
+	      }
         }
       }
     });

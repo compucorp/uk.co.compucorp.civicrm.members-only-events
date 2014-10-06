@@ -950,8 +950,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
 	//membersonlyevent
+  if($self->_purchaseForOther){
     if($self->_membersEventType == 3){
-    	if($self->_purchaseForOther){
     	  //deleted key()
     		$pfvId = CRM_Utils_Array::value('price_'.$self->_priceFieldId, $fields);
     		$pfvParams = array(
@@ -966,11 +966,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             		$errors['member_ID'] = ts('Please enter a valid member ID and Search');
             	}
 			}
-		}
-	}else if($self->_membersEventType == 2){
-        if(!CRM_Utils_Array::value('exist_ID', $fields)||!CRM_Utils_Array::value('member_ID', $fields)){
-          $errors['member_ID'] = ts('Please enter a valid member ID and search');
-        }
+  	}else if($self->_membersEventType == 2){
+          if(!CRM_Utils_Array::value('exist_ID', $fields)||!CRM_Utils_Array::value('member_ID', $fields)){
+            $errors['member_ID'] = ts('Please enter a valid member ID and search');
+          }
+    }
   }
 
     	foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
