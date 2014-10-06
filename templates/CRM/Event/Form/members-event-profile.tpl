@@ -100,7 +100,6 @@ function search_membership(){
 
               cj('#editrow-first_name').show();
               cj('#editrow-last_name').show();
-              cj('#editrow-email-Primary').show();
               cj('#editrow-current_employer').show();
 
               cj("[id='member_ID']").attr('readonly','readonly');
