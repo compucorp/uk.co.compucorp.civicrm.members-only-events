@@ -195,15 +195,19 @@
       cj(':input','fieldset.billing_mode-group').not(':button, :submit, :reset, :hidden').prop('selected', false);
 
       var purchaseForOther = {/literal}"{$purchaseForOther}"{literal};
+      if(purchaseForOther){
+        cj('fieldset.crm-profile:first').children('legend:first').text("Additional Participant Registration Info");
+      }
       var membersEventType =  {/literal}"{$membersEventType}"{literal};
-      if(membersEventType !== 1){
-        if(membersEventType === 3 && purchaseForOther){
+      if(membersEventType !== "1"){
+        if(membersEventType === "3" && purchaseForOther){
           checkMemberPrice();
         }else{
           var fields = new Array(
             cj("[id='first_name']"),
             cj("[id='last_name']"),
-            cj("[id='email-Primary']")
+            cj("[id='email-Primary']"),
+            cj("[id='current_employer']")
           );
 
           cj.each(fields, function(key, value){
@@ -213,7 +217,7 @@
             }
           });
           
-          if(membersEventType === 3){
+          if(membersEventType === "3"){
 	          var defaultPrice = 0;
 	          {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
 	            var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
