@@ -203,7 +203,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
     $isMemberEvent = 0;
-    
+
+    // Set the membershipType variable
+    if (isset($_POST['membership_types'])) {
+      setcookie('membership_types', $_POST['membership_types']);
+    }
+
     //membersonlyevent
     $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_eventId);
     if(is_object($members_only_event)){
@@ -663,6 +668,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         is_null($cid)
       ) {
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
+      }
+      // Hide the current employer field if the event is not a member only event.
+      if ($this->_isMembersOnlyEvent == 0 || ($this->_isMembersOnlyEvent != 0 && $_COOKIE['membership_types'] == 40)) {
+        $fields['current_employer']['skipDisplay'] = 1;
+      } else {
+        $fields['current_employer']['is_required'] = 1;
       }
       $this->assign($name, $fields);
       if (is_array($fields)) {
