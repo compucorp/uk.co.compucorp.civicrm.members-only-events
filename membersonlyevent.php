@@ -221,9 +221,6 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
     }
   }
   
-  $notification = 'Congratulations!';
-  $infoText = 'You meet the condition for this event.';
-  
   // Hide register now button, if the event is members only event and user has no permissions to register for the event
   if (is_object($members_only_event) && $members_only_event->is_members_only_event == 1) {
   	
@@ -238,68 +235,40 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
         'disabled' => TRUE,
       ));
       
-      if (!$userID) {
-        $url = CRM_Utils_System::url('user/login', '',
-          FALSE, // absolute?
-          NULL, // fragment
-          TRUE, // htmlize?
-          TRUE // is frontend?
-        );
-        
-        $button_text = ts('Log in to register');
-
-        $snippet = array(
-          'template' => 'CRM/Event/Page/members-event-button.tpl',
-          'button_text' => $button_text,
-          'position' => 'top',
-          'url' => $url,
-          'weight' => -10,
-        );
-       
-        CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->add($snippet);
-
-        $snippet['position'] = 'bottom';
-        $snippet['weight'] = -10;
-        
-        CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
-          
-      }else{
-      	if(!CRM_Core_Permission::check('members only event registration')){
+    	if(!CRM_Core_Permission::check('members only event registration')){
 	  		$notification = 'Sorry.';
 	  		$infoText = 'You need to become a member to for register this event.';
-			$button_text = ts('Become a member to register for this event');
-	  	}else if((CRM_Core_Permission::check('members only event registration')&&!$durationCheck)){
+			  $button_text = ts('Become a member to register for this event');
+  	  }else if((CRM_Core_Permission::check('members only event registration')&&!$durationCheck)){
 	  		$notification = 'Sorry.';
 	  		$infoText = 'Your membership expires before the event start. Please extend your membership to register for this event.';
-			$button_text = ts('Extend your membership to register for this event');
+			  $button_text = ts('Extend your membership to register for this event');
 	  	}
-    	
-      	$url = CRM_Utils_System::url('civicrm/event/register/member',
-        	array('id' => $currentEventID, 'reset' => 1),
-        	FALSE, // absolute?
-        	NULL, // fragment
-        	TRUE, // htmlize?
-        	TRUE // is frontend?
-      	);
+  	
+    	$url = CRM_Utils_System::url('civicrm/event/register/member',
+      	array('id' => $currentEventID, 'reset' => 1),
+      	FALSE, // absolute?
+      	NULL, // fragment
+      	TRUE, // htmlize?
+      	TRUE // is frontend?
+    	);
 
-      	$snippet = array(
-        	'template' => 'CRM/Event/Page/members-event-button.tpl',
-        	'button_text' => $button_text,
-        	'position' => 'top',
-        	'url' => $url,
-        	'weight' => -10,
-      	);
-      
-      	CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->add($snippet);
+    	$snippet = array(
+      	'template' => 'CRM/Event/Page/members-event-button.tpl',
+      	'button_text' => $button_text,
+      	'position' => 'top',
+      	'url' => $url,
+      	'weight' => -10,
+    	);
+    
+    	CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->add($snippet);
 
-      	$snippet['position'] = 'bottom';
-      	$snippet['weight'] = -10;
-           
-      	CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
-      }
-      
+    	$snippet['position'] = 'bottom';
+    	$snippet['weight'] = -10;
+         
+    	CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
+      CRM_Core_Session::setStatus(ts($infoText), ts($notification), 'error');
     }
-    CRM_Core_Session::setStatus(ts($infoText), ts($notification), 'error');
   }
 }
 
