@@ -188,9 +188,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_forcePayement;
 
   public $_isBillingAddressRequiredForPayLater;
-  
+
   public $_isMembersOnlyEvent = 0;
-  
+
   public $_isMember = 0;
 
   /**
@@ -214,14 +214,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if(is_object($members_only_event)){
       $this->_isMembersOnlyEvent = $members_only_event;
       $isMemberEvent = 1;
-      
+
       if (CRM_Core_Permission::check('members only event registration')){
         $this->_isMember = 1;
       }
     }else{
       $this->_isMembersOnlyEvent = 0;
     }
-    
+
     $this->assign("isMembersOnlyEvent", $isMemberEvent);
     $this->assign("isMember", $this->_isMember);
 
@@ -801,6 +801,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     //get the amount of primary participant
     if (!empty($this->_params['is_primary'])) {
       $this->_params['fee_amount'] = $this->get('primaryParticipantAmount');
+    }else{
+      $this->_params['registered_by_id'] = $this->get('registerByID');
     }
 
     // add participant record
