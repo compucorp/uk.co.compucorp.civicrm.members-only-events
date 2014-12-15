@@ -675,15 +675,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       // Hide the current employer field if the event is not a member only event.
       if ($this->_isMembersOnlyEvent == 0 || ($this->_isMembersOnlyEvent != 0 && $_COOKIE['membership_types'] == 40)) {
-        $fields['current_employer']['skipDisplay'] = 1;
+        $fields['current_employer']['is_required'] = 0;
       }
       elseif (isset($name) && $name == 'additionalCustomPre') {
-        $fields['current_employer']['skipDisplay'] = 1;
-        $this->_submitValues['current_employer'] = $this->_params[0]['current_employer'];
+        $fields['current_employer']['is_required'] = 0;
       }
       else {
         $fields['current_employer']['is_required'] = 1;
       }
+      
       $this->assign($name, $fields);
       if (is_array($fields)) {
         foreach ($fields as $key => $field) {
