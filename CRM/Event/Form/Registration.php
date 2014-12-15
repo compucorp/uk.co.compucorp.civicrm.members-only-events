@@ -674,7 +674,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       CRM_Core_Resources::singleton()->addScriptFile('com.compucorp.membersonlyevent', 'membership_fee.js');
 
       // Hide the current employer field if the event is not a member only event.
-      if ($this->_isMembersOnlyEvent == 0 || ($this->_isMembersOnlyEvent != 0 && $_COOKIE['membership_types'] == 40)) {
+      if ($this->_isMembersOnlyEvent == 0 || ($this->_isMembersOnlyEvent != 0 && $_COOKIE['membership_types'] == 40) || (isset($name) && $name == 'additionalCustomPre')) {
         $fields['current_employer']['skipDisplay'] = 1;
       } else {
         $fields['current_employer']['is_required'] = 1;
