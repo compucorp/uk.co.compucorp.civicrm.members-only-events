@@ -66,7 +66,7 @@
     cj(document).ready(function(){
       cj("input[id^='price_value_selectitem_']").hide();
 
-      var priceFieldId = cj("#price_field_id").find(":selected").val();
+      var priceFieldId = cj("select[id='price_field_id']").val();
       priceMemberMatch(priceFieldId);
       cj("#is_members_only_event_div input[type=checkbox]").click(function(){
         
@@ -88,7 +88,7 @@
       
     });
 
-    cj("#price_field_id").on('change', function(e) {
+    cj("select[id='price_field_id']").on('change', function(e) {
     	var priceFieldId = e.target.options[e.target.selectedIndex].value;
     	cj("select[id^='membership_type_selectitem_']").val("");
     	priceMemberMatch(priceFieldId);
