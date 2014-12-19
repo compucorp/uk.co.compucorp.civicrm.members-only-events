@@ -898,7 +898,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             'source' => 'Event purchase',
             'num_terms' => 1
           );
-          
+
+          if($params['contact_id'] == null) {
+            $params['contact_id'] = $this->_values['participant']['participant_contact_id'];
+          }
+
           $memberPrices = CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve(array('event_id' => $this->_eventId));
           $memberItems = array();
           foreach ($memberPrices as $key => $value) {
