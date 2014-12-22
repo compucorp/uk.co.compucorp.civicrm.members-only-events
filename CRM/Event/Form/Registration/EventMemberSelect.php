@@ -19,6 +19,7 @@ class CRM_Event_Form_Registration_EventMemberSelect extends CRM_Event_Form_Regis
   }
 
   function buildQuickForm() {
+    $this->preProcess();
     CRM_Utils_System::setTitle(ts('Become a Member'));
 
     $this -> _membershipList = $this -> getMembershipList();
