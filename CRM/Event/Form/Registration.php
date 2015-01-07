@@ -671,6 +671,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
 
       CRM_Core_Resources::singleton()->addSetting(array('membership_type' => array('type' => $_COOKIE['membership_types'])));
+      CRM_Core_Resources::singleton()->addSetting(array('membership_type' => array('value' => SCHOOLMEMBERSHIPID)));
       CRM_Core_Resources::singleton()->addScriptFile('com.compucorp.membersonlyevent', 'membership_fee.js');
 
       // Hide the current employer field if the event is not a member only event.

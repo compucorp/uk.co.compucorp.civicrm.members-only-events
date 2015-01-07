@@ -980,6 +980,31 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
       }
     }
+
+    // Verify the organization to see if has existing memberships.
+    if($_COOKIE['membership_types'] == SCHOOLMEMBERSHIPID) {
+      // Get the current employer's id.
+      $organizationParams['organization_name'] = $fields['current_employer'];
+      $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
+      $dedupeParams['check_permission'] = FALSE;
+      $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
+
+      // Verify if the organization was found, if not show error.
+      if (is_array($dupeIDs) && !empty($dupeIDs)) {
+        foreach ($dupeIDs as $orgId) {
+          $organization = $orgId;
+          break;
+        }
+
+        // Try to get the organization's membership. If a membership was found show error.
+        $params = array('contact_id' => $organization);
+        $membership = CRM_Member_BAO_Membership::retrieve($params, $params);
+        if (is_object($membership)) {
+          $errors['current_employer'] = ts('One of your colleague has already purchased the membership for your organisation, please contact your colleague to invite you to become a member.');
+        }
+      }
+    }
+
     return empty($errors) ? TRUE : $errors;
   }
 

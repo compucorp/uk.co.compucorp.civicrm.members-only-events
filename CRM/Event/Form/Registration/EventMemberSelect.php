@@ -15,7 +15,7 @@ class CRM_Event_Form_Registration_EventMemberSelect extends CRM_Event_Form_Regis
     parent::preProcess();
     $session = CRM_Core_Session::singleton();
     $session -> set('paid_membership', 0);
-    $this -> _eventId = $session -> get('member_event_id');
+//    $this -> _eventId = $session -> get('member_event_id');
   }
 
   function buildQuickForm() {

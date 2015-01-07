@@ -33,6 +33,7 @@
  * $Id$
  *
  */
+define('SCHOOLMEMBERSHIPID', 41);
 
 /**
  * This class generates form components for processing Event
@@ -899,10 +900,26 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             'num_terms' => 1
           );
 
+
           if($params['contact_id'] == null) {
             $params['contact_id'] = $this->_values['participant']['participant_contact_id'];
           }
+          if($_COOKIE['membership_types'] == SCHOOLMEMBERSHIPID) {
+            // Get the employer's id.
+            $organizationParams['organization_name'] = $this->_params['current_employer'];;
+            $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
+            $dedupeParams['check_permission'] = FALSE;
+            $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
 
+            // Verify if the organization was found.
+            if (is_array($dupeIDs) && !empty($dupeIDs)) {
+              foreach ($dupeIDs as $orgId) {
+                $organization = $orgId;
+                break;
+              }
+              $params['contact_id'] = $organization;
+            }
+          }
           $memberPrices = CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve(array('event_id' => $this->_eventId));
           $memberItems = array();
           foreach ($memberPrices as $key => $value) {
