@@ -1193,6 +1193,15 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
     }
+
+    // Get all the tags
+    $allTag = CRM_Core_BAO_Tag::getTags('civicrm_contact');
+    $tag_key = array_search('Webform Registration', $allTag);
+    if($tag_key != false) {
+      $fields['tag'] = 1;
+      $params['tag'][$tag_key] = "1";
+    }
+
     if ($contactID) {
       $ctype = CRM_Core_DAO::getFieldValue(
         'CRM_Contact_DAO_Contact',
