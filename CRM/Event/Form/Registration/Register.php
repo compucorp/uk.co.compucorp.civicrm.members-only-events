@@ -848,6 +848,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!$self->_skipDupeRegistrationCheck) {
       self::checkRegistration($fields, $self);
     }
+
+    // Check if the email is not already used.
+    $contact = CRM_Contact_BAO_Contact::matchContactOnEmail($fields['email-Primary']);
+    global $user;
+    if((!user_is_logged_in() && is_object($contact)) || (user_is_logged_in() && $user->mail !== $fields['email-Primary'])) {
+      $errors['email-Primary'] = ts('This email address has been taken by another user.');
+    }
+
     //check for availability of registrations.
     if (!$self->_allowConfirmation && empty($fields['bypass_payment']) &&
       is_numeric($self->_availableRegistrations) &&
