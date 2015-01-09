@@ -1,16 +1,14 @@
-<h3>{ts}Please select the membership:{/ts}</h3>
-<div class="crm-block crm-form-block crm-membersevent-system-config-form-block">
 
-<fieldset>
-  <table class="form-layout-compressed">
+<div class="crm-container crm-public">
+<fieldset class="crm-profile crm-profile-name-event_registration">
+  <legend>{ts}Please select the membership:{/ts}</legend>
+  <div class="crm-section">
+    <div class="label">{$form.membership_types.label}</div>
+    <div class="content">{$form.membership_types.html}</div>
+  </div>
 
-    <tr class="crm-membersevent-system-config-form-block-validation_settings">
-        <td class="label">{$form.membership_types.label}</td><td>{$form.membership_types.html}</td>
-    </tr>
-  </table>
 </fieldset>
-
-<div class="crm-submit-buttons">
-{include file="CRM/common/formButtons.tpl" location="bottom"}
-</div>
+  <div id="crm-submit-buttons" class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl" location="bottom"}
+  </div>
 </div>
