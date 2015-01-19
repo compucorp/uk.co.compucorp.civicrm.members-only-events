@@ -200,13 +200,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @access public
    */
   function preProcess() {
+    $session = CRM_Core_Session::singleton();
+
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
     $isMemberEvent = 0;
 
     // Set the membershipType variable
     if (isset($_POST['membership_types'])) {
-      setcookie('membership_types', $_POST['membership_types']);
+      $session->set('membership_types', $_POST['membership_types']);
     }
 
     //membersonlyevent
@@ -669,12 +671,23 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       ) {
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
       }
-
-      CRM_Core_Resources::singleton()->addSetting(array('membership_type' => array('type' => $_COOKIE['membership_types'])));
+      
+      //membersonlyevent
+      $currentSession = CRM_Core_Session::singleton();
+      CRM_Core_Resources::singleton()->addSetting(array('membership_type' => array('type' => $currentSession->get('membership_types'))));
       CRM_Core_Resources::singleton()->addScriptFile('com.compucorp.membersonlyevent', 'js/membership_fee.js');
 
       // Hide the current employer field if the event is not a member only event.
-      if ($this->_isMembersOnlyEvent == 0|| ($this->_isMembersOnlyEvent != 0 && $_COOKIE['membership_types'] == 40)) {
+      $priceParams = array(
+        'event_id' => $currentSession->get('member_event_id'),
+        'price_value_id' => $currentSession->get('membership_types')
+      );
+      
+      $memberSelected = array_pop(CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve($priceParams))->membership_type_id;
+      //bespoked membership system, suppose ID will not change, add config for this if necessary
+      $checkOrgMember = $memberSelected == 5 || $memberSelected == 6;
+      
+      if (!is_object($this->_isMembersOnlyEvent) || (is_object($this->_isMembersOnlyEvent) && !$checkOrgMember)) {
         $fields['current_employer']['is_required'] = 0;
       }
       elseif (isset($name) && $name == 'additionalCustomPre') {
