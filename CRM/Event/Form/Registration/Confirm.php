@@ -891,99 +891,102 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
         //membersonlyevent
         //TODO: maybe contribution_recur_id
-        if($members_only_event){
-        
-          $params = array(
-            'contact_id' => $currentSession->get('userID'),
-            'source' => 'Event purchase',
-            'num_terms' => 1
-          );
-
-          if($params['contact_id'] == null) {
-            $params['contact_id'] = $this->_values['participant']['participant_contact_id'];
-          }
-
-          $priceParams = array(
-            'event_id' => $currentSession->get('member_event_id'),
-            'price_value_id' => $currentSession->get('membership_types')
-          );
+        //Check if is additional participant
+        if(!$this->_values['params']['additionalParticipant']){
+          if($members_only_event){
           
-          $memberSelected = array_pop(CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve($priceParams))->membership_type_id;
-
-          //bespoked membership system, suppose ID will not change, add config for this if necessary
-          if($memberSelected == 5) {
-            // Get the employer's id.
-            $organizationParams['organization_name'] = $this->_params['current_employer'];;
-            $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
-            $dedupeParams['check_permission'] = FALSE;
-            $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
-
-            // Verify if the organization was found.
-            if (is_array($dupeIDs) && !empty($dupeIDs)) {
-              foreach ($dupeIDs as $orgId) {
-                $organization = $orgId;
-                break;
-              }
-              $params['contact_id'] = $organization;
+            $params = array(
+              'contact_id' => $currentSession->get('userID'),
+              'source' => 'Event purchase',
+              'num_terms' => 1
+            );
+    
+            if($params['contact_id'] == null) {
+              $params['contact_id'] = $this->_values['participant']['participant_contact_id'];
             }
-          }
-          $memberPrices = CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve(array('event_id' => $this->_eventId));
-          $memberItems = array();
-          foreach ($memberPrices as $key => $value) {
-            $memberItems[$value->price_value_id] = $value->membership_type_id;
-          }
-          
-          $action = CRM_Core_Action::ADD;
-          // we need user id during add mode
-          $ids = array ();
-          if (!empty($params['contact_id'])) {
-            $ids['userId'] = $params['contact_id'];
-          }
-          //for edit membership id should be present (if needed)
-          if (!empty($params['id'])) {
-            $ids['membership'] = $params['id'];
-            $action = CRM_Core_Action::UPDATE;
-          }
-          //need to pass action to handle related memberships.
-          $params['action'] = $action;
-          
-          if (empty($params['id']) || !empty($params['num_terms'])) {
-            if (empty($params['id'])) {
-              $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
-                $params['membership_type_id'],
-                CRM_Utils_Array::value('join_date', $params),
-                CRM_Utils_Array::value('start_date', $params),
-                CRM_Utils_Array::value('end_date', $params),
-                CRM_Utils_Array::value('num_terms', $params, 1)
-              );
-            }
-            else {
-              $calcDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType(
-                $params['id'],
-                NULL,
-                CRM_Utils_Array::value('membership_type_id', $params),
-                $params['num_terms']
-              );
-            }
-            foreach (array('join_date', 'start_date', 'end_date') as $date) {
-              if (empty($params[$date]) && isset($calcDates[$date])) {
-                $params[$date] = $calcDates[$date];
+    
+            $priceParams = array(
+              'event_id' => $currentSession->get('member_event_id'),
+              'price_value_id' => $currentSession->get('membership_types')
+            );
+            
+            $memberSelected = array_pop(CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve($priceParams))->membership_type_id;
+    
+            //bespoked membership system, suppose ID will not change, add config for this if necessary
+            if($memberSelected == 5) {
+              // Get the employer's id.
+              $organizationParams['organization_name'] = $this->_params['current_employer'];;
+              $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
+              $dedupeParams['check_permission'] = FALSE;
+              $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
+    
+              // Verify if the organization was found.
+              if (is_array($dupeIDs) && !empty($dupeIDs)) {
+                foreach ($dupeIDs as $orgId) {
+                  $organization = $orgId;
+                  break;
+                }
+                $params['contact_id'] = $organization;
               }
             }
-          }
-          
-  
-          foreach ($this->_lineItem as $key => $value) {
-            foreach ($value as $id => $item) {
-              if(key_exists($id, $memberItems)){
-                $params['membership_type_id'] = $memberItems[$id];
-                $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids, TRUE);
+            $memberPrices = CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve(array('event_id' => $this->_eventId));
+            $memberItems = array();
+            foreach ($memberPrices as $key => $value) {
+              $memberItems[$value->price_value_id] = $value->membership_type_id;
+            }
+            
+            $action = CRM_Core_Action::ADD;
+            // we need user id during add mode
+            $ids = array ();
+            if (!empty($params['contact_id'])) {
+              $ids['userId'] = $params['contact_id'];
+            }
+            //for edit membership id should be present (if needed)
+            if (!empty($params['id'])) {
+              $ids['membership'] = $params['id'];
+              $action = CRM_Core_Action::UPDATE;
+            }
+            //need to pass action to handle related memberships.
+            $params['action'] = $action;
+            
+            if (empty($params['id']) || !empty($params['num_terms'])) {
+              if (empty($params['id'])) {
+                $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
+                  $params['membership_type_id'],
+                  CRM_Utils_Array::value('join_date', $params),
+                  CRM_Utils_Array::value('start_date', $params),
+                  CRM_Utils_Array::value('end_date', $params),
+                  CRM_Utils_Array::value('num_terms', $params, 1)
+                );
+              }
+              else {
+                $calcDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType(
+                  $params['id'],
+                  NULL,
+                  CRM_Utils_Array::value('membership_type_id', $params),
+                  $params['num_terms']
+                );
+              }
+              foreach (array('join_date', 'start_date', 'end_date') as $date) {
+                if (empty($params[$date]) && isset($calcDates[$date])) {
+                  $params[$date] = $calcDates[$date];
+                }
               }
             }
-          }
-  		    $currentSession->set('paid_membership', 1);
-          $currentSession->set('membership_types', NULL);
-		    }
+            
+    dpm("breaker");dpm($memberItems);
+            foreach ($this->_lineItem as $key => $value) {
+              foreach ($value as $id => $item) {
+                if(key_exists($id, $memberItems)){dpm($id);
+                  $params['membership_type_id'] = $memberItems[$id];
+                  $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids, TRUE);
+                }
+              }
+            }
+    		    $currentSession->set('paid_membership', 1);
+            $currentSession->set('membership_types', NULL);
+    	    }
+        }
       }
     }
   }
