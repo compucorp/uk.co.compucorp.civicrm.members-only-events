@@ -66,7 +66,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     parent::preProcess();
 
     // lineItem isn't set until Register postProcess
-    $this->_lineItem = $this->get('lineItem');//dpm($this->_lineItem);
+    $this->_lineItem = $this->get('lineItem');
 
     $this->_params = $this->get('params');
     $this->_params[0]['tax_amount'] = $this->get('tax_amount');
@@ -974,10 +974,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
               }
             }
             
-    dpm("breaker");dpm($memberItems);
             foreach ($this->_lineItem as $key => $value) {
               foreach ($value as $id => $item) {
-                if(key_exists($id, $memberItems)){dpm($id);
+                if(key_exists($id, $memberItems)){
                   $params['membership_type_id'] = $memberItems[$id];
                   $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids, TRUE);
                 }
