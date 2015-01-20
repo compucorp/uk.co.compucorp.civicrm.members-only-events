@@ -15,20 +15,25 @@ class CRM_Event_Form_Registration_EventMemberSelect extends CRM_Event_Form_Regis
     parent::preProcess();
     $session = CRM_Core_Session::singleton();
     $session -> set('paid_membership', 0);
-//    $this -> _eventId = $session -> get('member_event_id');
   }
 
   function buildQuickForm() {
     $this->preProcess();
     CRM_Utils_System::setTitle(ts('Become a Member'));
 
-    $this -> _membershipList = $this -> getMembershipList();
+    $this->_membershipList = $this -> getMembershipList();
+    
+    if(!is_null($this->_membershipList)){
+      $options = $this->_membershipList;
+    }else{
+      $options = array('Membership purchase is not enabled for this event');
+    }
 
     // add form elements
     $this -> add('select', // field type
     'membership_types', // field name
     ts('Membership Types'), // field label
-    array_merge(array('' => ts('-- Select --')), $this -> _membershipList), // list of attributes
+    array('' => ts('-- Select --')) + $options, // list of attributes
     TRUE // is required
     );
 
@@ -47,11 +52,12 @@ class CRM_Event_Form_Registration_EventMemberSelect extends CRM_Event_Form_Regis
 
     if (isset($values['membership_types']) && array_key_exists($values['membership_types'], $this -> _membershipList)) {
       $session -> set('membership_price_field_value_id', $values['membership_types']);
+      $url = CRM_Utils_System::url('civicrm/event/register', "reset=1&id={$this->_eventId}");
     } else {
       $session -> set('membership_type', 0);
+      $url = $_SERVER['HTTP_REFERER'];
     }
 
-    $url = CRM_Utils_System::url('civicrm/event/register', "reset=1&id={$this->_eventId}");
     CRM_Utils_System::redirect($url);
   }
 
