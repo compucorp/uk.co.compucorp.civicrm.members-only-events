@@ -988,9 +988,19 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
       }
     }
-
+    
+    $currentSession = CRM_Core_Session::singleton();
+    
+    $priceParams = array(
+      'event_id' => $currentSession->get('member_event_id'),
+      'price_value_id' => $currentSession->get('membership_types')
+    );
+    
+    $memberSelected = array_pop(CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve($priceParams))->membership_type_id;
+          
     // Verify the organization to see if has existing memberships.
-    if($_COOKIE['membership_types'] == SCHOOLMEMBERSHIPID) {
+    //bespoked membership system, suppose ID will not change, add config for this if necessary
+    if($memberSelected == 5) {
       // Get the current employer's id.
       $organizationParams['organization_name'] = $fields['current_employer'];
       $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
