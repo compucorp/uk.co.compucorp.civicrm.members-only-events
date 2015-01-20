@@ -28,7 +28,7 @@ class CRM_Event_Form_Registration_EventMemberSelect extends CRM_Event_Form_Regis
     $this -> add('select', // field type
     'membership_types', // field name
     ts('Membership Types'), // field label
-    array('' => ts('-- Select --')) + $this -> _membershipList, // list of attributes
+    array_merge(array('' => ts('-- Select --')), $this -> _membershipList), // list of attributes
     TRUE // is required
     );
 
