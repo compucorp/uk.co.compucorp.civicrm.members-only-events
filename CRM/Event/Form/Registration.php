@@ -216,6 +216,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if(is_object($members_only_event)){
       $this->_isMembersOnlyEvent = $members_only_event;
       $isMemberEvent = 1;
+      
+      $searchPriceField = civicrm_api3("PriceField", "get", array("id" => $members_only_event->price_field_id));
+      $result = array_pop($searchPriceField['values']);
+      $this->assign("memberFieldSection", $result['name']);
 
       if (CRM_Core_Permission::check('members only event registration')){
         $this->_isMember = 1;
@@ -674,8 +678,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       
       //membersonlyevent
       $currentSession = CRM_Core_Session::singleton();
-      CRM_Core_Resources::singleton()->addSetting(array('membership_type' => array('type' => $currentSession->get('membership_types'))));
-      CRM_Core_Resources::singleton()->addScriptFile('com.compucorp.membersonlyevent', 'js/membership_fee.js');
+      if($this->_isMembersOnlyEvent){
+        CRM_Core_Resources::singleton()->addSetting(array('membership_type' => array('type' => $currentSession->get('membership_types'))));
+        CRM_Core_Resources::singleton()->addScriptFile('com.compucorp.membersonlyevent', 'js/membership_fee.js');
+      }
 
       // Hide the current employer field if the event is not a member only event.
       $priceParams = array(
