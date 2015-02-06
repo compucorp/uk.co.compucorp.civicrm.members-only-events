@@ -505,8 +505,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       else {
         $value['amount'] = $this->_totalAmount;
       }
-
+      
       $contactID = CRM_Event_Form_Registration_Confirm::updateContactFields($contactID, $value, $fields, $this);
+      $this->isAdditional = 1;
 
       // lets store the contactID in the session
       // we dont store in userID in case the user is doing multiple
@@ -1205,11 +1206,15 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     // Get all the tags
-    $allTag = CRM_Core_BAO_Tag::getTags('civicrm_contact');
-    $tag_key = array_search('Webform Registration', $allTag);
-    if($tag_key != false) {
-      $fields['tag'] = 1;
-      $params['tag'][$tag_key] = "1";
+    if($form->_isMembersOnlyEvent){
+      if($form->isAdditional!==1){
+        $allTag = CRM_Core_BAO_Tag::getTags('civicrm_contact');
+        $tag_key = array_search('Webform Registration', $allTag);
+        if($tag_key != false) {
+          $fields['tag'] = 1;
+          $params['tag'][$tag_key] = "1";
+        }
+      }
     }
 
     if ($contactID) {

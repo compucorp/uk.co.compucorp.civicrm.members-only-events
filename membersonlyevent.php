@@ -236,8 +236,8 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
       ));
       
     	if(!CRM_Core_Permission::check('members only event registration')){
-	  		$notification = 'Sorry.';
-	  		$infoText = 'You need to become a member to for register this event.';
+	  		$notification = '';
+	  		$infoText = "This event is for PSHE Association members only, if you have a current, pending or former membership please log in before filling in this form. If you are not a current member you will be charged an additional membership fee.";
 			  $button_text = ts('Become a member to register for this event');
   	  }else if((CRM_Core_Permission::check('members only event registration')&&!$durationCheck)){
 	  		$notification = 'Sorry.';

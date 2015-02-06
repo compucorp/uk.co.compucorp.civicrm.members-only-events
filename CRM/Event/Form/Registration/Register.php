@@ -850,10 +850,18 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     // Check if the email is not already used.
-    $contact = CRM_Contact_BAO_Contact::matchContactOnEmail($fields['email-Primary']);
     global $user;
-    if((!user_is_logged_in() && is_object($contact)) || (user_is_logged_in() && $user->mail !== $fields['email-Primary'])) {
+    if(user_is_logged_in() && $user->mail !== $fields['email-Primary']) {
       $errors['email-Primary'] = ts('This email address has been taken by another user.');
+    }
+    if($self->_isMembersOnlyEvent&&!user_is_logged_in()){
+      $drupalEmail = $fields['email-Primary'];
+      $drupalQuery = "SELECT mail FROM users WHERE mail ='".$drupalEmail."'";
+      $drupalResult = db_query($drupalQuery);
+      $drupalRecord = $drupalResult->fetchCol();
+      if($drupalRecord){
+        $errors['email-Primary'] = ts('This email address has been taken by another user.');
+      }
     }
 
     //check for availability of registrations.
@@ -989,40 +997,41 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
     
-    $currentSession = CRM_Core_Session::singleton();
-    
-    $priceParams = array(
-      'event_id' => $currentSession->get('member_event_id'),
-      'price_value_id' => $currentSession->get('membership_types')
-    );
-    
-    $memberSelected = array_pop(CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve($priceParams))->membership_type_id;
-          
-    // Verify the organization to see if has existing memberships.
-    //bespoked membership system, suppose ID will not change, add config for this if necessary
-    if($memberSelected == 5) {
-      // Get the current employer's id.
-      $organizationParams['organization_name'] = $fields['current_employer'];
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
-      $dedupeParams['check_permission'] = FALSE;
-      $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
-
-      // Verify if the organization was found, if not show error.
-      if (is_array($dupeIDs) && !empty($dupeIDs)) {
-        foreach ($dupeIDs as $orgId) {
-          $organization = $orgId;
-          break;
-        }
-
-        // Try to get the organization's membership. If a membership was found show error.
-        $params = array('contact_id' => $organization);
-        $membership = CRM_Member_BAO_Membership::retrieve($params, $params);
-        if (is_object($membership)) {
-          $errors['current_employer'] = ts('One of your colleague has already purchased the membership for your organisation, please contact your colleague to invite you to become a member.');
+    if($self->_isMembersOnlyEvent){
+      $currentSession = CRM_Core_Session::singleton();
+      
+      $priceParams = array(
+        'event_id' => $currentSession->get('member_event_id'),
+        'price_value_id' => $currentSession->get('membership_types')
+      );
+      
+      $memberSelected = array_pop(CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve($priceParams))->membership_type_id;
+            
+      // Verify the organization to see if has existing memberships.
+      //bespoked membership system, suppose ID will not change, add config for this if necessary
+      if($memberSelected == 5) {
+        // Get the current employer's id.
+        $organizationParams['organization_name'] = $fields['current_employer'];
+        $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
+        $dedupeParams['check_permission'] = FALSE;
+        $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
+  
+        // Verify if the organization was found, if not show error.
+        if (is_array($dupeIDs) && !empty($dupeIDs)) {
+          foreach ($dupeIDs as $orgId) {
+            $organization = $orgId;
+            break;
+          }
+  
+          // Try to get the organization's membership. If a membership was found show error.
+          $params = array('contact_id' => $organization);
+          $membership = CRM_Member_BAO_Membership::retrieve($params, $params);
+          if (is_object($membership)) {
+            $errors['current_employer'] = ts('One of your colleague has already purchased the membership for your organisation, please contact your colleague to invite you to become a member.');
+          }
         }
       }
     }
-
     return empty($errors) ? TRUE : $errors;
   }
 

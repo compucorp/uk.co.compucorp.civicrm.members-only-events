@@ -54,7 +54,7 @@ class CRM_Event_Form_Registration_EventMemberSelect extends CRM_Event_Form_Regis
       $session -> set('membership_price_field_value_id', $values['membership_types']);
       $url = CRM_Utils_System::url('civicrm/event/register', "reset=1&id={$this->_eventId}");
     } else {
-      $session -> set('membership_type', 0);
+      $session -> set('membership_types', 0);
       $url = $_SERVER['HTTP_REFERER'];
     }
 

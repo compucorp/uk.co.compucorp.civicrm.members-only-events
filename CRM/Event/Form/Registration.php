@@ -230,6 +230,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $this->assign("isMembersOnlyEvent", $isMemberEvent);
     $this->assign("isMember", $this->_isMember);
+    $this->assign("isLoggedIn", user_is_logged_in());
 
     //CRM-4320
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
