@@ -1447,7 +1447,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if(!$baseIPN->validateData($input2, $ids2, $memObjects, FALSE)){
         CRM_Core_Error::fatal();
       }
-      $objects['membership'] = $objects2['membership'];
+      $objects['membership'] = $memObjects['membership'];
       $memberships = &$objects['membership'];
     }
 
