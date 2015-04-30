@@ -114,7 +114,7 @@
 
     {* Display "Top of page" profile immediately after the introductory text *}
     {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
-    
+
     {if $pcp && $is_honor_roll }
       <fieldset class="crm-group pcp-group">
         <div class="crm-section pcp-section">
@@ -216,13 +216,15 @@
               value.attr('style', 'background:#C0C0C0');
             }
           });
-          
+
           if(membersEventType === "3"){
 	          var defaultPrice = 0;
 	          {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
-	            var priceString = "[id^='CIVICRM_QFID_"+{/literal}{$priceId}{literal}+"']";
+	            var priceString = 'input[id^="CIVICRM_QFID_{/literal}{$priceId}{literal}"]';
+
 	            if({/literal}{$priceType}{literal}==0){
-	              cj(priceString).attr("disabled", "disabled");
+                cj(priceString).parent().css("display", "none");
+                cj(priceString).attr("disabled", "disabled");
 	              cj(priceString).removeAttr('checked');
 
 	              }else{
