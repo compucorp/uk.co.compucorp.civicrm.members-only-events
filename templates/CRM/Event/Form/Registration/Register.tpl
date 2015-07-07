@@ -372,5 +372,25 @@
   }
   {/literal}{/if}{literal}
 
+
+    cj(document).ready(function(){
+      {/literal}{if $isLoggedIn == 1}{literal}
+        cj("#email-Primary").attr('readonly', true);
+      {/literal}{/if}{literal}
+      {/literal}{if $isMembersOnlyEvent == 1}{literal}console.log({/literal}{$isMembersOnlyEvent}{literal});
+      {/literal}{if $isMember == 0}{literal}
+        {/literal}{if $paidMembership == 0 }{literal}
+
+          var priceFields = cj("[name^='{/literal}{ $membershipField }{literal}']");
+          priceFields.attr('disabled', 'disabled');
+
+        {/literal}{/if}{literal}
+      {/literal}{else}{literal}
+        cj("div.{/literal}{$sectionName }{literal}").hide();
+      {/literal}{/if}{literal}
+      {/literal}{/if}{literal}
+    });
+
+
 </script>
 {/literal}

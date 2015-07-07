@@ -281,6 +281,71 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       CRM_Event_Form_Registration::resetElementValue($unsetSubmittedOptions, $this);
     }
 
+
+
+
+/////////////////////
+    $currentSession = CRM_Core_Session::singleton();
+    $members_only_event = $this->_isMembersOnlyEvent;
+
+    if($members_only_event){
+      $paidMembership = $currentSession->get('paid_membership');
+      $members_only_event = $this->_isMembersOnlyEvent;
+      $membershipField = $members_only_event->price_field_id;
+
+      $defaults = $params = array('id' => $membershipField);
+      $membershipFieldName = CRM_Price_BAO_PriceField::retrieve($params, $defaults);
+      $this->assign('sectionName', $membershipFieldName->name."-section");
+
+      if(!$paidMembership||is_null($paidMembership)){
+
+        $membershipValue = $currentSession->get('membership_price_field_value_id');
+
+        $this->assign('paidMembership', $paidMembership);
+
+        if ($this->_priceSetId && !empty($this->_feeBlock)) {
+            foreach ($this->_feeBlock as $key => $val) {
+              foreach ($val['options'] as $keys => $values) {
+                if($key==$membershipField&&$keys==$membershipValue){
+                  if ($val['html_type'] == 'CheckBox') {
+                    $this->_defaults["price_{$key}"][$keys] = 1;
+                  }else{
+                    $this->_defaults["price_{$key}"] = $keys;
+                  }
+                }
+              }
+            }
+          }
+      }else{
+        $this->assign('paidMembership', 1);
+      }
+
+      if(is_numeric($membershipField)){
+        $this->assign('membershipField', 'price_'.$membershipField);
+      }
+
+      if ($this->_priceSetId && !empty($this->_feeBlock)) {
+        foreach ($this->_feeBlock as $key => $val) {
+          foreach ($val['options'] as $keys => $values) {
+            if ($values['is_default'] && empty($values['is_full'])) {
+
+              if ($val['html_type'] == 'CheckBox') {
+                $this->_defaults["price_{$key}"][$keys] = 1;
+              }
+              else {
+                $this->_defaults["price_{$key}"] = $keys;
+              }
+            }
+          }
+        }
+      }
+    }
+/////////////////////
+
+
+
+
+
     //set default participant fields, CRM-4320.
     $hasAdditionalParticipants = FALSE;
     if ($this->_allowConfirmation) {
@@ -828,6 +893,27 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!$self->_skipDupeRegistrationCheck) {
       self::checkRegistration($fields, $self);
     }
+
+
+//////////////////////
+    // Check if the email is not already used.
+    global $user;
+    if(user_is_logged_in() && $user->mail !== $fields['email-Primary']) {
+      $errors['email-Primary'] = ts('This email address has been taken by another user.');
+    }
+    if($self->_isMembersOnlyEvent&&!user_is_logged_in()){
+      $drupalEmail = $fields['email-Primary'];
+      $drupalQuery = "SELECT mail FROM users WHERE mail ='".$drupalEmail."'";
+      $drupalResult = db_query($drupalQuery);
+      $drupalRecord = $drupalResult->fetchCol();
+      if($drupalRecord){
+        $errors['email-Primary'] = ts('This email address has been taken by another user.');
+      }
+    }
+//////////////////////
+
+
+
     //check for availability of registrations.
     if (!$self->_allowConfirmation && empty($fields['bypass_payment']) &&
       is_numeric($self->_availableRegistrations) &&
@@ -955,6 +1041,49 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
       }
     }
+
+
+//////////////////
+    if($self->_isMembersOnlyEvent){
+      $currentSession = CRM_Core_Session::singleton();
+
+      $priceParams = array(
+        'event_id' => $currentSession->get('member_event_id'),
+        'price_value_id' => $currentSession->get('membership_types')
+      );
+
+      $memberSelected = array_pop(CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve($priceParams))->membership_type_id;
+
+      // Verify the organization to see if has existing memberships.
+      //bespoked membership system, suppose ID will not change, add config for this if necessary
+      if($memberSelected == 5) {
+        // Get the current employer's id.
+        $organizationParams['organization_name'] = $fields['current_employer'];
+        $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
+        $dedupeParams['check_permission'] = FALSE;
+        $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
+
+        // Verify if the organization was found, if not show error.
+        if (is_array($dupeIDs) && !empty($dupeIDs)) {
+          foreach ($dupeIDs as $orgId) {
+            $organization = $orgId;
+            break;
+          }
+
+          // Try to get the organization's membership. If a membership was found show error.
+          $params = array('contact_id' => $organization);
+          $membership = CRM_Member_BAO_Membership::retrieve($params, $params);
+          if (is_object($membership)) {
+            $errors['current_employer'] = ts('One of your colleague has already purchased the membership for your organisation, please contact your colleague to invite you to become a member.');
+          }
+        }
+      }
+    }
+//////////////////
+
+
+
+
     return empty($errors) ? TRUE : $errors;
   }
 
@@ -986,6 +1115,40 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public function postProcess() {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
+
+
+
+
+//////////////////
+    $currentSession = CRM_Core_Session::singleton();
+    $members_only_event = $this->_isMembersOnlyEvent;
+
+    if($members_only_event){
+      $paidMembership = $currentSession->get('paid_membership');
+
+      if(!$paidMembership||is_null($paidMembership)){
+
+        $membershipField = $members_only_event->price_field_id;
+        $membershipValue = $currentSession->get('membership_price_field_value_id');
+
+        if ($this->_priceSetId && !empty($this->_feeBlock)) {
+            foreach ($this->_feeBlock as $key => $val) {
+              foreach ($val['options'] as $keys => $values) {
+                if($key==$membershipField&&$keys==$membershipValue){
+                  if ($val['html_type'] == 'CheckBox') {
+                    $params["price_{$key}"][$keys] = 1;
+                  }else{
+                    $params["price_{$key}"] = $keys;
+                  }
+                }
+              }
+            }
+          }
+      }
+    }
+//////////////////
+
+
 
     //set as Primary participant
     $params['is_primary'] = 1;

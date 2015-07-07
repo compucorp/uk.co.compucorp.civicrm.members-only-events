@@ -174,14 +174,58 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   public $_isBillingAddressRequiredForPayLater;
 
+
+
+/////////////////
+  public $_isMembersOnlyEvent = 0;
+
+  public $_isMember = 0;
+/////////////////
+
   /**
    * Set variables up before form is built.
    *
    * @return void
    */
   public function preProcess() {
+
+/////////////////
+    $session = CRM_Core_Session::singleton();
+/////////////////
+
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+
+/////////////////
+    $isMemberEvent = 0;
+
+    // Set the membershipType variable
+    if (isset($_POST['membership_types'])) {
+      $session->set('membership_types', $_POST['membership_types']);
+    }
+
+    //membersonlyevent
+    $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_eventId);
+    if(is_object($members_only_event)){
+      $this->_isMembersOnlyEvent = $members_only_event;
+      $isMemberEvent = 1;
+
+      $searchPriceField = civicrm_api3("PriceField", "get", array("id" => $members_only_event->price_field_id));
+      $result = array_pop($searchPriceField['values']);
+      $this->assign("memberFieldSection", $result['name']);
+
+      if (CRM_Core_Permission::check('members only event registration')){
+        $this->_isMember = 1;
+      }
+    }else{
+      $this->_isMembersOnlyEvent = 0;
+    }
+/////////////////
+
+
+    $this->assign("isMembersOnlyEvent", $isMemberEvent);
+    $this->assign("isMember", $this->_isMember);
+    $this->assign("isLoggedIn", user_is_logged_in());
 
     //CRM-4320
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
@@ -625,6 +669,38 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       ) {
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
       }
+
+
+/////////////////////
+      //membersonlyevent
+      $currentSession = CRM_Core_Session::singleton();
+      if($this->_isMembersOnlyEvent){
+        CRM_Core_Resources::singleton()->addSetting(array('membership_type' => array('type' => $currentSession->get('membership_types'))));
+        CRM_Core_Resources::singleton()->addScriptFile('com.compucorp.membersonlyevent', 'js/membership_fee.js');
+      }
+
+      // Hide the current employer field if the event is not a member only event.
+      $priceParams = array(
+        'event_id' => $currentSession->get('member_event_id'),
+        'price_value_id' => $currentSession->get('membership_types')
+      );
+
+      $memberSelected = array_pop(CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve($priceParams))->membership_type_id;
+      //bespoked membership system, suppose ID will not change, add config for this if necessary
+      $checkOrgMember = $memberSelected == 5 || $memberSelected == 6;
+
+      if (!is_object($this->_isMembersOnlyEvent) || (is_object($this->_isMembersOnlyEvent) && !$checkOrgMember)) {
+        $fields['current_employer']['is_required'] = 0;
+      }
+      elseif (isset($name) && $name == 'additionalCustomPre') {
+        $fields['current_employer']['is_required'] = 0;
+      }
+      else {
+        $fields['current_employer']['is_required'] = 1;
+      }
+/////////////////////
+
+
       $this->assign($name, $fields);
       if (is_array($fields)) {
         foreach ($fields as $key => $field) {

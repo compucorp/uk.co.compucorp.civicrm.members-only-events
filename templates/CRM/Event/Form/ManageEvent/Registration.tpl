@@ -82,8 +82,24 @@
       <td>{include file="CRM/common/jcalendar.tpl" elementName=registration_end_date}</td>
     </tr>
   {/if}
+
+
+<!-------------->
+  <tr class="crm-event-manage-registration-form-block-multiple_registrations_notice">
+    <td></td>
+  </tr>
+<!-------------->
+
+
   <tr class="crm-event-manage-registration-form-block-is_multiple_registrations">
     <td scope="row" class="label" width="20%">{$form.is_multiple_registrations.label}</td>
+
+
+<!-------------->
+    <td id="help">{ts}Additional participants will not be checked for their membership validation.{/ts}<p>{$form.is_multiple_registrations.html} {help id="id-allow_multiple"}</p></td>
+<!-------------->
+
+
     <td>{$form.is_multiple_registrations.html} {help id="id-allow_multiple"}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-allow_same_participant_emails">

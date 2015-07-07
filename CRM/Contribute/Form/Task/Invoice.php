@@ -324,6 +324,22 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $eid = $contribID;
         $etable = 'contribution';
         $lineItem = CRM_Price_BAO_LineItem::getLineItems($eid, $etable, NULL, TRUE, TRUE);
+
+
+/////////////////////
+        $eventId = $contribution->_relatedObjects['event']->id;
+        if(is_object(CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($eventId))){
+          $result = array();
+          $lineitemParams = array(
+            'contribution_id' => $contribution->id,
+            'entity_table' => 'civicrm_membership'
+          );
+          CRM_Price_BAO_LineItem::retrieve($lineitemParams, $result);dpm($result);
+          $lineItem += CRM_Price_BAO_LineItem::getLineItems($result['entity_id'], 'membership');
+        }
+/////////////////////
+
+
       }
       else {
         $eid = $contribution->_relatedObjects['participant']->id;

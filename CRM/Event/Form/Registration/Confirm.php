@@ -623,6 +623,39 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
         }
 
+
+////////////////////
+        $members_only_event = $this->_isMembersOnlyEvent;
+        $currentSession = CRM_Core_Session::singleton();
+
+        if($members_only_event){
+          $paidMembership = $currentSession->get('paid_membership');
+
+          if(is_numeric($paidMembership)&&$paidMembership==0){
+
+            $membershipField = $members_only_event->price_field_id;
+            $membershipValue = $currentSession->get('membership_price_field_value_id');
+            $membershipCheck = FALSE;
+
+            foreach ($this->_lineItem as $setKey => $setValue) {
+              foreach ($setValue as $key => $singleItem) {
+                if($singleItem['price_field_id']==$membershipField && $singleItem['price_field_value_id']==$membershipValue){
+                  $membershipCheck = TRUE;
+                  break;
+                }
+              }
+            }
+
+            if(is_numeric($paidMembership)&&$paidMembership==0){
+              if(!$membershipCheck){
+                CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
+              }
+            }
+          }
+        }
+////////////////////
+
+
         if (is_a($result, 'CRM_Core_Error')) {
           CRM_Core_Error::displaySessionError($result);
           CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
@@ -742,6 +775,108 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       $totalTaxAmount = 0;
       $dataArray = array();
+
+
+
+////////////////////
+
+      //membersonlyevent
+      //TODO: maybe contribution_recur_id
+      //Check if is additional participant
+      if(!$this->isAdditional){
+        if($members_only_event){
+
+          $memParams = array(
+            'contact_id' => $currentSession->get('userID'),
+            'source' => 'Event purchase',
+            'num_terms' => 1
+          );
+
+          if($memParams['contact_id'] == null) {
+            $memParams['contact_id'] = $this->_values['participant']['participant_contact_id'];
+          }
+
+          $priceParams = array(
+            'event_id' => $currentSession->get('member_event_id'),
+            'price_value_id' => $currentSession->get('membership_types')
+          );
+
+          $memberSelected = array_pop(CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve($priceParams))->membership_type_id;
+
+          //bespoked membership system, suppose ID will not change, add config for this if necessary
+          if($memberSelected == 5) {
+            // Get the employer's id.
+            $organizationParams['organization_name'] = $this->_params['current_employer'];;
+            $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
+            $dedupeParams['check_permission'] = FALSE;
+            $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
+
+            // Verify if the organization was found.
+            if (is_array($dupeIDs) && !empty($dupeIDs)) {
+              foreach ($dupeIDs as $orgId) {
+                $organization = $orgId;
+                break;
+              }
+              $memParams['contact_id'] = $organization;
+            }
+          }
+          $memberPrices = CRM_Membersonlyevent_BAO_EventMemberPrice::retrieve(array('event_id' => $this->_eventId));
+          $memberItems = array();
+          foreach ($memberPrices as $key => $value) {
+            $memberItems[$value->price_value_id] = $value->membership_type_id;
+          }
+
+          $action = CRM_Core_Action::ADD;
+          // we need user id during add mode
+          $ids = array ();
+          if (!empty($memParams['contact_id'])) {
+            $ids['userId'] = $memParams['contact_id'];
+          }
+          //for edit membership id should be present (if needed)
+          if (!empty($memParams['id'])) {
+            $ids['membership'] = $memParams['id'];
+            $action = CRM_Core_Action::UPDATE;
+          }
+          //need to pass action to handle related memberships.
+          $memParams['action'] = $action;
+
+          if (empty($memParams['id']) || !empty($memParams['num_terms'])) {
+            if (empty($memParams['id'])) {
+              $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
+                $memParams['membership_type_id'],
+                CRM_Utils_Array::value('join_date', $memParams),
+                CRM_Utils_Array::value('start_date', $memParams),
+                CRM_Utils_Array::value('end_date', $memParams),
+                CRM_Utils_Array::value('num_terms', $memParams, 1)
+              );
+            }
+            else {
+              $calcDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType(
+                $memParams['id'],
+                NULL,
+                CRM_Utils_Array::value('membership_type_id', $memParams),
+                $memParams['num_terms']
+              );
+            }
+            foreach (array('join_date', 'start_date', 'end_date') as $date) {
+              if (empty($memParams[$date]) && isset($calcDates[$date])) {
+                $memParams[$date] = $calcDates[$date];
+              }
+            }
+          }
+
+          if($this->_params['is_pay_later']){
+            $memParams['status_id'] = 5;
+            $memParams['skipStatusCal'] = 1;
+          }
+        }
+      }
+
+////////////////////
+
+
+
+
       foreach ($this->_lineItem as $key => $value) {
         if (($value != 'skip') &&
           ($entityId = CRM_Utils_Array::value($key, $allParticipantIds))
@@ -751,6 +886,33 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           if ($this->_allowConfirmation) {
             CRM_Price_BAO_LineItem::deleteLineItems($entityId, $entityTable);
           }
+
+
+
+////////////////////
+          //Check if is additional participant
+          if(!$this->isAdditional){
+            if($members_only_event){
+              foreach ($value as $id => &$itemParams) {
+                if(key_exists($id, $memberItems)){
+                  $memParams['membership_type_id'] = $memberItems[$id];
+                  $membershipBAO = CRM_Member_BAO_Membership::create($memParams, $ids, TRUE);
+                  CRM_Member_BAO_Membership::linkMembershipPayment($membershipBAO, $contribution);
+                  //merged latest code for handelling priceset lineitems in CRM_Price_BAO_LineItem::processPriceSet
+                  $itemParams['membership_type_id'] = $memberItems[$id];
+                  $itemParams['entity_id'] = $membershipBAO->id;
+                  unset($itemParams);
+                }
+              }
+              $currentSession->set('paid_membership', 1);
+              $currentSession->set('membership_types', NULL);
+              $this->isAdditional = 1;
+            }
+////////////////////
+
+          }
+
+
           $lineItem[$this->_priceSetId] = $value;
           CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, $entityTable);
         }
@@ -1180,6 +1342,22 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
     }
+
+
+////////////////
+    if($form->_isMembersOnlyEvent){
+      if($form->isAdditional!==1){
+        $allTag = CRM_Core_BAO_Tag::getTags('civicrm_contact');
+        $tag_key = array_search('Webform Registration', $allTag);
+        if($tag_key != false) {
+          $fields['tag'] = 1;
+          $params['tag'][$tag_key] = "1";
+        }
+      }
+    }
+////////////////
+
+
     if ($contactID) {
       $ctype = CRM_Core_DAO::getFieldValue(
         'CRM_Contact_DAO_Contact',

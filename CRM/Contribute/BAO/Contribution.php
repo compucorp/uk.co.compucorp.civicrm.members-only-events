@@ -1486,6 +1486,27 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $pledgePayment = &$objects['pledge_payment'];
     $contribution = &$objects['contribution'];
 
+
+/////////////////////
+    if($input!=='membership'&&!empty($ids['membership'])&&!is_array($memberships)){
+      $memObjects = array();
+      $input2 = 'membership';
+      $ids2['contribution'] = $contributionId;
+      $ids2['contact'] = CRM_Utils_Array::value('contact_id', $componentDetails);
+      $ids2['membership'] = CRM_Utils_Array::value('membership', $componentDetails);
+      $ids2['pledge_payment'] = CRM_Utils_Array::value('pledge_payment', $componentDetails);
+      $ids2['contributionRecur'] = NULL;
+      $ids2['contributionPage'] = NULL;
+      if(!$baseIPN->validateData($input2, $ids2, $memObjects, FALSE)){
+        CRM_Core_Error::fatal();
+      }
+      $objects['membership'] = $memObjects['membership'];
+      $memberships = &$objects['membership'];
+    }
+/////////////////////
+
+
+
     if ($pledgePayment) {
       $pledgePaymentIDs = array();
       foreach ($pledgePayment as $key => $object) {
@@ -2499,8 +2520,11 @@ WHERE  contribution_id = %1 ";
     }
 
     $template->assign('trxn_id', $this->trxn_id);
+       $correct_date = str_replace(' ', '', $this->receive_date);
+    $correct_date = str_replace('-', '', $correct_date);
+    $correct_date = str_replace(':', '', $correct_date);
     $template->assign('receive_date',
-      CRM_Utils_Date::mysqlToIso($this->receive_date)
+      CRM_Utils_Date::mysqlToIso($correct_date)
     );
     $template->assign('contributeMode', 'notify');
     $template->assign('action', $this->is_test ? 1024 : 1);
