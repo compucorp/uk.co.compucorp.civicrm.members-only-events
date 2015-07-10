@@ -175,12 +175,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_isBillingAddressRequiredForPayLater;
 
 
-
-/////////////////
   public $_isMembersOnlyEvent = 0;
 
   public $_isMember = 0;
-/////////////////
+
 
   /**
    * Set variables up before form is built.
@@ -189,14 +187,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function preProcess() {
 
-/////////////////
+
     $session = CRM_Core_Session::singleton();
-/////////////////
 
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
 
-/////////////////
     $isMemberEvent = 0;
 
     // Set the membershipType variable
@@ -220,8 +216,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }else{
       $this->_isMembersOnlyEvent = 0;
     }
-/////////////////
-
 
     $this->assign("isMembersOnlyEvent", $isMemberEvent);
     $this->assign("isMember", $this->_isMember);
@@ -670,8 +664,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
       }
 
-
-/////////////////////
       //membersonlyevent
       $currentSession = CRM_Core_Session::singleton();
       if($this->_isMembersOnlyEvent){
@@ -698,7 +690,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       else {
         $fields['current_employer']['is_required'] = 1;
       }
-/////////////////////
 
 
       $this->assign($name, $fields);

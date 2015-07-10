@@ -282,9 +282,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
 
-
-
-/////////////////////
     $currentSession = CRM_Core_Session::singleton();
     $members_only_event = $this->_isMembersOnlyEvent;
 
@@ -340,9 +337,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
       }
     }
-/////////////////////
-
-
 
 
 
@@ -894,8 +888,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       self::checkRegistration($fields, $self);
     }
 
-
-//////////////////////
     // Check if the email is not already used.
     global $user;
     if(user_is_logged_in() && $user->mail !== $fields['email-Primary']) {
@@ -910,8 +902,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $errors['email-Primary'] = ts('This email address has been taken by another user.');
       }
     }
-//////////////////////
-
 
 
     //check for availability of registrations.
@@ -1042,8 +1032,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
-
-//////////////////
     if($self->_isMembersOnlyEvent){
       $currentSession = CRM_Core_Session::singleton();
 
@@ -1079,9 +1067,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
       }
     }
-//////////////////
-
-
 
 
     return empty($errors) ? TRUE : $errors;
@@ -1117,9 +1102,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $params = $this->controller->exportValues($this->_name);
 
 
-
-
-//////////////////
     $currentSession = CRM_Core_Session::singleton();
     $members_only_event = $this->_isMembersOnlyEvent;
 
@@ -1146,7 +1128,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           }
       }
     }
-//////////////////
 
 
 
