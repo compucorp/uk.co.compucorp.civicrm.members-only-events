@@ -260,6 +260,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 	}
 
 	$this->_purchaseForOther = !($purchaseRestriction&& !$isParticipant);
+
+	$zeroCID = CRM_Utils_Array::value('cid', $_GET);
+	if($zeroCID==="0"){
+	  $this->_purchaseForOther = TRUE;
+	}
+
 	$this->assign("purchaseForOther", $this->_purchaseForOther);
 
     // current mode
