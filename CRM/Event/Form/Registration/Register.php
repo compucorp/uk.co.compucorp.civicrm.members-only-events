@@ -281,7 +281,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       CRM_Event_Form_Registration::resetElementValue($unsetSubmittedOptions, $this);
     }
 
-
+    // members only event
     $currentSession = CRM_Core_Session::singleton();
     $members_only_event = $this->_isMembersOnlyEvent;
 
@@ -888,6 +888,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       self::checkRegistration($fields, $self);
     }
 
+    // members only event
     // Check if the email is not already used.
     global $user;
     if(user_is_logged_in() && $user->mail !== $fields['email-Primary']) {
@@ -902,7 +903,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $errors['email-Primary'] = ts('This email address has been taken by another user.');
       }
     }
-
 
     //check for availability of registrations.
     if (!$self->_allowConfirmation && empty($fields['bypass_payment']) &&
@@ -1032,6 +1032,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
+    // members only event
     if($self->_isMembersOnlyEvent){
       $currentSession = CRM_Core_Session::singleton();
 
@@ -1101,7 +1102,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
 
-
+    // members only event
     $currentSession = CRM_Core_Session::singleton();
     $members_only_event = $this->_isMembersOnlyEvent;
 

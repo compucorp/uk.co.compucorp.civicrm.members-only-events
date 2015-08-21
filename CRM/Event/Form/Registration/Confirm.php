@@ -623,8 +623,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
         }
 
-
-////////////////////
+        // members only event
         $members_only_event = $this->_isMembersOnlyEvent;
         $currentSession = CRM_Core_Session::singleton();
 
@@ -653,8 +652,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             }
           }
         }
-////////////////////
-
 
         if (is_a($result, 'CRM_Core_Error')) {
           CRM_Core_Error::displaySessionError($result);
@@ -776,10 +773,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $totalTaxAmount = 0;
       $dataArray = array();
 
-
-
-////////////////////
-
       //membersonlyevent
       //TODO: maybe contribution_recur_id
       //Check if is additional participant
@@ -872,11 +865,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
 
-////////////////////
-
-
-
-
       foreach ($this->_lineItem as $key => $value) {
         if (($value != 'skip') &&
           ($entityId = CRM_Utils_Array::value($key, $allParticipantIds))
@@ -887,9 +875,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             CRM_Price_BAO_LineItem::deleteLineItems($entityId, $entityTable);
           }
 
-
-
-////////////////////
+          // members only event
           //Check if is additional participant
           if(!$this->isAdditional){
             if($members_only_event){
@@ -908,8 +894,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
               $currentSession->set('membership_types', NULL);
               $this->isAdditional = 1;
             }
-////////////////////
-
           }
 
 
@@ -1344,7 +1328,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
 
-////////////////
+    // members only event
     if($form->_isMembersOnlyEvent){
       if($form->isAdditional!==1){
         $allTag = CRM_Core_BAO_Tag::getTags('civicrm_contact');
@@ -1355,8 +1339,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
     }
-////////////////
-
 
     if ($contactID) {
       $ctype = CRM_Core_DAO::getFieldValue(

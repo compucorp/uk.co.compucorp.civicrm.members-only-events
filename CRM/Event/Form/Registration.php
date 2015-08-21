@@ -187,7 +187,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function preProcess() {
 
-
     $session = CRM_Core_Session::singleton();
 
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -195,12 +194,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $isMemberEvent = 0;
 
+    // members only event
     // Set the membershipType variable
     if (isset($_POST['membership_types'])) {
       $session->set('membership_types', $_POST['membership_types']);
     }
 
-    //membersonlyevent
     $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_eventId);
     if(is_object($members_only_event)){
       $this->_isMembersOnlyEvent = $members_only_event;
@@ -664,7 +663,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
       }
 
-      //membersonlyevent
+      // members only event
       $currentSession = CRM_Core_Session::singleton();
       if($this->_isMembersOnlyEvent){
         CRM_Core_Resources::singleton()->addSetting(array('membership_type' => array('type' => $currentSession->get('membership_types'))));
@@ -1578,18 +1577,16 @@ WHERE  v.option_group_id = g.id
       CRM_Core_Error::statusBounce(ts('Registration for this event begins on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('registration_start_date', $this->_values['event'])))), $redirect);
     }
 
-    $endDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('registration_end_date',
+    $regEndDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('registration_end_date',
       $this->_values['event']
     ));
     $eventEndDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('event_end_date', $this->_values['event']));
-    if (
-      $endDate &&
-      $endDate < $now
-    ) {
-      CRM_Core_Error::statusBounce(ts('Registration for this event ended on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('registration_end_date', $this->_values['event'])))), $redirect);
-    }
-    if (!empty($eventEndDate) && $eventEndDate < $now) {
-      CRM_Core_Error::statusBounce(ts('Event ended on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('event_end_date', $this->_values['event'])))), $redirect);
+    if (($regEndDate && ($regEndDate < $now)) || (empty($regEndDate) && ($eventEndDate < $now))) {
+      $endDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('registration_end_date', $this->_values['event']));
+      if (empty($regEndDate)) {
+        $endDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('event_end_date', $this->_values['event']));
+      }
+      CRM_Core_Error::statusBounce(ts('Registration for this event ended on %1', array(1 => $endDate)), $redirect);
     }
   }
 
