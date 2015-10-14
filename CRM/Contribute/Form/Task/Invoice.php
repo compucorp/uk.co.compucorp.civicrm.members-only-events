@@ -345,8 +345,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
             'entity_table' => 'civicrm_membership'
           );
           $memLineItem = CRM_Price_BAO_LineItem::retrieve($lineitemParams, $result);
-          $allMemLineItems = CRM_Price_BAO_LineItem::getLineItems($result['entity_id'], 'membership');
-          $lineItem += array($allMemLineItems[$memLineItem->id]);
+          if(!empty($memLineItem)){
+            $allMemLineItems = CRM_Price_BAO_LineItem::getLineItems($result['entity_id'], 'membership');
+            $lineItem += array($allMemLineItems[$memLineItem->id]);
+          }
         }
       }
 
