@@ -460,6 +460,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2', CRM_Utils_Array::value($contribution->contact_id, $billingAddress)),
         'city' => CRM_Utils_Array::value('city', CRM_Utils_Array::value($contribution->contact_id, $billingAddress)),
         'stateProvinceAbbreviation' => $stateProvinceAbbreviation,
+        'country' => CRM_Core_PseudoConstant::country(CRM_Utils_Array::value('country_id', CRM_Utils_Array::value($contribution->contact_id, $billingAddress))),
         'postal_code' => CRM_Utils_Array::value('postal_code', CRM_Utils_Array::value($contribution->contact_id, $billingAddress)),
         'is_pay_later' => $contribution->is_pay_later,
         'organization_name' => $contribution->_relatedObjects['contact']->organization_name,
@@ -496,7 +497,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       }
       // Fix Invoice email doesnot send out when completed payment using Paypal
       if (empty($contactID)) {
-        $contactID = $contactIds['0'];
+        $contactID = current($contactIds);
       }
       $contactEmails = CRM_Core_BAO_Email::allEmails($contactID);
       $emails = array();
