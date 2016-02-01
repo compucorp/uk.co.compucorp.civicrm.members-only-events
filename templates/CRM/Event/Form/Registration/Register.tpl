@@ -400,3 +400,7 @@
 
 </script>
 {/literal}
+
+<script type="text/javascript">
+  CRM.$('div.Membership_fee-content input[type="radio"]:not(:checked)').parent().css("display","none");
+</script>
