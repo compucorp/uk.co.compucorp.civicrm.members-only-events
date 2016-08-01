@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,12 +25,12 @@
 *}
 {* Callback snippet: Load payment processor *}
 {if $snippet}
-  {include file="CRM/Core/BillingBlock.tpl" context="front-end"}
+  {include file="CRM/Core/BillingBlock.tpl"}
   <div id="paypalExpress">
     {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
     {if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
       {assign var=expressButtonName value='_qf_Register_upload_express'}
-      <fieldset class="crm-group payPalExpress-group">
+      <fieldset class="crm-public-form-item crm-group payPalExpress-group">
         <legend>{ts}Checkout with PayPal{/ts}</legend>
         <div class="description">{ts}Click the PayPal button to continue.{/ts}</div>
         <div>{$form.$expressButtonName.html} <span style="font-size:11px; font-family: Arial, Verdana;">Checkout securely.  Pay without sharing your financial information. </span>
@@ -60,38 +60,39 @@
     {/if}
 
     {if $contact_id}
-      <div class="messages status no-popup" id="crm-event-register-different">
+      <div class="messages status no-popup crm-not-you-message" id="crm-event-register-different">
         {ts 1=$display_name}Welcome %1{/ts}.
         {if $membersEventType != 3}
         (<a
           href="{crmURL p='civicrm/event/register' q="cid=0&reset=1&id=`$event.id`"}"
           title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
-      {/if}
+        {/if}
       </div>
     {/if}
     {if $event.intro_text}
-      <div id="intro_text" class="crm-section intro_text-section">
+      <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
         <p>{$event.intro_text}</p>
       </div>
     {/if}
 
     {include file="CRM/common/cidzero.tpl"}
     {if $pcpSupporterText}
-      <div class="crm-section pcpSupporterText-section">
+      <div class="crm-public-form-item crm-section pcpSupporterText-section">
         <div class="content">{$pcpSupporterText}</div>
       </div>
     {/if}
 
     {if $priceSet}
       {if ! $quickConfig}<fieldset id="priceset" class="crm-group priceset-group">
-        <legend>{$event.fee_label}</legend>{/if}
+        <legend>{$event.fee_label}</legend>
+      {/if}
       {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
       {include file="CRM/Price/Form/ParticipantCount.tpl"}
       {if ! $quickConfig}</fieldset>{/if}
     {/if}
 
     {if $form.additional_participants.html}
-      <div class="crm-section additional_participants-section" id="noOfparticipants">
+      <div class="crm-public-form-item crm-section additional_participants-section" id="noOfparticipants">
         <div class="label">{$form.additional_participants.label}</div>
         <div class="content">
           {$form.additional_participants.html}{if $contact_id || $contact_id == NULL} &nbsp; ({ts}including yourself{/ts}){/if}
@@ -103,35 +104,45 @@
       </div>
     {/if}
 
-    {* User account registration option. Displays if enabled for one of the profiles on this page. *}
-    {include file="CRM/common/CMSUser.tpl"}
-
+    <div class="crm-public-form-item crm-section cms_user-section">
+      {* User account registration option. Displays if enabled for one of the profiles on this page. *}
+      {include file="CRM/common/CMSUser.tpl"}
+    </div>
     {if $membersEventType !== 1 && $purchaseForOther}
 
-    {include file="CRM/Event/Form/members-event-profile.tpl"}
+      {include file="CRM/Event/Form/members-event-profile.tpl"}
 
     {/if}
 
-    {* Display "Top of page" profile immediately after the introductory text *}
-    {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+    <div class="crm-public-form-item crm-section custom_pre-section">
+      {* Display "Top of page" profile immediately after the introductory text *}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+    </div>
 
+    {if $priceSet}
+      {if ! $quickConfig}<fieldset id="priceset" class="crm-public-form-item crm-group priceset-group">
+        <legend>{$event.fee_label}</legend>{/if}
+      {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
+      {include file="CRM/Price/Form/ParticipantCount.tpl"}
+      {if ! $quickConfig}</fieldset>{/if}
+    {/if}
     {if $pcp && $is_honor_roll }
-      <fieldset class="crm-group pcp-group">
-        <div class="crm-section pcp-section">
-          <div class="crm-section display_in_roll-section">
+      <fieldset class="crm-public-form-item crm-group pcp-group">
+        <div class="crm-public-form-item crm-section pcp-section">
+          <div class="crm-public-form-item crm-section display_in_roll-section">
             <div class="content">
               {$form.pcp_display_in_roll.html} &nbsp;
               {$form.pcp_display_in_roll.label}
             </div>
             <div class="clear"></div>
           </div>
-          <div id="nameID" class="crm-section is_anonymous-section">
+          <div id="nameID" class="crm-public-form-item crm-section is_anonymous-section">
             <div class="content">
               {$form.pcp_is_anonymous.html}
             </div>
             <div class="clear"></div>
           </div>
-          <div id="nickID" class="crm-section pcp_roll_nickname-section">
+          <div id="nickID" class="crm-public-form-item crm-section pcp_roll_nickname-section">
             <div class="label">{$form.pcp_roll_nickname.label}</div>
             <div class="content">{$form.pcp_roll_nickname.html}
               <div
@@ -139,7 +150,7 @@
             </div>
             <div class="clear"></div>
           </div>
-          <div id="personalNoteID" class="crm-section pcp_personal_note-section">
+          <div id="personalNoteID" class="crm-public-form-item crm-section pcp_personal_note-section">
             <div class="label">{$form.pcp_personal_note.label}</div>
             <div class="content">
               {$form.pcp_personal_note.html}
@@ -152,9 +163,9 @@
     {/if}
 
     {if $form.payment_processor.label}
-      <fieldset class="crm-group payment_options-group" style="display:none;">
+      <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
         <legend>{ts}Payment Options{/ts}</legend>
-        <div class="crm-section payment_processor-section">
+        <div class="crm-public-form-item crm-section payment_processor-section">
           <div class="label">{$form.payment_processor.label}</div>
           <div class="content">{$form.payment_processor.html}</div>
           <div class="clear"></div>
@@ -164,13 +175,15 @@
 
     <div id="billing-payment-block">
       {* If we have a payment processor, load it - otherwise it happens via ajax *}
-      {if $ppType or $isBillingAddressRequiredForPayLater}
+      {if $paymentProcessorID or $isBillingAddressRequiredForPayLater}
         {include file="CRM/Event/Form/Registration/Register.tpl" snippet=4}
       {/if}
     </div>
     {include file="CRM/common/paymentBlock.tpl"}
 
-    {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+    <div class="crm-public-form-item crm-section custom_pre-section">
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+    </div>
 
     {if $isCaptcha}
       {include file='CRM/common/ReCAPTCHA.tpl'}
@@ -181,14 +194,13 @@
     </div>
 
     {if $event.footer_text}
-      <div id="footer_text" class="crm-section event_footer_text-section">
+      <div id="footer_text" class="crm-public-form-item crm-section event_footer_text-section">
         <p>{$event.footer_text}</p>
       </div>
     {/if}
   </div>
   <script type="text/javascript">
     {literal}
-
     cj(document).ready(function(){
       cj(':input','fieldset.billing_mode-group').not(':button, :submit, :reset, :hidden').val('');
       cj(':input','fieldset.billing_mode-group').not(':button, :submit, :reset, :hidden').prop('checked', false);
@@ -218,25 +230,25 @@
           });
 
           if(membersEventType === "3"){
-	          var defaultPrice = 0;
-	          {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
-	            var priceString = 'input[id^="CIVICRM_QFID_{/literal}{$priceId}{literal}"]';
+            var defaultPrice = 0;
+            {/literal}{foreach from=$membersPriceOptions key=priceId item=priceType}{literal}
+            var priceString = 'input[id^="CIVICRM_QFID_{/literal}{$priceId}{literal}"]';
 
-	            if({/literal}{$priceType}{literal}==0){
+              if({/literal}{$priceType}{literal}==0){
                 cj(priceString).parent().css("display", "none");
                 cj(priceString).attr("disabled", "disabled");
-	              cj(priceString).removeAttr('checked');
+                cj(priceString).removeAttr('checked');
 
-	              }else{
-	                if(!defaultPrice){
-	                  cj(priceString).attr("checked", "checked");
-	                  defaultPrice = 1;
-	                }
-	              }
-	          {/literal}{/foreach}{literal}
-	      }
-        }
-      }
+               }else{
+                 if(!defaultPrice){
+                   cj(priceString).attr("checked", "checked");
+                   defaultPrice = 1;
+                 }
+               }
+             {/literal}{/foreach}{literal}
+           }
+         }
+       }
     });
 
     function toggleConfirmButton() {
@@ -261,14 +273,24 @@
       toggleConfirmButton();
     });
 
+    cj("#additional_participants").change(function () {
+      skipPaymentMethod();
+    });
+
     CRM.$(function($) {
       toggleConfirmButton();
       skipPaymentMethod();
     });
 
-    // Called from display() in Calculate.tpl, depends on display() having been called
+    // Hides billing and payment options block - but only if a price set is used.
+    // Called from display() in Calculate.tpl, depends on display() having been called.
     function skipPaymentMethod() {
-      var symbol = '{/literal}{$currencySymbol}{literal}';
+      // If we're in quick-config price set, we do not have the pricevalue hidden element, so just return.
+      if (cj('#pricevalue').length == 0) {
+        return;
+      }
+      // CRM-15433 Remove currency symbol, decimal separator so we can check for zero numeric total regardless of localization.
+      currentTotal = cj('#pricevalue').text().replace(/[^\/\d]/g,'');
       var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
 
       var flag = 1;
@@ -276,11 +298,12 @@
       var payment_processor = cj("div.payment_processor-section");
       var payment_information = cj("div#payment_information");
 
-      if (isMultiple && cj("#additional_participants").val() && cj('#pricevalue').text() !== symbol + " 0.00") {
+      // Do not hide billing and payment blocks if user is registering additional participants, since we do not know total owing.
+      if (isMultiple && cj("#additional_participants").val() && currentTotal == 0) {
         flag = 0;
       }
 
-      if ((cj('#pricevalue').text() == symbol + " 0.00") && flag) {
+      if (currentTotal == 0 && flag) {
         payment_options.hide();
         payment_processor.hide();
         payment_information.hide();
@@ -295,12 +318,12 @@
     }
 
     cj('#priceset input, #priceset select').change(function () {
-        var purchaseForOther = {/literal}"{$purchaseForOther}"{literal};
-        if(purchaseForOther){
-          {/literal}{if $membersEventType == 3}{literal}
-          	checkMemberPrice();
-          {/literal}{/if}{literal}
-        }
+      var purchaseForOther = {/literal}"{$purchaseForOther}"{literal};
+      if(purchaseForOther){
+        {/literal}{if $membersEventType == 3}{literal}
+        checkMemberPrice();
+        {/literal}{/if}{literal}
+      }
     });
 
     {/literal}
