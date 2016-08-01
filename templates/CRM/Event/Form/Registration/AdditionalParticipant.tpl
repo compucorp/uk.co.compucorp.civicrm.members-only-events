@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,7 +42,7 @@
 {/if}
 
 {if $priceSet}
-     <fieldset id="priceset" class="crm-group priceset-group"><legend>{$event.fee_label}</legend>
+     <fieldset id="priceset" class="crm-public-form-item crm-group priceset-group"><legend>{$event.fee_label}</legend>
         {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
     </fieldset>
 {else}
@@ -58,46 +58,47 @@
 {/if}
 
 {if $membersEventType != 1}
-
-{include file="CRM/Event/Form/members-event-profile.tpl"}
-
+  {include file="CRM/Event/Form/members-event-profile.tpl"}
 {/if}
 
 {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
 
 {if $priceSet && $allowGroupOnWaitlist}
-    {include file="CRM/Price/Form/ParticipantCount.tpl"}
-    <div id="waiting-status" style="display:none;" class="messages status no-popup"></div>
-    <div class="messages status no-popup" style="width:25%"><span id="event_participant_status"></span></div>
+  {include file="CRM/Price/Form/ParticipantCount.tpl"}
+  <div id="waiting-status" style="display:none;" class="messages status no-popup"></div>
+  <div class="messages status no-popup" style="width:25%"><span id="event_participant_status"></span></div>
 {/if}
 
 <div class="crm-block crm-event-additionalparticipant-form-block">
 
-{include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost}
+<div class="crm-public-form-item crm-section custom_post-section">
+  {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost}
+</div>
 
 <div id="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl"}
 </div>
 </div>
+
 <script type="text/javascript">
 {literal}
 
 cj(document).ready(function(){
-    cj("[id='editrow-custom_22']").hide();
-    cj("[id='custom_22_terms_and_conditions']").prop('checked', true);
-    {/literal}
-    {if $membersEventType == 3}
-    checkMemberPrice();
-    {/if}
-    {literal}
+  cj("[id='editrow-custom_22']").hide();
+  cj("[id='custom_22_terms_and_conditions']").prop('checked', true);
+{/literal}
+{if $membersEventType == 3}
+  checkMemberPrice();
+{/if}
+{literal}
 });
 
 cj('#priceset input, #priceset select').change(function () {
-    {/literal}
-    {if $membersEventType == 3}
-    checkMemberPrice();
-    {/if}
-    {literal}
+{/literal}
+{if $membersEventType == 3}
+  checkMemberPrice();
+{/if}
+{literal}
 });
 
 {/literal}
@@ -105,7 +106,6 @@ cj('#priceset input, #priceset select').change(function () {
 {if $priceSet && $allowGroupOnWaitlist}
 {literal}
 <script type="text/javascript">
-
 
 function allowGroupOnWaitlist( participantCount, currentCount )
 {
