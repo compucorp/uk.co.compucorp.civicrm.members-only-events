@@ -384,39 +384,37 @@ function membersonlyevent_civicrm_alterContent(&$content, $context, $tplName, &$
   	  	}
   	}
           
-    if (is_object($members_only_event) && $members_only_event->members_event_type !== 1) {
+    if (is_object($members_only_event) && $members_only_event->members_event_type != PUBLIC_EVENT) {
        
       if (!CRM_Core_Permission::check('members only event registration')||
     (CRM_Core_Permission::check('members only event registration')&&!$durationCheck)){
     	global $base_url;
 	$members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($object->_eventId);
 	$link = $members_only_event->membership_url;
-	if($members_only_event->members_event_type != PUBLIC_EVENT) {
-            $output = array(
-		'info'  => array(
-				'#type' 		=> 'markup',
-				'#markup'		=> '<p>This event if for members only, please login or become a member to register</p>',
+        $output = array(
+	    'info'  => array(
+			'#type' 		=> 'markup',
+			'#markup'		=> '<p>This event if for members only, please login or become a member to register</p>',
 					
-		),
-		'login' => array(
-				'#type'			=> 'link',
-				'#title'		=> t('Login'),
-				'#href' 		=> $base_url.'/'.'user',
-				'#attributes' 	=> array(
-				    'class' => 'button',
-                                ),
-		),
-		'member' => array(
-				'#type' 		=> 'link',
-				'#title' 		=> t('Become a member'),
-				'#href' 		=> $base_url.'/'.$link,
-				'#attributes' 	=> array(
-				    'class' => 'button',
-				),
-		),
-	    );
-            $content = render($output);
-        }
+	    ),
+	    'login' => array(
+                        '#type'			=> 'link',
+			'#title'		=> t('Login'),
+			'#href' 		=> $base_url.'/'.'user',
+			'#attributes' 	=> array(
+		            'class' => 'button',
+                        ),
+	    ),
+	    'member' => array(
+			'#type' 		=> 'link',
+			'#title' 		=> t('Become a member'),
+			'#href' 		=> $base_url.'/'.$link,
+			'#attributes' 	=> array(
+			    'class' => 'button',
+			),
+	    ),
+	);
+       $content = render($output);
       }
       
     }
@@ -470,4 +468,3 @@ function membersonlyevent_civicrm_entityTypes(&$entityTypes) {
     'table' => 'civicrm_membersonlyevent_price',
   );
 }
-
