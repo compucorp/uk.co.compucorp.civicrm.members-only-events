@@ -119,13 +119,6 @@
       {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
     </div>
 
-    {if $priceSet}
-      {if ! $quickConfig}<fieldset id="priceset" class="crm-public-form-item crm-group priceset-group">
-        <legend>{$event.fee_label}</legend>{/if}
-      {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
-      {include file="CRM/Price/Form/ParticipantCount.tpl"}
-      {if ! $quickConfig}</fieldset>{/if}
-    {/if}
     {if $pcp && $is_honor_roll }
       <fieldset class="crm-public-form-item crm-group pcp-group">
         <div class="crm-public-form-item crm-section pcp-section">
