@@ -108,7 +108,7 @@
       {* User account registration option. Displays if enabled for one of the profiles on this page. *}
       {include file="CRM/common/CMSUser.tpl"}
     </div>
-    {if $membersEventType !== 1 && $purchaseForOther}
+    {if $membersEventType != 1 && $purchaseForOther}
 
       {include file="CRM/Event/Form/members-event-profile.tpl"}
 
