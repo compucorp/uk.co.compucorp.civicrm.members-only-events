@@ -235,7 +235,7 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
   }
   
   // Hide register now button, if the event is members only event and user has no permissions to register for the event
-  if (is_object($members_only_event) && $members_only_event->members_event_type !== 1) {
+  if (is_object($members_only_event) && $members_only_event->members_event_type != 1) {
   	
     if (!CRM_Core_Permission::check('members only event registration')||
     (CRM_Core_Permission::check('members only event registration')&&!$durationCheck)){
