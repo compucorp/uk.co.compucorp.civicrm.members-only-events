@@ -317,12 +317,57 @@ function membersonlyevent_civicrm_alterContent(&$content, $context, $tplName, &$
     if (is_object($members_only_event) && $members_only_event->is_members_only_event == 1) {
        
       if (!CRM_Core_Permission::check('members only event registration')) {
-        $content = ts('<p>You are not allowed to register for this event!</p>');      
+        $memberOnlyEventMembershipTypes = _membersonlyevent_civicrm_getMemberOnlyEventMembershipTypes();
+
+        $membershipSignupLink = _membersonlyevent_civicrm_generateMembershipSignupLink();
+
+        $notAllowedMessage = ts(
+          '<p>You are not allowed to register for this event! please register for any of the following membership levels (%1) from <a href="%2">here</a>.</p>',
+          array(
+            1 => implode(', ', $memberOnlyEventMembershipTypes) ,
+            2 => $membershipSignupLink,
+          )
+        );
+
+        $content = $notAllowedMessage;
       }
-      
+
     }
     
   }
+}
+
+function _membersonlyevent_civicrm_getMemberOnlyEventMembershipTypes() {
+  $sql = "SELECT {civicrm_member_roles_rules}.type_id from {civicrm_member_roles_rules}
+          INNER JOIN {role_permission} ON {civicrm_member_roles_rules}.rid = {role_permission}.rid
+          WHERE {role_permission}.permission = 'members only event registration'";
+  $result = db_query($sql);
+
+  $allowedMembershipIDs = array();
+  foreach ($result as $record) {
+    $allowedMembershipIDs[] = $record->type_id;
+  }
+
+  $allowedMembershipNames = civicrm_api3('MembershipType', 'get', array(
+    'sequential' => 1,
+    'return' => "name",
+    'id' => array('IN' => $allowedMembershipIDs),
+  ));
+
+  $returnTypes = array();
+  if ($allowedMembershipNames['count'] > 0) {
+    foreach($allowedMembershipNames['values'] as $type) {
+      $returnTypes[] = $type['name'];
+    }
+  }
+
+  return $returnTypes;
+}
+
+function _membersonlyevent_civicrm_generateMembershipSignupLink(){
+  $path = 'civicrm/contribute/transact';
+  $params = http_build_query(array('reset' => 1, 'id' => 2));
+  return CRM_Utils_System::url($path, $params);
 }
 
 function membersonlyevent_civicrm_navigationMenu( &$params ) {
