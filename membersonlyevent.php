@@ -262,24 +262,26 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
         CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
           
       }
-	  
+
+      $url = CRM_Utils_System::url('civicrm/contribute/transact',
+        array('reset' => 1, 'id' => $members_only_event->contribution_page_id),
+        FALSE,
+        NULL,
+        TRUE,
+        TRUE
+      );
+
 	  if(!CRM_Core_Permission::check('members only event registration')){
 	  	$notification = 'Sorry.';
 	  	$infoText = 'You need to become a member to for register this event.';
 		$button_text = ts('Become a member to register for this event');
-	  }else if((CRM_Core_Permission::check('members only event registration')&&!$durationCheck)){
+      $url = CRM_Utils_System::url($members_only_event->membership_url);
+	  }
+	  else if((CRM_Core_Permission::check('members only event registration')&&!$durationCheck)){
 	  	$notification = 'Sorry.';
 	  	$infoText = 'Your membership expires before the event start. Please extend your membership to register for this event.';
-		$button_text = ts('Extend your membership to register for this event');
+		  $button_text = ts('Extend your membership to register for this event');
 	  }
-    	
-      $url = CRM_Utils_System::url('civicrm/contribute/transact',
-        array('reset' => 1, 'id' => $members_only_event->contribution_page_id),
-        FALSE, // absolute?
-        NULL, // fragment
-        TRUE, // htmlize?
-        TRUE // is frontend?
-      );
 
       $snippet = array(
         'template' => 'CRM/Event/Page/members-event-button.tpl',
@@ -319,7 +321,7 @@ function membersonlyevent_civicrm_alterContent(&$content, $context, $tplName, &$
       if (!CRM_Core_Permission::check('members only event registration')) {
         $memberOnlyEventMembershipTypes = _membersonlyevent_civicrm_getMemberOnlyEventMembershipTypes();
 
-        $membershipSignupLink = _membersonlyevent_civicrm_generateMembershipSignupLink();
+        $membershipSignupLink = _membersonlyevent_civicrm_generateMembershipSignupLink($members_only_event->membership_url);
 
         $notAllowedMessage = ts(
           '<p>You are not allowed to register for this event! please register for any of the following membership levels (%1) from <a href="%2">here</a>.</p>',
@@ -333,7 +335,7 @@ function membersonlyevent_civicrm_alterContent(&$content, $context, $tplName, &$
       }
 
     }
-    
+
   }
 }
 
@@ -364,10 +366,11 @@ function _membersonlyevent_civicrm_getMemberOnlyEventMembershipTypes() {
   return $returnTypes;
 }
 
-function _membersonlyevent_civicrm_generateMembershipSignupLink(){
-  $path = 'civicrm/contribute/transact';
-  $params = http_build_query(array('reset' => 1, 'id' => 2));
-  return CRM_Utils_System::url($path, $params);
+function _membersonlyevent_civicrm_generateMembershipSignupLink($membershipSubURL){
+  global $base_url;
+  $path = $membershipSubURL;
+
+  return CRM_Utils_System::url($path);
 }
 
 function membersonlyevent_civicrm_navigationMenu( &$params ) {
