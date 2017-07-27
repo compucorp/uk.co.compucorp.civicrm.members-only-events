@@ -113,7 +113,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
 
   public function formRules($params, $files, $self) {
     $errors = array();
-    $isMembersOnlyEvent = CRM_Utils_Array::value('is_members_only_event', $params);
+    $isMembersOnlyEvent = CRM_Utils_Array::value('is_members_only_event', $params, FALSE);
     $memberURL = CRM_Utils_Array::value('membership_url', $params);
 
     if ($isMembersOnlyEvent && empty($memberURL)) {
