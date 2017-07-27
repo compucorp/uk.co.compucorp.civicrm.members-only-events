@@ -38,7 +38,7 @@
   <field>
     <name>membership_url</name>
     <type>varchar</type>
-    <length>255</length>
+    <length>3000</length>
     <comment>URL for purchasing membership</comment>
     <title>Membership Purchasing URL</title>
     <add>4.4</add>

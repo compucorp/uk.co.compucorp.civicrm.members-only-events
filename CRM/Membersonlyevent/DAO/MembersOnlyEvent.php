@@ -171,7 +171,7 @@ class CRM_Membersonlyevent_DAO_MembersOnlyEvent extends CRM_Core_DAO
           'name' => 'membership_url',
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('Membership Purchasing URL') ,
-          'maxlength' => 255,
+          'maxlength' => 3000,
           'size' => CRM_Utils_Type::HUGE,
         ) ,
         'contribution_page_id' => array(

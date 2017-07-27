@@ -10,7 +10,7 @@ CREATE TABLE `civicrm_membersonlyevent` (
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique Members Only Event ID',
      `event_id` int unsigned NOT NULL   COMMENT 'Foreign key for the Event',
-     `membership_url` varchar(255) NOT NULL   COMMENT 'URL for purchasing membership',
+     `membership_url` varchar(3000) NOT NULL   COMMENT 'URL for purchasing membership',
      `contribution_page_id` int unsigned    COMMENT 'Foreign key for the Contribution page',
      `is_members_only_event` tinyint   DEFAULT 0 COMMENT 'If this box is ticked only the users with permission "Can register for Members only events" will be able to register for this event.' 
 ,

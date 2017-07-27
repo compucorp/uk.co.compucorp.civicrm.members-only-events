@@ -39,7 +39,8 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     ));
 
     // add form rules
-    $this->addFormRule(array('CRM_Membersonlyevent_Form_MembersOnlyEvent', 'rules'));
+
+    $this->addFormRule(array($this, 'formRules'));
 
     global $base_url;
     $this->assign('BASE_URL', $base_url.'/');
@@ -110,7 +111,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     parent::postProcess();
   }
 
-  protected static function rules($params, $files, $self) {
+  public function formRules($params, $files, $self) {
     $errors = array();
     $isMembersOnlyEvent = CRM_Utils_Array::value('is_members_only_event', $params);
     $memberURL = CRM_Utils_Array::value('membership_url', $params);
