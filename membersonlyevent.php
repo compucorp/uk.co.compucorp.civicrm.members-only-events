@@ -112,26 +112,26 @@ function membersonlyevent_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
  * This hook is called to allow custom permissions to be defined. Available in 4.3 or 4.4.
  */
 function membersonlyevent_civicrm_permission(&$permissions) {
-    
+
   $prefix = ts('CiviEvent') . ': '; // name of extension or module
   $permissions = array(
     'members only event registration' => $prefix . ts('Can register for Members only events'),
   );
-  
+
 }
 
 function membersonlyevent_civicrm_tabset($tabsetName, &$tabs, $context) {
-    
+
   // Check if the tab set is Event manage
   if ($tabsetName == 'civicrm/event/manage') {
     if (!empty($context)) {
-        
+
       $eventID = $context['event_id'];
       $url = CRM_Utils_System::url( 'civicrm/event/manage/membersonlyevent',
         "reset=1&snippet=5&force=1&id=$eventID&action=update&component=event" );
-      
-     // Add a new Members only event tab along with url
-     $tab['membersonlyevent'] = array(
+
+      // Add a new Members only event tab along with url
+      $tab['membersonlyevent'] = array(
         'title' => ts('Members only event settings'),
         'link' => $url,
         'valid' => FALSE,
@@ -141,14 +141,14 @@ function membersonlyevent_civicrm_tabset($tabsetName, &$tabs, $context) {
     }
     else {
       $tab['membersonlyevent'] = array(
-      'title' => ts('Members only event settings'),
+        'title' => ts('Members only event settings'),
         'url' => 'civicrm/event/manage/membersonlyevent',
       );
     }
- 
+
     if (isset($context['event_id'])) {
-    	
-	  $eventID = $context['event_id'];
+
+      $eventID = $context['event_id'];
 
       // disable tabs based on their configuration status
       $sql = "
@@ -165,7 +165,7 @@ function membersonlyevent_civicrm_tabset($tabsetName, &$tabs, $context) {
       if ($dao->is_online_registration&&$dao->is_members_only_event) {
         $tab['membersonlyevent']['valid'] = TRUE;
       }
-	}
+    }
     //Insert this tab into position 4
     $tabs = array_merge(
       array_slice($tabs, 0, 4),
@@ -191,50 +191,50 @@ function membersonlyevent_civicrm_pageRun(&$page) {
  * Callback for event info page
  *
  * Inserts "Login Now and the Membership Signup buttons to the event page"
- * 
+ *
  */
 function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
-  
+
   // Search for the Members Only Event object by the Event ID
   $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($page->_id);
-  
+
   // Get the current user ID and current event ID
   $session = CRM_Core_Session::singleton();
   $currentEventID = $members_only_event->event_id;
   $userID = $session->get('userID');
-  $durationCheck = true;
+  $isMembershipActiveDuringEvent = true;
   $config = CRM_Membersonlyevent_BAO_MembershipConfig::getConfig();
   if($config['duration_check'] == 1&&$userID){
-  	$durationCheck = false;
+    $isMembershipActiveDuringEvent = false;
     if(is_object($members_only_event)){
-  	  $currentEventID = $page->_id;
-	  $currentEvent = civicrm_api3('event', 'get', array('id' => $currentEventID));
-	  $memberships = civicrm_api3('membership', 'get', array('contact_id' => $userID));
+      $currentEventID = $page->_id;
+      $currentEvent = civicrm_api3('event', 'get', array('id' => $currentEventID));
+      $memberships = civicrm_api3('membership', 'get', array('contact_id' => $userID));
       foreach($memberships['values'] as $key => $membership){
-  	    if($membership['end_date'] >= $currentEvent['values'][$currentEventID]['event_start_date']){
-  	  	  $durationCheck = true;
-  	    }
+        if($membership['end_date'] >= $currentEvent['values'][$currentEventID]['event_start_date']){
+          $isMembershipActiveDuringEvent = true;
+        }
       }
     }
   }
-  
+
   $notification = 'Congratulations!';
   $infoText = 'You meet the condition for this event.';
-  
+
   // Hide register now button, if the event is members only event and user has no permissions to register for the event
   if (is_object($members_only_event) && $members_only_event->is_members_only_event == 1) {
-  	
-    if (!CRM_Core_Permission::check('members only event registration')||
-    (CRM_Core_Permission::check('members only event registration')&&!$durationCheck)){
-        
+    if (
+      !CRM_Core_Permission::check('members only event registration') ||
+      (CRM_Core_Permission::check('members only event registration') && !$isMembershipActiveDuringEvent)
+    ){
       CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->update('default', array(
         'disabled' => TRUE,
       ));
-      
+
       CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->update('default', array(
         'disabled' => TRUE,
       ));
-      
+
       if (!$userID) {
         $url = CRM_Utils_System::url('user/login', '',
           //array('reset' => 1, 'id' => $members_only_event->contribution_page_id),
@@ -243,7 +243,7 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
           TRUE, // htmlize?
           TRUE // is frontend?
         );
-        
+
         $button_text = ts('Log in to register');
 
         $snippet = array(
@@ -253,33 +253,35 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
           'url' => $url,
           'weight' => -10,
         );
-       
+
         CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->add($snippet);
 
         $snippet['position'] = 'bottom';
         $snippet['weight'] = -10;
-        
+
         CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
-          
+
       }
-	  
-	  if(!CRM_Core_Permission::check('members only event registration')){
-	  	$notification = 'Sorry.';
-	  	$infoText = 'You need to become a member to for register this event.';
-		$button_text = ts('Become a member to register for this event');
-	  }else if((CRM_Core_Permission::check('members only event registration')&&!$durationCheck)){
-	  	$notification = 'Sorry.';
-	  	$infoText = 'Your membership expires before the event start. Please extend your membership to register for this event.';
-		$button_text = ts('Extend your membership to register for this event');
-	  }
-    	
+
       $url = CRM_Utils_System::url('civicrm/contribute/transact',
         array('reset' => 1, 'id' => $members_only_event->contribution_page_id),
-        FALSE, // absolute?
-        NULL, // fragment
-        TRUE, // htmlize?
-        TRUE // is frontend?
+        FALSE,
+        NULL,
+        TRUE,
+        TRUE
       );
+
+      if(!CRM_Core_Permission::check('members only event registration')){
+        $notification = 'Sorry.';
+        $infoText = 'You need to become a member to for register this event.';
+        $button_text = ts('Become a member to register for this event');
+        $url = CRM_Utils_System::url($members_only_event->membership_url);
+      }
+      else if((CRM_Core_Permission::check('members only event registration') && !$durationCheck)){
+        $notification = 'Sorry.';
+        $infoText = 'Your membership expires before the event start. Please extend your membership to register for this event.';
+        $button_text = ts('Extend your membership to register for this event');
+      }
 
       $snippet = array(
         'template' => 'CRM/Event/Page/members-event-button.tpl',
@@ -288,14 +290,14 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
         'url' => $url,
         'weight' => -10,
       );
-      
+
       CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->add($snippet);
 
       $snippet['position'] = 'bottom';
       $snippet['weight'] = -10;
-           
+
       CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
-      
+
     }
     CRM_Core_Session::setStatus(ts($infoText), ts($notification), 'error');
   }
@@ -305,24 +307,43 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
  * Alter the event registration and check for the correct permissions.
  */
 function membersonlyevent_civicrm_alterContent(&$content, $context, $tplName, &$object) {
-  
-  // If we are on windows enviroment the tplName is generated by backslashes so we need to convert it to slashes  
+  // If we are on windows enviroment the tplName is generated by backslashes so we need to convert it to slashes
   $tplName = preg_replace('/\\\\/', '/', $tplName);
-   
+
   if($tplName == "CRM/Event/Form/Registration/Register.tpl" && $context == "form") {
-      
     // Search for the Members Only Event object by the Event ID
     $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($_GET['id']);
-          
+
     if (is_object($members_only_event) && $members_only_event->is_members_only_event == 1) {
-       
       if (!CRM_Core_Permission::check('members only event registration')) {
-        $content = ts('<p>You are not allowed to register for this event!</p>');      
+        $membershipSignupLink = _membersonlyevent_civicrm_getMembershipSignupLink($members_only_event->membership_url);
+
+        $notAllowedMessage = sprintf(
+          '<p>%s<a href="%s"> %s </a></p>',
+          ts('You are not allowed to register for this event! please register for membership first from'),
+          $membershipSignupLink,
+          ts('here')
+        );
+
+        $content = $notAllowedMessage;
       }
-      
     }
-    
   }
+}
+
+/**
+ * Gets absolute Membership Signup (purchase) link
+ *
+ * @param string $membershipSubURL
+ *
+ * @return string
+ *
+ */
+function _membersonlyevent_civicrm_getMembershipSignupLink($membershipSubURL){
+  global $base_url;
+  $path = $membershipSubURL;
+
+  return CRM_Utils_System::url($path);
 }
 
 function membersonlyevent_civicrm_navigationMenu( &$params ) {
@@ -335,18 +356,18 @@ function membersonlyevent_civicrm_navigationMenu( &$params ) {
     $maxAdminMenuKey = max( array_keys($params[$administerMenuId]['child']));
     $nextAdminMenuKey = $maxAdminMenuKey+1;
     $params[$administerMenuId]['child'][$nextAdminMenuKey] =  array(
-        'attributes' => array(
-          'label' => ts('Members Event'),
-          'name' => 'members_event',
-          'url' => 'civicrm/admin/setting/preferences/members_event_config?reset=1',
-          'permission' => null,
-          'operator' => null,
-          'separator' => 1,
-          'parentID' => $administerMenuId,
-          'navID' => $nextAdminMenuKey,
-          'active' => 1
-        ),
-        'child' => null
-	);
+      'attributes' => array(
+        'label' => ts('Members Event'),
+        'name' => 'members_event',
+        'url' => 'civicrm/admin/setting/preferences/members_event_config?reset=1',
+        'permission' => null,
+        'operator' => null,
+        'separator' => 1,
+        'parentID' => $administerMenuId,
+        'navID' => $nextAdminMenuKey,
+        'active' => 1
+      ),
+      'child' => null
+    );
   }
 }

@@ -101,6 +101,12 @@ class CRM_Membersonlyevent_DAO_MembersOnlyEvent extends CRM_Core_DAO
    */
   public $event_id;
   /**
+   * URL for purchasing membership
+   *
+   * @var string
+   */
+  public $membership_url;
+  /**
    * Foreign key for the Contribution page
    *
    * @var int unsigned
@@ -161,6 +167,13 @@ class CRM_Membersonlyevent_DAO_MembersOnlyEvent extends CRM_Core_DAO
           'required' => true,
           'FKClassName' => 'CRM_Event_DAO_Event',
         ) ,
+        'membership_url' => array(
+          'name' => 'membership_url',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Membership Purchasing URL') ,
+          'maxlength' => 3000,
+          'size' => CRM_Utils_Type::HUGE,
+        ) ,
         'contribution_page_id' => array(
           'name' => 'contribution_page_id',
           'type' => CRM_Utils_Type::T_INT,
@@ -191,6 +204,7 @@ class CRM_Membersonlyevent_DAO_MembersOnlyEvent extends CRM_Core_DAO
       self::$_fieldKeys = array(
         'id' => 'id',
         'event_id' => 'event_id',
+        'membership_url' => 'membership_url',
         'contribution_page_id' => 'contribution_page_id',
         'is_members_only_event' => 'is_members_only_event',
       );

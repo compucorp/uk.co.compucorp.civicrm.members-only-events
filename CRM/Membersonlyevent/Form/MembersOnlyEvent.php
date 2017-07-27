@@ -18,6 +18,8 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
       '',   // list of attributes
       false // is required
     );
+
+    $this->add('text', 'membership_url', ts('Membership purchase URL'));
     
     // add form elements
     $this->add(
@@ -35,6 +37,13 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
         'isDefault' => TRUE,
       ),
     ));
+
+    // add form rules
+
+    $this->addFormRule(array($this, 'formRules'));
+
+    global $base_url;
+    $this->assign('BASE_URL', $base_url.'/');
 
     // export form elements
     $this->assign('elementNames', $this->getRenderableElementNames());
@@ -56,6 +65,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     if(is_object($members_only_event)) {
     
       $defaults['is_members_only_event'] = $members_only_event->is_members_only_event;
+      $defaults['membership_url'] = $members_only_event->membership_url;
       $defaults['contribution_page_id'] = $members_only_event->contribution_page_id;
     
     }
@@ -90,6 +100,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     }
     
     $params['event_id'] = $this->_id;
+    $params['membership_url'] = $passed_values['membership_url'];
     $params['contribution_page_id'] = $passed_values['contribution_page_id'];
     $params['is_members_only_event'] = isset($passed_values['is_members_only_event']) ? $passed_values['is_members_only_event'] : 0;
     
@@ -98,6 +109,18 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     
     //need recheck
     parent::postProcess();
+  }
+
+  public function formRules($params, $files, $self) {
+    $errors = array();
+    $isMembersOnlyEvent = CRM_Utils_Array::value('is_members_only_event', $params, FALSE);
+    $memberURL = CRM_Utils_Array::value('membership_url', $params);
+
+    if ($isMembersOnlyEvent && empty($memberURL)) {
+      $errors['membership_url'] = ts('Please set a membership purchasing url.');
+    }
+
+    return $errors;
   }
 
   /**

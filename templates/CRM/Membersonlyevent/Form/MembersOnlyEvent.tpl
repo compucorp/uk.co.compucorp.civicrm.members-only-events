@@ -7,16 +7,24 @@
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="top"}
   </div>
-    
-  {* FIELDS: (AUTOMATIC LAYOUT) *}
 
-  {foreach from=$elementNames item=elementName}
-    <div class="crm-section" id="{$form.$elementName.id}">
-      <div class="label">{$form.$elementName.label}</div>
-      <div class="content">{$form.$elementName.html}</div>
-      <div class="clear"></div>
-    </div>
-  {/foreach}
+  <div class="crm-section" id="{$form.is_members_only_event.id}">
+    <div class="label">{$form.is_members_only_event.label}</div>
+    <div class="content">{$form.is_members_only_event.html}</div>
+    <div class="clear"></div>
+  </div>
+
+  <div class="crm-section" id="{$form.membership_url.id}">
+    <div class="label">{$form.membership_url.label}</div>
+    <div class="content">{$BASE_URL}{$form.membership_url.html}</div>
+    <div class="clear"></div>
+  </div>
+
+  <div class="crm-section" id="{$form.contribution_page_id.id}">
+    <div class="label">{$form.contribution_page_id.label}</div>
+    <div class="content">{$form.contribution_page_id.html}</div>
+    <div class="clear"></div>
+  </div>
 
 </div>
 
