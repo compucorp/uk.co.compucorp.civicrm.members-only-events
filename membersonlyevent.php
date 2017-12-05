@@ -253,7 +253,7 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
       );
 
       $notification = 'Sorry.';
-      $infoText = 'You need to become a member to for register this event.';
+      $infoText = 'You need to become a member to register for this event.';
       $button_text = ts('Become a member to register for this event');
       $url = CRM_Utils_System::url($members_only_event->membership_url);
 
