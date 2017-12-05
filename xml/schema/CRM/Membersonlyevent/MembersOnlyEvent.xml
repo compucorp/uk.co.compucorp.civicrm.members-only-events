@@ -63,7 +63,7 @@
     <type>boolean</type>
     <title>Is Members Only Event</title>
     <default>0</default>
-    <comment>If this box is ticked only the users with permission &quot;Can register for Members only events&quot; will be able to register for this event.</comment>
+    <comment>The event is a members-only event</comment>
     <add>1.7</add>
     <html>
       <type>CheckBox</type>

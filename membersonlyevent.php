@@ -115,7 +115,7 @@ function membersonlyevent_civicrm_permission(&$permissions) {
 
   $prefix = ts('CiviEvent') . ': '; // name of extension or module
   $permissions = array(
-    'members only event registration' => $prefix . ts('Can register for Members only events'),
+    'members only event registration' => $prefix . ts('Can register for members only events irrespective of membership status'),
   );
 
 }
@@ -200,33 +200,14 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
 
   // Get the current user ID and current event ID
   $session = CRM_Core_Session::singleton();
-  $currentEventID = $members_only_event->event_id;
   $userID = $session->get('userID');
-  $isMembershipActiveDuringEvent = true;
-  $config = CRM_Membersonlyevent_BAO_MembershipConfig::getConfig();
-  if($config['duration_check'] == 1&&$userID){
-    $isMembershipActiveDuringEvent = false;
-    if(is_object($members_only_event)){
-      $currentEventID = $page->_id;
-      $currentEvent = civicrm_api3('event', 'get', array('id' => $currentEventID));
-      $memberships = civicrm_api3('membership', 'get', array('contact_id' => $userID));
-      foreach($memberships['values'] as $key => $membership){
-        if($membership['end_date'] >= $currentEvent['values'][$currentEventID]['event_start_date']){
-          $isMembershipActiveDuringEvent = true;
-        }
-      }
-    }
-  }
 
   $notification = 'Congratulations!';
   $infoText = 'You meet the condition for this event.';
 
   // Hide register now button, if the event is members only event and user has no permissions to register for the event
   if (is_object($members_only_event) && $members_only_event->is_members_only_event == 1) {
-    if (
-      !CRM_Core_Permission::check('members only event registration') ||
-      (CRM_Core_Permission::check('members only event registration') && !$isMembershipActiveDuringEvent)
-    ){
+    if (!CRM_Core_Permission::check('members only event registration')){
       CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->update('default', array(
         'disabled' => TRUE,
       ));
@@ -271,17 +252,10 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
         TRUE
       );
 
-      if(!CRM_Core_Permission::check('members only event registration')){
-        $notification = 'Sorry.';
-        $infoText = 'You need to become a member to for register this event.';
-        $button_text = ts('Become a member to register for this event');
-        $url = CRM_Utils_System::url($members_only_event->membership_url);
-      }
-      else if((CRM_Core_Permission::check('members only event registration') && !$durationCheck)){
-        $notification = 'Sorry.';
-        $infoText = 'Your membership expires before the event start. Please extend your membership to register for this event.';
-        $button_text = ts('Extend your membership to register for this event');
-      }
+      $notification = 'Sorry.';
+      $infoText = 'You need to become a member to register for this event.';
+      $button_text = ts('Become a member to register for this event');
+      $url = CRM_Utils_System::url($members_only_event->membership_url);
 
       $snippet = array(
         'template' => 'CRM/Event/Page/members-event-button.tpl',
