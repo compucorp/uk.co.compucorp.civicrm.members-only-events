@@ -113,7 +113,7 @@ class CRM_Membersonlyevent_DAO_MembersOnlyEvent extends CRM_Core_DAO
    */
   public $contribution_page_id;
   /**
-   * If this box is ticked only the users with permission "Can register for Members only events" will be able to register for this event.
+   * The event is a members-only event
    *
    * @var boolean
    */
