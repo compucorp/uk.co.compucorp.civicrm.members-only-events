@@ -14,6 +14,12 @@
     <div class="clear"></div>
   </div>
 
+  <div class="crm-section">
+    <div class="label">{$form.allowed_membership_types.label} {help id="allowed-membership-types" file="CRM/Membersonlyevent/Form/MembersOnlyEvent"}</div>
+    <div class="content">{$form.allowed_membership_types.html}</div>
+    <div class="clear"></div>
+  </div>
+
   <div class="crm-section" id="{$form.membership_url.id}">
     <div class="label">{$form.membership_url.label}</div>
     <div class="content">{$BASE_URL}{$form.membership_url.html}</div>

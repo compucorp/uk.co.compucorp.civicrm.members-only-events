@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<table>
+  <base>CRM/Membersonlyevent</base>
+  <class>EventMembershipType</class>
+  <name>membersonlyevent_event_membership_type</name>
+  <comment>Joining table for members-only-event and membership types</comment>
+  <add>4.4</add>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique members-only-event and membership type association id</comment>
+    <add>4.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>event_id</name>
+    <title>Event ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Event ID.</comment>
+    <add>4.4</add>
+  </field>
+  <foreignKey>
+    <name>event_id</name>
+    <table>civicrm_event</table>
+    <key>id</key>
+    <add>4.4</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>membership_type_id</name>
+    <title>Membership Type ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Membership Type ID.</comment>
+    <add>4.4</add>
+  </field>
+  <foreignKey>
+    <name>membership_type_id</name>
+    <table>civicrm_membership_type</table>
+    <key>id</key>
+    <add>4.4</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <index>
+    <name>index_event_id_membership_type_id</name>
+    <fieldName>event_id</fieldName>
+    <fieldName>membership_type_id</fieldName>
+    <add>4.4</add>
+  </index>
+
+</table>
