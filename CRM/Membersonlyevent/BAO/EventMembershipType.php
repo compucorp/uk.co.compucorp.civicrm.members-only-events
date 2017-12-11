@@ -35,14 +35,15 @@ class CRM_Membersonlyevent_BAO_EventMembershipType extends CRM_Membersonlyevent_
   }
 
   /**
-   * Sets the allowed memebership types
+   * Sets the allowed membership types
    * for the provided members-only event.
    *
-   * @param $membersOnlyEventID
-   * @param $allowedMembershipTypeIDs
+   * @param int $membersOnlyEventID
+   * @param array $allowedMembershipTypeIDs
    *
-   * @return int
-   *   The number of affected records.
+   * @return boolean
+   *   True if the creation of all allowed membership
+   *   types succeed or False otherwise.
    */
   private static function createAllowedMembershipTypes($membersOnlyEventID, $allowedMembershipTypeIDs) {
     $createdRecordsCount = 0;

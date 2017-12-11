@@ -1,5 +1,8 @@
 <?php
 
+use CRM_Membersonlyevent_BAO_MembersOnlyEvent as MembersOnlyEvent;
+use CRM_Membersonlyevent_BAO_EventMembershipType as EventMembershipType;
+
 require_once 'CRM/Core/Form.php';
 
 /**
@@ -8,6 +11,15 @@ require_once 'CRM/Core/Form.php';
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/QuickForm+Reference
  */
 class CRM_Membersonlyevent_Form_MembersOnlyEventTab extends CRM_Event_Form_ManageEvent {
+
+  /**
+   * Used to specify the type of  operation
+   * to be performed on the submitted event data.
+   */
+  const OPERATION_DO_NOTHING = 'do_nothing';
+  const OPERATION_CREATE = 'create';
+  const OPERATION_UPDATE = 'update';
+  const OPERATION_DOWNGRADE_TO_NORMAL_EVENT = 'downgrade_to_normal_event';
 
   /**
    * @inheritdoc
@@ -70,7 +82,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
   public function formRules($params, $files, $self) {
     $errors = array();
 
-    $isMembersOnlyEvent = CRM_Utils_Array::value('is_members_only_event', $params, FALSE);
+    $isMembersOnlyEvent = CRM_Utils_Array::value('is_members_only_event', $params);
     $membershipPurchaseURL = CRM_Utils_Array::value('membership_purchase_url', $params);
 
     if ($isMembersOnlyEvent && empty($membershipPurchaseURL)) {
@@ -86,12 +98,12 @@ class CRM_Membersonlyevent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
   public function setDefaultValues() {
     $defaultValues= array();
 
-    $membersOnlyEvent = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_id);
+    $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($this->_id);
     if($membersOnlyEvent) {
       $defaultValues['is_members_only_event'] = TRUE;
       $defaultValues['membership_purchase_url'] = $membersOnlyEvent->membership_purchase_url;
       $defaultValues['contribution_page_id'] = $membersOnlyEvent->contribution_page_id;
-      $defaultValues['allowed_membership_types'] = CRM_Membersonlyevent_BAO_EventMembershipType::getAllowedMembershipTypesIDs($membersOnlyEvent->id);
+      $defaultValues['allowed_membership_types'] = EventMembershipType::getAllowedMembershipTypesIDs($membersOnlyEvent->id);
     }
     
     return $defaultValues;
@@ -105,18 +117,18 @@ class CRM_Membersonlyevent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
     $params['event_id'] = $this->_id;
 
     $eventSetToMembersOnly = !empty($params['is_members_only_event']) ? TRUE : FALSE;
-    $membersOnlyEvent = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($params['event_id']);
+    $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($params['event_id']);
     $operation = $this->getSubmitOperation($eventSetToMembersOnly, $membersOnlyEvent);
 
     switch ($operation){
-      case 'create':
+      case self::OPERATION_CREATE:
         $this->saveFormData($params);
         break;
-      case 'update':
+      case self::OPERATION_UPDATE:
         $params['id'] = $membersOnlyEvent->id;
         $this->saveFormData($params);
         break;
-      case 'downgrade_to_normal_event':
+      case self::OPERATION_DOWNGRADE_TO_NORMAL_EVENT:
         $this->downgradeToNormalEvent($membersOnlyEvent->id);
         break;
     }
@@ -125,13 +137,13 @@ class CRM_Membersonlyevent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
   /**
    * Returns the type of submit operation based
    * on the submitted data, there are 4 cases which are :
-   * 1- do_nothing : the event is not already a members-only
+   * 1- OPERATION_DO_NOTHING : the event is not already a members-only
    *   event & 'Is members-only event ?' field is not checked.
-   * 2- downgrade_to_normal_event : if the event is currently
+   * 2- OPERATION_DOWNGRADE_TO_NORMAL_EVENT : if the event is currently
    *   a members-only event but we unchecked 'Is members-only event ?' field.
-   * 3- update : if the event is currently a members-only event
+   * 3- OPERATION_UPDATE : if the event is currently a members-only event
    *   and we kept 'Is members-only event ?' field checked.
-   * 4- create : if the event is not a members-only event but
+   * 4- OPERATION_CREATE : if the event is not a members-only event but
    *   we checked 'Is members-only event ?' field.
    *
    * @param boolean $eventSetToMembersOnly
@@ -142,23 +154,23 @@ class CRM_Membersonlyevent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
    *   members-only event.
    *
    * @return string
-   *   It may contain `do_nothing`, `downgrade_to_normal_event`,
-   *     `update` or `create`.
+   *   It may contain one of the OPERATION_* constants
+   *   defined at the top of this class.
    */
   private function getSubmitOperation($eventSetToMembersOnly, $membersOnlyEvent = NULL) {
     if(!$membersOnlyEvent && !$eventSetToMembersOnly) {
-      return 'do_nothing';
+      return self::OPERATION_DO_NOTHING;
     }
 
     if($membersOnlyEvent && !$eventSetToMembersOnly) {
-      return 'downgrade_to_normal_event';
+      return self::OPERATION_DOWNGRADE_TO_NORMAL_EVENT;
     }
 
     if($membersOnlyEvent && $eventSetToMembersOnly) {
-      return 'update';
+      return self::OPERATION_UPDATE;
     }
 
-    return 'create';
+    return self::OPERATION_CREATE;
   }
 
   /**
@@ -177,7 +189,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
         $allowedMembershipTypesIDs = explode(',', $params['allowed_membership_types']);
       }
 
-      CRM_Membersonlyevent_BAO_EventMembershipType::updateAllowedMembershipTypes($membersOnlyEvent->id, $allowedMembershipTypesIDs);
+      EventMembershipType::updateAllowedMembershipTypes($membersOnlyEvent->id, $allowedMembershipTypesIDs);
     }
   }
 
@@ -190,7 +202,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
    *   to be downgraded.
    */
   private function downgradeToNormalEvent($membersOnlyEventID) {
-    $membersOnlyEvent = new CRM_Membersonlyevent_BAO_MembersOnlyEvent();
+    $membersOnlyEvent = new MembersOnlyEvent();
     $membersOnlyEvent->id = $membersOnlyEventID;
     $membersOnlyEvent->delete();
   }

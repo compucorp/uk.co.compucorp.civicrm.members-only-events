@@ -1,5 +1,7 @@
 <?php
 
+use CRM_Membersonlyevent_BAO_Configurations as Configurations;
+
 require_once 'CRM/Core/Form.php';
 
 /**
@@ -32,7 +34,7 @@ class CRM_Membersonlyevent_Form_Configurations extends CRM_Core_Form {
   public function setDefaultValues() {
     $defaultValues = array();
 
-    $configs = CRM_Membersonlyevent_BAO_Configurations::getConfigs();
+    $configs = Configurations::getConfigs();
     $defaultValues['membership_duration_check'] = $configs->membership_duration_check;
 
     return $defaultValues;
@@ -41,7 +43,7 @@ class CRM_Membersonlyevent_Form_Configurations extends CRM_Core_Form {
   public function postProcess() {
     $params = $this->exportValues();
     $params['membership_duration_check'] = !empty($params['membership_duration_check']) ? TRUE : FALSE;
-    CRM_Membersonlyevent_BAO_Configurations::updateConfigs($params);
+    Configurations::updateConfigs($params);
 
     CRM_Core_Session::setStatus(ts('The configurations have been saved.'), ts('Saved'), 'success');
   }

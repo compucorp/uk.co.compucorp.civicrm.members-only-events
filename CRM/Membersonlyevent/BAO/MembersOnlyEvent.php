@@ -35,12 +35,8 @@ class CRM_Membersonlyevent_BAO_MembersOnlyEvent extends CRM_Membersonlyevent_DAO
    * @return CRM_Membersonlyevent_DAO_MembersOnlyEvent|FALSE
    */
   public static function getMembersOnlyEvent($eventID) {
-    $params = array(
-      'event_id' => $eventID,
-    );
-
     $membersOnlyEvent = new self();
-    $membersOnlyEvent->copyValues($params);
+    $membersOnlyEvent->event_id = $eventID;
     $membersOnlyEvent->find(TRUE);
 
     if ($membersOnlyEvent->N) {

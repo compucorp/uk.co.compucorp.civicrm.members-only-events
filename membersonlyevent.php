@@ -12,6 +12,8 @@
 //                                                                            //
 //----------------------------------------------------------------------------//
 
+use CRM_Membersonlyevent_BAO_MembersOnlyEvent as MembersOnlyEvent;
+
 require_once 'membersonlyevent.civix.php';
 
 
@@ -217,7 +219,7 @@ function _membersonlyevent_is_tab_valid($eventID) {
     $isOnlineRegistrationEnabled = TRUE;
   }
 
-  $membersOnlyEvent = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($eventID);
+  $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($eventID);
 
   if ($isOnlineRegistrationEnabled && $membersOnlyEvent) {
     return TRUE;
