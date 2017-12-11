@@ -11,10 +11,16 @@ require_once 'CRM/Core/Form.php';
  */
 class CRM_MembersOnlyEvent_Form_Configurations extends CRM_Core_Form {
 
+  /**
+   * @inheritdoc
+   */
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('Members-Only Event Extension Configurations'));
   }
 
+  /**
+   * @inheritdoc
+   */
   public function buildQuickForm() {
     $this->add(
       'checkbox',
@@ -31,19 +37,28 @@ class CRM_MembersOnlyEvent_Form_Configurations extends CRM_Core_Form {
     ));
   }
 
+  /**
+   * @inheritdoc
+   */
   public function setDefaultValues() {
-    $defaultValues = array();
+    $existingValues = civicrm_api3('Setting', 'get',
+      array('sequential' => 1, 'return' => 'membership_duration_check')
+    );
 
-    $configs = Configurations::getConfigs();
-    $defaultValues['membership_duration_check'] = $configs->membership_duration_check;
+    $defaults['membership_duration_check'] = !empty($existingValues['values'][0]['membership_duration_check']) ? TRUE : FALSE;
 
-    return $defaultValues;
+    return $defaults;
   }
 
+  /**
+   * @inheritdoc
+   */
   public function postProcess() {
     $params = $this->exportValues();
-    $params['membership_duration_check'] = !empty($params['membership_duration_check']) ? TRUE : FALSE;
-    Configurations::updateConfigs($params);
+
+    $settingsToSave['membership_duration_check'] = !empty($params['membership_duration_check']) ? TRUE : FALSE;
+
+    civicrm_api3('Setting', 'create', $settingsToSave);
 
     CRM_Core_Session::setStatus(ts('The configurations have been saved.'), ts('Saved'), 'success');
   }
