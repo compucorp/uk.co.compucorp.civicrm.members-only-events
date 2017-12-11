@@ -14,6 +14,12 @@
     <div class="clear"></div>
   </div>
 
+  <div class="crm-section" id="allowed-membership-types">
+    <div class="label">{$form.allowed_membership_types.label} {help id="allowed-membership-types" file="CRM/Membersonlyevent/Form/MembersOnlyEvent"}</div>
+    <div class="content">{$form.allowed_membership_types.html}</div>
+    <div class="clear"></div>
+  </div>
+
   <div class="crm-section" id="{$form.membership_url.id}">
     <div class="label">{$form.membership_url.label}</div>
     <div class="content">{$BASE_URL}{$form.membership_url.html}</div>
@@ -41,15 +47,18 @@
         
         if (jQuery(this).attr("checked") == true){
           jQuery("#contribution_page_id").show();
+          jQuery("#allowed-membership-types").show();
         }
         else {
           jQuery("#contribution_page_id").hide();
+          jQuery("#allowed-membership-types").hide();
         }
       
       });
       
       if (jQuery("#is_members_only_event input[type=checkbox]").attr("checked") == false){
         jQuery("#contribution_page_id").hide();
+        jQuery("#allowed-membership-types").hide();
       }
       
     });

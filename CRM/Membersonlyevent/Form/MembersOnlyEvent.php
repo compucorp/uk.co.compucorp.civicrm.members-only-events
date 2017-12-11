@@ -19,6 +19,13 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
       false // is required
     );
 
+    $this->addEntityRef('allowed_membership_types', ts('Allowed Membership Types'), array(
+      'entity' => 'MembershipType',
+      'multiple' => TRUE,
+      'placeholder' => ts('- any -'),
+      'select' => array('minimumInputLength' => 0),
+    ));
+
     $this->add('text', 'membership_url', ts('Membership purchase URL'));
     
     // add form elements
@@ -56,18 +63,17 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
    * @access public
    */
   function setDefaultValues() {
-      
     $defaults = array();
     
     // Search for the Members Only Event object by the Event ID
     $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($this->_id);
-    
     if(is_object($members_only_event)) {
-    
       $defaults['is_members_only_event'] = $members_only_event->is_members_only_event;
       $defaults['membership_url'] = $members_only_event->membership_url;
       $defaults['contribution_page_id'] = $members_only_event->contribution_page_id;
-    
+
+      // Search for the allowed membership types for this event
+      $defaults['allowed_membership_types'] = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getAllowedMembershipTypesIDs($this->_id);
     }
     
     return $defaults;
@@ -103,9 +109,23 @@ class CRM_Membersonlyevent_Form_MembersOnlyEvent extends CRM_Event_Form_ManageEv
     $params['membership_url'] = $passed_values['membership_url'];
     $params['contribution_page_id'] = $passed_values['contribution_page_id'];
     $params['is_members_only_event'] = isset($passed_values['is_members_only_event']) ? $passed_values['is_members_only_event'] : 0;
-    
+
+    $transaction = new CRM_Core_Transaction();
     // Create or edit the values
-    CRM_Membersonlyevent_BAO_MembersOnlyEvent::create($params);
+    $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::create($params);
+
+    if (!empty($members_only_event->id)) {
+      $allowed_membership_types = array();
+      if (!empty($passed_values['allowed_membership_types'])) {
+        $allowed_membership_types = explode(',', $passed_values['allowed_membership_types']);
+      }
+
+      CRM_Membersonlyevent_BAO_MembersOnlyEvent::setAllowedMembershipTypes($this->_id, $allowed_membership_types);
+      $transaction->commit();
+    } else {
+      $transaction->rollback();
+      CRM_Core_Session::setStatus(ts('Failed to save data'), ts('Please try again'), 'error');
+    }
     
     //need recheck
     parent::postProcess();
