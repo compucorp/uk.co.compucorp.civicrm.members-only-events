@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Membersonlyevent</base>
+  <class>Configurations</class>
+  <name>membersonlyevent_configurations</name>
+  <comment>Stores members-only event extension system-wide configurations</comment>
+  <add>4.4</add>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>4.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>membership_duration_check</name>
+    <type>boolean</type>
+    <title>Membership duration check</title>
+    <default>0</default>
+    <comment>If True, the extension will check if the user membership is active (valid) at the time of the event</comment>
+    <add>4.4</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+
+</table>

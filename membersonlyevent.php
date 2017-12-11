@@ -1,6 +1,23 @@
 <?php
 
+//----------------------------------------------------------------------------//
+//                             File Organization                              //
+//                                                                            //
+// To keep this file organized, it is split into 2 sections: CiviCRM Hooks    //
+// and Helper Functions. The former has all the civicrm hooks implementations //
+// used by this extension, whereas the latter, has all the helper functions   //
+// used by those hooks.                                                       //
+//                                                                            //
+// If you're adding new things here, please keep this organization in mind.   //
+//                                                                            //
+//----------------------------------------------------------------------------//
+
 require_once 'membersonlyevent.civix.php';
+
+
+//----------------------------------------------------------------------------//
+//                           CiviCRM Hooks                                    //
+//----------------------------------------------------------------------------//
 
 /**
  * Implementation of hook_civicrm_config
@@ -108,65 +125,40 @@ function membersonlyevent_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
 }
 
 /**
- * hook_civicrm_permission(&$permissions)
- * This hook is called to allow custom permissions to be defined. Available in 4.3 or 4.4.
+ * Implements hook_civicrm_permission().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_permission
  */
 function membersonlyevent_civicrm_permission(&$permissions) {
-
-  $prefix = ts('CiviEvent') . ': '; // name of extension or module
-  $permissions = array(
-    'members only event registration' => $prefix . ts('Can register for members only events irrespective of membership status'),
-  );
-
+  $prefix = ts('Members-Only Event') . ': ';
+  $permissions['members only event registration'] = $prefix . ts('Can register for members-only events irrespective of membership status');
 }
 
+/**
+ * Implements hook_civicrm_tabset().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_tabset/
+ */
 function membersonlyevent_civicrm_tabset($tabsetName, &$tabs, $context) {
-
-  // Check if the tab set is Event manage
+  // check if the tabset is 'Manage Event' page
   if ($tabsetName == 'civicrm/event/manage') {
-    if (!empty($context)) {
-
-      $eventID = $context['event_id'];
-      $url = CRM_Utils_System::url( 'civicrm/event/manage/membersonlyevent',
-        "reset=1&snippet=5&force=1&id=$eventID&action=update&component=event" );
-
-      // Add a new Members only event tab along with url
-      $tab['membersonlyevent'] = array(
-        'title' => ts('Members only event settings'),
-        'link' => $url,
-        'valid' => FALSE,
-        'active' => TRUE,
-        'current' => FALSE,
-      );
-    }
-    else {
-      $tab['membersonlyevent'] = array(
-        'title' => ts('Members only event settings'),
-        'url' => 'civicrm/event/manage/membersonlyevent',
-      );
+    if (empty($context['event_id'])) {
+      return;
     }
 
-    if (isset($context['event_id'])) {
+    $eventID = $context['event_id'];
+    $url = CRM_Utils_System::url(
+      'civicrm/event/manage/membersonlyevent',
+      'reset=1&id=' . $eventID . '&action=update&component=event');
 
-      $eventID = $context['event_id'];
+    $tab['membersonlyevent'] = array(
+      'title' => ts('Members only event settings'),
+      'link' => $url,
+      'valid' => _membersonlyevent_is_tab_valid($eventID),
+      'active' => TRUE,
+    );
 
-      // disable tabs based on their configuration status
-      $sql = "
-			SELECT     e.is_online_registration, cm.is_members_only_event
-			FROM       civicrm_event e
-			LEFT JOIN  civicrm_membersonlyevent cm ON cm.event_id = e.id
-			WHERE      e.id = %1
-	  ";
-      $params = array(1 => array($eventID, 'Integer'));
-      $dao = CRM_Core_DAO::executeQuery($sql, $params);
-      if (!$dao->fetch()) {
-        CRM_Core_Error::fatal();
-      }
-      if ($dao->is_online_registration&&$dao->is_members_only_event) {
-        $tab['membersonlyevent']['valid'] = TRUE;
-      }
-    }
-    //Insert this tab into position 4
+    //Insert this tab into position 4 (after `Online Registration` tab)
     $tabs = array_merge(
       array_slice($tabs, 0, 4),
       $tab,
@@ -178,6 +170,8 @@ function membersonlyevent_civicrm_tabset($tabsetName, &$tabs, $context) {
 /**
  * Implementation of hook_civicrm_pageRun
  *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_pageRun/
+ *
  * Handler for pageRun hook.
  */
 function membersonlyevent_civicrm_pageRun(&$page) {
@@ -188,153 +182,68 @@ function membersonlyevent_civicrm_pageRun(&$page) {
 }
 
 /**
- * Callback for event info page
- *
- * Inserts "Login Now and the Membership Signup buttons to the event page"
- *
- */
-function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
-
-  // Search for the Members Only Event object by the Event ID
-  $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($page->_id);
-
-  // Get the current user ID and current event ID
-  $session = CRM_Core_Session::singleton();
-  $userID = $session->get('userID');
-
-  $notification = 'Congratulations!';
-  $infoText = 'You meet the condition for this event.';
-
-  // Hide register now button, if the event is members only event and user has no permissions to register for the event
-  if (is_object($members_only_event) && $members_only_event->is_members_only_event == 1) {
-    if (!CRM_Core_Permission::check('members only event registration')){
-      CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->update('default', array(
-        'disabled' => TRUE,
-      ));
-
-      CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->update('default', array(
-        'disabled' => TRUE,
-      ));
-
-      if (!$userID) {
-        $url = CRM_Utils_System::url('user/login', '',
-          //array('reset' => 1, 'id' => $members_only_event->contribution_page_id),
-          FALSE, // absolute?
-          NULL, // fragment
-          TRUE, // htmlize?
-          TRUE // is frontend?
-        );
-
-        $button_text = ts('Log in to register');
-
-        $snippet = array(
-          'template' => 'CRM/Event/Page/members-event-button.tpl',
-          'button_text' => $button_text,
-          'position' => 'top',
-          'url' => $url,
-          'weight' => -10,
-        );
-
-        CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->add($snippet);
-
-        $snippet['position'] = 'bottom';
-        $snippet['weight'] = -10;
-
-        CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
-
-      }
-
-      $url = CRM_Utils_System::url('civicrm/contribute/transact',
-        array('reset' => 1, 'id' => $members_only_event->contribution_page_id),
-        FALSE,
-        NULL,
-        TRUE,
-        TRUE
-      );
-
-      $notification = 'Sorry.';
-      $infoText = 'You need to become a member to register for this event.';
-      $button_text = ts('Become a member to register for this event');
-      $url = CRM_Utils_System::url($members_only_event->membership_url);
-
-      $snippet = array(
-        'template' => 'CRM/Event/Page/members-event-button.tpl',
-        'button_text' => $button_text,
-        'position' => 'top',
-        'url' => $url,
-        'weight' => -10,
-      );
-
-      CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->add($snippet);
-
-      $snippet['position'] = 'bottom';
-      $snippet['weight'] = -10;
-
-      CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
-
-    }
-    CRM_Core_Session::setStatus(ts($infoText), ts($notification), 'error');
-  }
-}
-
-/**
  * Alter the event registration and check for the correct permissions.
  */
 function membersonlyevent_civicrm_alterContent(&$content, $context, $tplName, &$object) {
-  // If we are on windows enviroment the tplName is generated by backslashes so we need to convert it to slashes
-  $tplName = preg_replace('/\\\\/', '/', $tplName);
+}
 
-  if($tplName == "CRM/Event/Form/Registration/Register.tpl" && $context == "form") {
-    // Search for the Members Only Event object by the Event ID
-    $members_only_event = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($_GET['id']);
+function membersonlyevent_civicrm_navigationMenu(&$params) {
+  _membersonlyevent_add_configurations_menu($params);
+}
 
-    if (is_object($members_only_event) && $members_only_event->is_members_only_event == 1) {
-      if (!CRM_Core_Permission::check('members only event registration')) {
-        $membershipSignupLink = _membersonlyevent_civicrm_getMembershipSignupLink($members_only_event->membership_url);
+//----------------------------------------------------------------------------//
+//                               Helper Functions                             //
+//----------------------------------------------------------------------------//
 
-        $notAllowedMessage = sprintf(
-          '<p>%s<a href="%s"> %s </a></p>',
-          ts('You are not allowed to register for this event! please register for membership first from'),
-          $membershipSignupLink,
-          ts('here')
-        );
-
-        $content = $notAllowedMessage;
-      }
-    }
+/**
+ * Checks if the members-only settings tab
+ * should be valid or not. Currently it is valid
+ * only if the event is members-only event and
+ * online registration is enabled.
+ *
+ * @param int $eventID
+ *
+ * @return bool
+ *
+ */
+function _membersonlyevent_is_tab_valid($eventID) {
+  $isOnlineRegistrationEnabled = FALSE;
+  $event = civicrm_api3('Event', 'get', array(
+    'sequential' => 1,
+    'return' => array('is_online_registration'),
+    'id' => $eventID,
+  ));
+  if (!empty($event['values'][0]['is_online_registration'])) {
+    $isOnlineRegistrationEnabled = TRUE;
   }
+
+  $membersOnlyEvent = CRM_Membersonlyevent_BAO_MembersOnlyEvent::getMembersOnlyEvent($eventID);
+
+  if ($isOnlineRegistrationEnabled && $membersOnlyEvent) {
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 /**
- * Gets absolute Membership Signup (purchase) link
+ * Adds `Members-Only Event Extension Configurations` menu
+ * item under `Administer` top-level menu item.
  *
- * @param string $membershipSubURL
- *
- * @return string
- *
+ * @param $params
  */
-function _membersonlyevent_civicrm_getMembershipSignupLink($membershipSubURL){
-  global $base_url;
-  $path = $membershipSubURL;
-
-  return CRM_Utils_System::url($path);
-}
-
-function membersonlyevent_civicrm_navigationMenu( &$params ) {
-
-  // get the id of Administer Menu
+function _membersonlyevent_add_configurations_menu(&$params) {
   $administerMenuId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Navigation', 'Administer', 'id', 'name');
-  // skip adding menu if there is no administer menu
   if ($administerMenuId) {
     // get the maximum key under administer menu
-    $maxAdminMenuKey = max( array_keys($params[$administerMenuId]['child']));
+    $maxAdminMenuKey = max(array_keys($params[$administerMenuId]['child']));
     $nextAdminMenuKey = $maxAdminMenuKey+1;
     $params[$administerMenuId]['child'][$nextAdminMenuKey] =  array(
       'attributes' => array(
-        'label' => ts('Members Event'),
-        'name' => 'members_event',
-        'url' => 'civicrm/admin/setting/preferences/members_event_config?reset=1',
-        'permission' => null,
+        'label' => ts('Members-Only Event Extension Configurations'),
+        'name' => 'membersonlyevent_configurations',
+        'url' => 'civicrm/admin/membersonlyevent',
+        'permission' => 'administer CiviCRM,access CiviEvent',
         'operator' => null,
         'separator' => 1,
         'parentID' => $administerMenuId,

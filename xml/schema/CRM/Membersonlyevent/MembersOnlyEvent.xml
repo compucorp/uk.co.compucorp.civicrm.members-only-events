@@ -3,8 +3,8 @@
 <table>
   <base>CRM/Membersonlyevent</base>
   <class>MembersOnlyEvent</class>
-  <name>civicrm_membersonlyevent</name>
-  <comment>Members Only Event entity settings table</comment>
+  <name>membersonlyevent</name>
+  <comment>Stores members-only event configurations</comment>
   <add>4.4</add>
   <log>true</log>
 
@@ -12,7 +12,6 @@
     <name>id</name>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Unique Members Only Event ID</comment>
     <add>4.4</add>
   </field>
   <primaryKey>
@@ -36,11 +35,11 @@
   </foreignKey>
 
   <field>
-    <name>membership_url</name>
+    <name>membership_purchase_url</name>
     <type>varchar</type>
     <length>3000</length>
-    <comment>URL for purchasing membership</comment>
-    <title>Membership Purchasing URL</title>
+    <comment>Membership purchasing page URL</comment>
+    <title>Membership purchasing page URL</title>
     <add>4.4</add>
   </field>
   
@@ -57,17 +56,5 @@
     <add>4.4</add>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
-  
-  <field>
-    <name>is_members_only_event</name>
-    <type>boolean</type>
-    <title>Is Members Only Event</title>
-    <default>0</default>
-    <comment>The event is a members-only event</comment>
-    <add>1.7</add>
-    <html>
-      <type>CheckBox</type>
-    </html>
-  </field>
 
 </table>
