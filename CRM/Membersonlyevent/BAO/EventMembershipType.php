@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Membersonlyevent_BAO_EventMembershipType extends CRM_Membersonlyevent_DAO_EventMembershipType {
+class CRM_MembersOnlyEvent_BAO_EventMembershipType extends CRM_MembersOnlyEvent_DAO_EventMembershipType {
 
   /**
    * Stores the allowed membership types for specific

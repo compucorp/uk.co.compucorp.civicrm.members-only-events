@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 
 <table>
-  <base>CRM/Membersonlyevent</base>
+  <base>CRM/MembersOnlyEvent</base>
   <class>MembersOnlyEvent</class>
   <name>membersonlyevent</name>
   <comment>Stores members-only event configurations</comment>

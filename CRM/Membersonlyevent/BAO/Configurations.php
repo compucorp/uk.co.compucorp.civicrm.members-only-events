@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Membersonlyevent_BAO_Configurations extends CRM_Membersonlyevent_DAO_Configurations {
+class CRM_MembersOnlyEvent_BAO_Configurations extends CRM_MembersOnlyEvent_DAO_Configurations {
 
   /**
    * Configurations record id in the entity table
@@ -14,7 +14,7 @@ class CRM_Membersonlyevent_BAO_Configurations extends CRM_Membersonlyevent_DAO_C
    *
    * @param array $params
    *
-   * @return CRM_Membersonlyevent_DAO_Configurations
+   * @return CRM_MembersOnlyEvent_DAO_Configurations
    */
   public static function updateConfigs(array $params) {
     // always set the id to ensure we don't create another record
@@ -31,7 +31,7 @@ class CRM_Membersonlyevent_BAO_Configurations extends CRM_Membersonlyevent_DAO_C
   /**
    * Gets the extension system-wide configurations
    *
-   * @return CRM_Membersonlyevent_DAO_Configurations
+   * @return CRM_MembersOnlyEvent_DAO_Configurations
    */
   public static function getConfigs() {
     $configurations = new self();

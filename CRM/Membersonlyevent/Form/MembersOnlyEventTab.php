@@ -1,7 +1,7 @@
 <?php
 
-use CRM_Membersonlyevent_BAO_MembersOnlyEvent as MembersOnlyEvent;
-use CRM_Membersonlyevent_BAO_EventMembershipType as EventMembershipType;
+use CRM_MembersOnlyEvent_BAO_MembersOnlyEvent as MembersOnlyEvent;
+use CRM_MembersOnlyEvent_BAO_EventMembershipType as EventMembershipType;
 
 require_once 'CRM/Core/Form.php';
 
@@ -10,7 +10,7 @@ require_once 'CRM/Core/Form.php';
  *
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/QuickForm+Reference
  */
-class CRM_Membersonlyevent_Form_MembersOnlyEventTab extends CRM_Event_Form_ManageEvent {
+class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_ManageEvent {
 
   /**
    * Used to specify the type of  operation
@@ -149,7 +149,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
    * @param boolean $eventSetToMembersOnly
    *   True if Is members-only event ?' field is checked
    *   or False if it's not.
-   * @param CRM_Membersonlyevent_BAO_MembersOnlyEvent $membersOnlyEvent
+   * @param MembersOnlyEvent $membersOnlyEvent
    *   Contains the members-only event configurations if the event is
    *   members-only event.
    *
@@ -182,7 +182,7 @@ class CRM_Membersonlyevent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
    * @param $params
    */
   private function saveFormData($params) {
-    $membersOnlyEvent = CRM_Membersonlyevent_BAO_MembersOnlyEvent::create($params);
+    $membersOnlyEvent = MembersOnlyEvent::create($params);
     if (!empty($membersOnlyEvent->id)) {
       $allowedMembershipTypesIDs = array();
       if (!empty($params['allowed_membership_types'])) {

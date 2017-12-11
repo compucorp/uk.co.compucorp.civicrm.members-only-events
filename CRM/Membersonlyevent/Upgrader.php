@@ -3,5 +3,5 @@
 /**
  * Collection of upgrade steps
  */
-class CRM_Membersonlyevent_Upgrader extends CRM_Membersonlyevent_Upgrader_Base {
+class CRM_MembersOnlyEvent_Upgrader extends CRM_MembersOnlyEvent_Upgrader_Base {
 }

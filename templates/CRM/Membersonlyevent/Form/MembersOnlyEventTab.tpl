@@ -15,7 +15,7 @@
   </div>
 
   <div class="crm-section" id="{$form.allowed_membership_types.id}">
-    <div class="label">{$form.allowed_membership_types.label} {help id="allowed-membership-types" file="CRM/Membersonlyevent/Form/MembersOnlyEventTab"}</div>
+    <div class="label">{$form.allowed_membership_types.label} {help id="allowed-membership-types" file="CRM/MembersOnlyEvent/Form/MembersOnlyEventTab"}</div>
     <div class="content">{$form.allowed_membership_types.html}</div>
     <div class="clear"></div>
   </div>

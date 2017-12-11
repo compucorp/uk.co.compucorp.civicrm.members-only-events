@@ -1,6 +1,6 @@
 <?php
 
-use CRM_Membersonlyevent_BAO_Configurations as Configurations;
+use CRM_MembersOnlyEvent_BAO_Configurations as Configurations;
 
 require_once 'CRM/Core/Form.php';
 
@@ -9,7 +9,7 @@ require_once 'CRM/Core/Form.php';
  *
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/QuickForm+Reference
  */
-class CRM_Membersonlyevent_Form_Configurations extends CRM_Core_Form {
+class CRM_MembersOnlyEvent_Form_Configurations extends CRM_Core_Form {
 
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('Members-Only Event Extension Configurations'));

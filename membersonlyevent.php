@@ -12,7 +12,7 @@
 //                                                                            //
 //----------------------------------------------------------------------------//
 
-use CRM_Membersonlyevent_BAO_MembersOnlyEvent as MembersOnlyEvent;
+use CRM_MembersOnlyEvent_BAO_MembersOnlyEvent as MembersOnlyEvent;
 
 require_once 'membersonlyevent.civix.php';
 

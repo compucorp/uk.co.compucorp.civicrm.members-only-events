@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Membersonlyevent_BAO_MembersOnlyEvent extends CRM_Membersonlyevent_DAO_MembersOnlyEvent {
+class CRM_MembersOnlyEvent_BAO_MembersOnlyEvent extends CRM_MembersOnlyEvent_DAO_MembersOnlyEvent {
 
   /**
    * Creates a new Members-Only Event record
@@ -8,7 +8,7 @@ class CRM_Membersonlyevent_BAO_MembersOnlyEvent extends CRM_Membersonlyevent_DAO
    *
    * @param array $params
    *
-   * @return CRM_Membersonlyevent_BAO_MembersOnlyEvent
+   * @return CRM_MembersOnlyEvent_BAO_MembersOnlyEvent
    */
   public static function create($params) {
     $entityName = 'MembersOnlyEvent';
@@ -32,7 +32,7 @@ class CRM_Membersonlyevent_BAO_MembersOnlyEvent extends CRM_Membersonlyevent_DAO
    *
    * @param int $eventID
    *
-   * @return CRM_Membersonlyevent_DAO_MembersOnlyEvent|FALSE
+   * @return CRM_MembersOnlyEvent_DAO_MembersOnlyEvent|FALSE
    */
   public static function getMembersOnlyEvent($eventID) {
     $membersOnlyEvent = new self();

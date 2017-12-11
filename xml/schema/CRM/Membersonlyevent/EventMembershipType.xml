@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <table>
-  <base>CRM/Membersonlyevent</base>
+  <base>CRM/MembersOnlyEvent</base>
   <class>EventMembershipType</class>
   <name>membersonlyevent_event_membership_type</name>
   <comment>Joining table for members-only event and allowed membership types</comment>
