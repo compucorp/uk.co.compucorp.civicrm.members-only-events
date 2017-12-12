@@ -6,10 +6,14 @@
 -- *
 -- *******************************************************/
 CREATE TABLE `membersonlyevent` (
-     `id` int unsigned NOT NULL AUTO_INCREMENT,
+     `id` int unsigned NOT NULL AUTO_INCREMENT  ,
      `event_id` int unsigned NOT NULL   COMMENT 'Foreign key for the Event',
-     `membership_purchase_url` varchar(3000) NOT NULL   COMMENT 'Membership purchasing page URL',
-     `contribution_page_id` int unsigned    COMMENT 'Foreign key for the Contribution page',
+     `purchase_membership_button` tinyint   DEFAULT 0 COMMENT 'Should we provide membership purchase button when access to event denied ?',
+     `notice_for_access_denied` text   DEFAULT NULL COMMENT 'Notice message to show to the user when the access to members-only event denied.',
+     `purchase_membership_button_label` varchar(255)   DEFAULT NULL COMMENT 'Purchase membership button label if it is enabled',
+     `purchase_membership_link_type` int   DEFAULT 0 COMMENT '0: contribution page, 1: custom URL',
+     `contribution_page_id` int unsigned   DEFAULT NULL COMMENT 'Foreign key for the Contribution page',
+     `purchase_membership_url` varchar(3000)   DEFAULT NULL COMMENT 'Purchase membership page URL',
     PRIMARY KEY ( `id` ),
     CONSTRAINT FK_civicrm_membersonlyevent_event_id
       FOREIGN KEY (`event_id`) REFERENCES `civicrm_event`(`id`) ON DELETE CASCADE,

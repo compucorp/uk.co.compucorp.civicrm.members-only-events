@@ -53,7 +53,7 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
     );
 
 
-    $this->add('text', 'membership_purchase_url', ts('Membership purchasing page URL'));
+    $this->add('text', 'purchase_membership_url', ts('Purchase Membership page URL'));
     $this->assign('BASE_URL', CRM_Utils_System::baseURL());
 
     $this->addEntityRef(
@@ -83,10 +83,10 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
     $errors = array();
 
     $isMembersOnlyEvent = CRM_Utils_Array::value('is_members_only_event', $params);
-    $membershipPurchaseURL = CRM_Utils_Array::value('membership_purchase_url', $params);
+    $membershipPurchaseURL = CRM_Utils_Array::value('purchase_membership_url', $params);
 
     if ($isMembersOnlyEvent && empty($membershipPurchaseURL)) {
-      $errors['membership_purchase_url'] = ts('Please set Membership purchasing page URL.');
+      $errors['purchase_membership_url'] = ts('Please set Membership purchasing page URL.');
     }
 
     return $errors;
@@ -101,7 +101,7 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
     $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($this->_id);
     if($membersOnlyEvent) {
       $defaultValues['is_members_only_event'] = TRUE;
-      $defaultValues['membership_purchase_url'] = $membersOnlyEvent->membership_purchase_url;
+      $defaultValues['purchase_membership_url'] = $membersOnlyEvent->purchase_membership_url;
       $defaultValues['contribution_page_id'] = $membersOnlyEvent->contribution_page_id;
       $defaultValues['allowed_membership_types'] = EventMembershipType::getAllowedMembershipTypesIDs($membersOnlyEvent->id);
     }

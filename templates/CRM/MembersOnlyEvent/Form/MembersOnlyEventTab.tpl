@@ -20,9 +20,9 @@
     <div class="clear"></div>
   </div>
 
-  <div class="crm-section" id="{$form.membership_purchase_url.id}">
-    <div class="label">{$form.membership_purchase_url.label}</div>
-    <div class="content">{$BASE_URL}{$form.membership_purchase_url.html}</div>
+  <div class="crm-section" id="{$form.purchase_membership_url.id}">
+    <div class="label">{$form.purchase_membership_url.label}</div>
+    <div class="content">{$BASE_URL}{$form.purchase_membership_url.html}</div>
     <div class="clear"></div>
   </div>
 
@@ -47,12 +47,12 @@
         
         if (jQuery(this).attr("checked") == true){
           jQuery("#allowed_membership_types").show();
-          jQuery("#membership_purchase_url").show();
+          jQuery("#purchase_membership_url").show();
           jQuery("#contribution_page_id").show();
         }
         else {
           jQuery("#allowed_membership_types").hide();
-          jQuery("#membership_purchase_url").hide();
+          jQuery("#purchase_membership_url").hide();
           jQuery("#contribution_page_id").hide();
         }
       
@@ -60,7 +60,7 @@
       
       if (jQuery("#is_members_only_event input[type=checkbox]").attr("checked") == false){
         jQuery("#allowed_membership_types").hide();
-        jQuery("#membership_purchase_url").hide();
+        jQuery("#purchase_membership_url").hide();
         jQuery("#contribution_page_id").hide();
       }
       
