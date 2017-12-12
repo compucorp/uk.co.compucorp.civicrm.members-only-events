@@ -5,7 +5,7 @@
 /**
  * Base class which provides helpers to execute upgrade logic
  */
-class CRM_Membersonlyevent_Upgrader_Base {
+class CRM_MembersOnlyEvent_Upgrader_Base {
 
   /**
    * @var varies, subclass of htis
@@ -38,8 +38,8 @@ class CRM_Membersonlyevent_Upgrader_Base {
   static public function instance() {
     if (! self::$instance) {
       // FIXME auto-generate
-      self::$instance = new CRM_Membersonlyevent_Upgrader(
-        'com.greg.membersonlyevent',
+      self::$instance = new CRM_MembersOnlyEvent_Upgrader(
+        'com.compucorp.membersonlyevent',
         realpath(__DIR__ .'/../../../')
       );
     }
@@ -53,7 +53,7 @@ class CRM_Membersonlyevent_Upgrader_Base {
    * task-context; otherwise, this will be non-reentrant.
    *
    * @code
-   * CRM_Membersonlyevent_Upgrader_Base::_queueAdapter($ctx, 'methodName', 'arg1', 'arg2');
+   * CRM_MembersOnlyEvent_Upgrader_Base::_queueAdapter($ctx, 'methodName', 'arg1', 'arg2');
    * @endcode
    */
   static public function _queueAdapter() {

@@ -15,6 +15,6 @@
   </compatibility>
   <comments>Please report any comments or issues with the module on the Github page for the extension.</comments>
   <civix>
-    <namespace>CRM/Membersonlyevent</namespace>
+    <namespace>CRM/MembersOnlyEvent</namespace>
   </civix>
 </extension>

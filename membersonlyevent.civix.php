@@ -109,13 +109,13 @@ function _membersonlyevent_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = N
 }
 
 /**
- * @return CRM_Membersonlyevent_Upgrader
+ * @return CRM_MembersOnlyEvent_Upgrader
  */
 function _membersonlyevent_civix_upgrader() {
-  if (!file_exists(__DIR__.'/CRM/Membersonlyevent/Upgrader.php')) {
+  if (!file_exists(__DIR__.'/CRM/MembersOnlyEvent/Upgrader.php')) {
     return NULL;
   } else {
-    return CRM_Membersonlyevent_Upgrader_Base::instance();
+    return CRM_MembersOnlyEvent_Upgrader_Base::instance();
   }
 }
 
