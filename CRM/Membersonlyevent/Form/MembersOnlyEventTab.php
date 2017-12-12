@@ -26,7 +26,6 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
    */
   public function buildQuickForm() {
     $this->addFields();
-    $this->addFormRule(array($this, 'formRules'));
 
     parent::buildQuickForm();
   }
@@ -52,19 +51,15 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
       )
     );
 
+    $this->addYesNo(
+      'purchase_membership_button',
+      ts('Provide Purchase Membership Button when access denied ?')
+    );
 
-    $this->add('text', 'membership_purchase_url', ts('Membership purchasing page URL'));
-    $this->assign('BASE_URL', CRM_Utils_System::baseURL());
-
-    $this->addEntityRef(
-      'contribution_page_id',
-      ts('Contribution page used for membership signup'),
-      array(
-        'entity' => 'ContributionPage',
-        'multiple' => FALSE,
-        'placeholder' => ts('- No selection -'),
-        'select' => array('minimumInputLength' => 0),
-      )
+    $this->add(
+      'wysiwyg',
+      'notice_for_access_denied',
+      ts('Notice for access denied')
     );
 
     $this->addButtons(array(
@@ -77,33 +72,18 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
   }
 
   /**
-   * Sets the form validation rules.
-   */
-  public function formRules($params, $files, $self) {
-    $errors = array();
-
-    $isMembersOnlyEvent = CRM_Utils_Array::value('is_members_only_event', $params);
-    $membershipPurchaseURL = CRM_Utils_Array::value('membership_purchase_url', $params);
-
-    if ($isMembersOnlyEvent && empty($membershipPurchaseURL)) {
-      $errors['membership_purchase_url'] = ts('Please set Membership purchasing page URL.');
-    }
-
-    return $errors;
-  }
-
-  /**
    * @inheritdoc
    */
   public function setDefaultValues() {
     $defaultValues= array();
+    $defaultValues['purchase_membership_button'] = 0;
 
     $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($this->_id);
     if($membersOnlyEvent) {
       $defaultValues['is_members_only_event'] = TRUE;
-      $defaultValues['membership_purchase_url'] = $membersOnlyEvent->membership_purchase_url;
-      $defaultValues['contribution_page_id'] = $membersOnlyEvent->contribution_page_id;
       $defaultValues['allowed_membership_types'] = EventMembershipType::getAllowedMembershipTypesIDs($membersOnlyEvent->id);
+      $defaultValues['purchase_membership_button'] = $membersOnlyEvent->purchase_membership_button;
+      $defaultValues['notice_for_access_denied'] = $membersOnlyEvent->notice_for_access_denied;
     }
     
     return $defaultValues;
