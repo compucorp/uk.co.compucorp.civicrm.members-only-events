@@ -51,6 +51,17 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
       )
     );
 
+    $this->addYesNo(
+      'purchase_membership_button',
+      ts('Provide Purchase Membership Button when access denied ?')
+    );
+
+    $this->add(
+      'wysiwyg',
+      'notice_for_access_denied',
+      ts('Notice for access denied')
+    );
+
     $this->addButtons(array(
       array(
         'type' => 'submit',
@@ -65,11 +76,14 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
    */
   public function setDefaultValues() {
     $defaultValues= array();
+    $defaultValues['purchase_membership_button'] = 0;
 
     $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($this->_id);
     if($membersOnlyEvent) {
       $defaultValues['is_members_only_event'] = TRUE;
       $defaultValues['allowed_membership_types'] = EventMembershipType::getAllowedMembershipTypesIDs($membersOnlyEvent->id);
+      $defaultValues['purchase_membership_button'] = $membersOnlyEvent->purchase_membership_button;
+      $defaultValues['notice_for_access_denied'] = $membersOnlyEvent->notice_for_access_denied;
     }
     
     return $defaultValues;
