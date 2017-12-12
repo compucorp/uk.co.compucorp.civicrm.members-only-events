@@ -26,7 +26,6 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
    */
   public function buildQuickForm() {
     $this->addFields();
-    $this->addFormRule(array($this, 'formRules'));
 
     parent::buildQuickForm();
   }
@@ -52,21 +51,6 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
       )
     );
 
-
-    $this->add('text', 'purchase_membership_url', ts('Purchase Membership page URL'));
-    $this->assign('BASE_URL', CRM_Utils_System::baseURL());
-
-    $this->addEntityRef(
-      'contribution_page_id',
-      ts('Contribution page used for membership signup'),
-      array(
-        'entity' => 'ContributionPage',
-        'multiple' => FALSE,
-        'placeholder' => ts('- No selection -'),
-        'select' => array('minimumInputLength' => 0),
-      )
-    );
-
     $this->addButtons(array(
       array(
         'type' => 'submit',
@@ -74,22 +58,6 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
         'isDefault' => TRUE,
       ),
     ));
-  }
-
-  /**
-   * Sets the form validation rules.
-   */
-  public function formRules($params, $files, $self) {
-    $errors = array();
-
-    $isMembersOnlyEvent = CRM_Utils_Array::value('is_members_only_event', $params);
-    $membershipPurchaseURL = CRM_Utils_Array::value('purchase_membership_url', $params);
-
-    if ($isMembersOnlyEvent && empty($membershipPurchaseURL)) {
-      $errors['purchase_membership_url'] = ts('Please set Membership purchasing page URL.');
-    }
-
-    return $errors;
   }
 
   /**
@@ -101,8 +69,6 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
     $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($this->_id);
     if($membersOnlyEvent) {
       $defaultValues['is_members_only_event'] = TRUE;
-      $defaultValues['purchase_membership_url'] = $membersOnlyEvent->purchase_membership_url;
-      $defaultValues['contribution_page_id'] = $membersOnlyEvent->contribution_page_id;
       $defaultValues['allowed_membership_types'] = EventMembershipType::getAllowedMembershipTypesIDs($membersOnlyEvent->id);
     }
     
