@@ -13,6 +13,8 @@
 //----------------------------------------------------------------------------//
 
 use CRM_MembersOnlyEvent_BAO_MembersOnlyEvent as MembersOnlyEvent;
+use CRM_MembersOnlyEvent_BAO_EventMembershipType as EventMembershipType;
+use CRM_MembersOnlyEvent_Configurations as Configurations;
 
 require_once 'membersonlyevent.civix.php';
 
@@ -226,6 +228,180 @@ function _membersonlyevent_is_tab_valid($eventID) {
   }
 
   return FALSE;
+}
+
+/**
+ * Callback for event info page
+ */
+function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
+  $eventID = $page->_id;
+  $userHasEventAccess = _membersonlyevent_user_has_event_access($eventID);
+  if (!$userHasEventAccess) {
+    _membersonlyevent_hide_event_info_page_register_button();
+
+    $contactID = CRM_Core_Session::getLoggedInContactID();
+    if (!$contactID) {
+      _membersonlyevent_add_login_button_to_event_info_page();
+    }
+  }
+}
+
+/**
+ * Checks if the logged-in user has
+ * an access to the specified event or not.
+ *
+ * @param int $eventID
+ *
+ * @return bool
+ *   True if has access or False otherwise
+ */
+function _membersonlyevent_user_has_event_access($eventID) {
+  $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($eventID);
+  if (!$membersOnlyEvent) {
+    // the member is not a members-only event so nothing to check
+    return TRUE;
+  }
+
+  $contactID = CRM_Core_Session::getLoggedInContactID();
+  if (!$contactID) {
+    // the user is not logged-in so he cannot access the event
+    return FALSE;
+  }
+
+  if(CRM_Core_Permission::check('members only event registration')){
+    // any user with 'members only event registration' permission
+    // can access any members-only event.
+    return TRUE;
+  }
+
+  $contactActiveAllowedMemberships = _membersonlyevent_get_contact_active_allowed_memberships($membersOnlyEvent->id, $contactID);
+
+  if (!$contactActiveAllowedMemberships) {
+    // the users does not have any active membership
+    // so he cannot access the event.
+    return FALSE;
+  }
+
+  return _membersonlyevent_is_memberships_duration_valid_during_event($eventID, $contactActiveAllowedMemberships);
+}
+
+/**
+ * Gets the memberships for the specified
+ * contact in case he has any active membership
+ * with a membership type allowed to access the
+ * provided members-only event.
+ *
+ * @param int $membersOnlyEventID
+ * @param int $contactID
+ *
+ * @return array
+ *   List of contact Memberships or empty array if nothing found
+ */
+function _membersonlyevent_get_contact_active_allowed_memberships($membersOnlyEventID, $contactID) {
+  $params = array(
+    'sequential' => 1,
+    'contact_id' => $contactID,
+    'active_only' => 1,
+  );
+
+  $allowedMembershipTypes = EventMembershipType::getAllowedMembershipTypesIDs($membersOnlyEventID);
+  if (!empty($allowedMembershipTypes)) {
+    $params['membership_type_id'] = array('IN' => $allowedMembershipTypes);
+  }
+
+  $contactActiveMemberships = civicrm_api3('Membership', 'get', $params);
+
+  if ($contactActiveMemberships['count']) {
+    return $contactActiveMemberships['values'];
+  }
+
+  return array();
+}
+
+/**
+ * Checks if any of a list of allowed an active memberships
+ * is valid (active) during the  period of
+ * the specified event in case 'membership duration check'
+ * is enabled.
+ * The membership is valid during an event if :
+ * 1- The membership end date is empty.
+ * 2- The event start date is empty.
+ * 3- The membership end data is > the event start date.
+ *
+ * @param int $eventID
+ * @param array $activeAllowedMemberships
+ *   A list of allowed and active memberships to be checked
+ *   if they are valid during the specified event period.
+ *
+ * @return bool
+ *   True if there is any valid membership during the event period
+ *   or false otherwise.
+ */
+function _membersonlyevent_is_memberships_duration_valid_during_event($eventID, $activeAllowedMemberships) {
+  $configs = Configurations::get();
+  if (!empty($configs['membership_duration_check'])) {
+    // the 'membership duration check' is not enabled
+    // so the user should be able to access the event.
+    return TRUE;
+  }
+
+  $eventInfo = civicrm_api3('event', 'get', array('id' => $eventID, 'return' => array('start_date')))['values'][0];
+  $eventStartDate = !(empty($eventInfo['start_date'])) ? $eventInfo['start_date'] : '';
+  foreach($activeAllowedMemberships as $membership) {
+    $membershipEndDate = !(empty($membership['end_date'])) ? $membership['end_date'] : '';
+    if (empty($membershipEndDate) || empty($eventStartDate) || ($membershipEndDate > $eventStartDate)) {
+      // the user has an active allowed membership for this event
+      // so the user should be able to access the event.
+      return TRUE;
+    }
+  }
+
+  // since 'membership duration check' is enabled but
+  // the user does not have any active allowed membership
+  // for this event so he will not be able to access the event.
+  return FALSE;
+}
+
+/**
+ * Hides the event info page action links which contain
+ * the event register link.
+ */
+function _membersonlyevent_hide_event_info_page_register_button() {
+  CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->update('default', array(
+    'disabled' => TRUE,
+  ));
+  CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->update('default', array(
+    'disabled' => TRUE,
+  ));
+}
+
+/**
+ * Adds `login to register` button to the event
+ * info page that allow send the user to the login
+ * page.
+ */
+function _membersonlyevent_add_login_button_to_event_info_page() {
+  $loginURL = CRM_Utils_System::url(
+    'user/login',
+    '',
+    FALSE,
+    NULL,
+    TRUE,
+    TRUE
+  );
+  $loginButtonText = ts('Login to register');
+  $snippet = array(
+    'template' => 'CRM/Event/Page/members-event-button.tpl',
+    'button_text' => $loginButtonText,
+    'position' => 'top',
+    'url' => $loginURL,
+    'weight' => -10,
+  );
+
+  CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->add($snippet);
+
+  $snippet['position'] = 'bottom';
+  CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
 }
 
 /**
