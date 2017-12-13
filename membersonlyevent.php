@@ -242,6 +242,11 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
     $contactID = CRM_Core_Session::getLoggedInContactID();
     if (!$contactID) {
       _membersonlyevent_add_login_button_to_event_info_page();
+    } else {
+      $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($eventID);
+      if (!$membersOnlyEvent->purchase_membership_button) {
+        CRM_Core_Session::setStatus($membersOnlyEvent->notice_for_access_denied);
+      }
     }
   }
 }
