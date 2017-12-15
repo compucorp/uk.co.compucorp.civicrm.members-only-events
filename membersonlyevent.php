@@ -160,6 +160,8 @@ function membersonlyevent_civicrm_tabset($tabsetName, &$tabs, $context) {
       'link' => $url,
       'valid' => _membersonlyevent_is_tab_valid($eventID),
       'active' => TRUE,
+      'current' => FALSE,
+      'class' => 'ajaxForm',
     );
 
     //Insert this tab into position 4 (after `Online Registration` tab)
@@ -186,9 +188,17 @@ function membersonlyevent_civicrm_pageRun(&$page) {
 }
 
 /**
- * Alter the event registration and check for the correct permissions.
+ * Implementation of hook_civicrm_preProcess
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_preProcess/
+ *
+ * Handler for preProcess hook.
  */
-function membersonlyevent_civicrm_alterContent(&$content, $context, $tplName, &$object) {
+function membersonlyevent_civicrm_preProcess($formName, &$form) {
+  $f = '_' . __FUNCTION__ . '_' . $formName;
+  if (function_exists($f)) {
+    $f($form);
+  }
 }
 
 function membersonlyevent_civicrm_navigationMenu(&$params) {
@@ -236,18 +246,19 @@ function _membersonlyevent_is_tab_valid($eventID) {
 function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
   $eventID = $page->_id;
   $userHasEventAccess = _membersonlyevent_user_has_event_access($eventID);
-  if (!$userHasEventAccess) {
-    _membersonlyevent_hide_event_info_page_register_button();
+  if ($userHasEventAccess) {
+    // skip early and show the page if the user has access to the members-only event.
+    return;
+  }
 
-    $contactID = CRM_Core_Session::getLoggedInContactID();
-    if (!$contactID) {
-      _membersonlyevent_add_login_button_to_event_info_page();
-    } else {
-      $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($eventID);
-      if (!$membersOnlyEvent->purchase_membership_button) {
-        CRM_Core_Session::setStatus($membersOnlyEvent->notice_for_access_denied);
-      }
-    }
+  _membersonlyevent_hide_event_info_page_register_button();
+
+  $userLoggedIn = CRM_Core_Session::getLoggedInContactID();
+  if (!$userLoggedIn) {
+    _membersonlyevent_handle_access_denied_for_guest_users();
+  }
+  else {
+    _membersonlyevent_handle_access_denied_for_logged_users($eventID);
   }
 }
 
@@ -381,32 +392,99 @@ function _membersonlyevent_hide_event_info_page_register_button() {
 }
 
 /**
- * Adds `login to register` button to the event
- * info page that allow send the user to the login
- * page.
+ * Handles the case when the guest
+ * user does not have permission to access
+ * the event info page.
+ *
+ * @param int $eventID
  */
-function _membersonlyevent_add_login_button_to_event_info_page() {
-  $loginURL = CRM_Utils_System::url(
-    'user/login',
-    '',
-    FALSE,
-    NULL,
-    TRUE,
-    TRUE
-  );
-  $loginButtonText = ts('Login to register');
-  $snippet = array(
+function _membersonlyevent_handle_access_denied_for_guest_users() {
+  $loginURL = CRM_Core_Config::singleton()->userSystem->getLoginURL();
+  _membersonlyevent_add_action_button_to_event_info_page($loginURL, 'Login to register');
+}
+
+/**
+ * Handles the case when the logged-in
+ * user does not have permission to access
+ * the event info page.
+ *
+ * @param int $eventID
+ */
+function _membersonlyevent_handle_access_denied_for_logged_users($eventID) {
+  $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($eventID);
+  if ($membersOnlyEvent->purchase_membership_button) {
+    _membersonlyevent_add_membership_purchase_button_to_event_info_page($membersOnlyEvent);
+  }
+  else {
+    // Purchase membership button is disabled, so we will just show the configured notice message
+    CRM_Core_Session::setStatus($membersOnlyEvent->notice_for_access_denied);
+  }
+}
+
+/**
+ * Adds membership purchase button based
+ * on the members-only event configurations to
+ * the header and the footer of the event info page.
+ *
+ * @param MembersOnlyEvent $membersOnlyEvent
+ */
+function _membersonlyevent_add_membership_purchase_button_to_event_info_page($membersOnlyEvent) {
+  switch ($membersOnlyEvent->purchase_membership_link_type) {
+    case MembersOnlyEvent::LINK_TYPE_CONTRIBUTION_PAGE:
+      $contributionPageID = $membersOnlyEvent->contribution_page_id;
+      $path = 'civicrm/contribute/transact';
+      $params = 'reset=1&id=' . $contributionPageID;
+      $membershipPurchaseURL = CRM_Utils_System::url($path, $params);
+      break;
+    case MembersOnlyEvent::LINK_TYPE_URL:
+    Default:
+      $membershipPurchaseURL = $membersOnlyEvent->purchase_membership_url;
+      break;
+  }
+
+  $buttonText = $membersOnlyEvent->purchase_membership_button_label;
+
+  _membersonlyevent_add_action_button_to_event_info_page($membershipPurchaseURL, $buttonText);
+}
+
+/**
+ * Adds a button with the specified
+ * url and text to the header and the footer
+ * of the event info page.
+ */
+function _membersonlyevent_add_action_button_to_event_info_page($url, $buttonText) {
+  $buttonToAdd = array(
     'template' => 'CRM/Event/Page/members-event-button.tpl',
-    'button_text' => $loginButtonText,
+    'button_text' => ts($buttonText),
     'position' => 'top',
-    'url' => $loginURL,
+    'url' => $url,
     'weight' => -10,
   );
 
-  CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->add($snippet);
+  CRM_Core_Region::instance('event-page-eventinfo-actionlinks-top')->add($buttonToAdd);
 
-  $snippet['position'] = 'bottom';
-  CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($snippet);
+  $buttonToAdd['position'] = 'bottom';
+  CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($buttonToAdd);
+}
+
+/**
+ * Callback for event registration page
+ *
+ * Hence that users are supposed to register for events
+ * from the info page, so in case the user tired to access
+ * the registration page directly we will just redirect him
+ * to the main page instead of showing any error or buttons to
+ * login or buy membership.
+ * 
+ * @param $form
+ */
+function _membersonlyevent_civicrm_preProcess_CRM_Event_Form_Registration_Register(&$form) {
+  $eventID = $form->_eventId;
+  $userHasEventAccess = _membersonlyevent_user_has_event_access($eventID);
+  if (!$userHasEventAccess) {
+    // if the user has no access, redirect to the main page
+    CRM_Utils_System::redirect('/');
+  }
 }
 
 /**

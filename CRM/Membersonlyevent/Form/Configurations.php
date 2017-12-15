@@ -1,9 +1,5 @@
 <?php
 
-use CRM_MembersOnlyEvent_BAO_Configurations as Configurations;
-
-require_once 'CRM/Core/Form.php';
-
 /**
  * Form controller class
  *

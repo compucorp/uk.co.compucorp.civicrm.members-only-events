@@ -3,8 +3,6 @@
 use CRM_MembersOnlyEvent_BAO_MembersOnlyEvent as MembersOnlyEvent;
 use CRM_MembersOnlyEvent_BAO_EventMembershipType as EventMembershipType;
 
-require_once 'CRM/Core/Form.php';
-
 /**
  * Form controller class
  *
@@ -13,8 +11,24 @@ require_once 'CRM/Core/Form.php';
 class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_ManageEvent {
 
   /**
+   * 'No' Option is selected for a radio button.
+   *
+   * @const boolean
+   */
+  const NO_SELECTED = FALSE;
+
+  /**
+   * 'Yes' Option is selected for a radio button.
+   *
+   * @const boolean
+   */
+  const YES_SELECTED = TRUE;
+
+  /**
    * Used to specify the type of  operation
    * to be performed on the submitted event data.
+   *
+   * @const String
    */
   const OPERATION_DO_NOTHING = 'do_nothing';
   const OPERATION_CREATE = 'create';
@@ -26,6 +40,8 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
    */
   public function buildQuickForm() {
     $this->addFields();
+
+    $this->addFormRule(array($this, 'formRules'));
 
     parent::buildQuickForm();
   }
@@ -62,13 +78,119 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
       ts('Notice for access denied')
     );
 
-    $this->addButtons(array(
+    $this->add(
+      'text',
+      'purchase_membership_button_label',
+      ts('Purchase Membership Button Label')
+    );
+
+    $this->addRadio(
+      'purchase_membership_link_type',
+      ts('Purchase Membership Button Link'),
+      array(0 => 'Link to a Contribution Page', 1 => 'Other URLs')
+    );
+
+    $this->addEntityRef(
+      'contribution_page_id',
+      ts('Contribution Page'),
       array(
-        'type' => 'submit',
-        'name' => ts('Submit'),
-        'isDefault' => TRUE,
-      ),
-    ));
+        'entity' => 'ContributionPage',
+        'multiple' => False,
+        'placeholder' => ts('- Select -'),
+        'select' => array('minimumInputLength' => 0),
+      )
+    );
+
+    $this->add(
+      'text',
+      'purchase_membership_url',
+      ts('Purchase Membership URL'),
+      array('placeholder' => CRM_Utils_System::baseCMSURL())
+    );
+  }
+
+  /**
+   * Validates the submitted form values.
+   *
+   * @param array $values
+   *   All the submitted form values
+   *
+   * @return array|bool
+   *   The errors message to report to the user if any or TRUE otherwise.
+   */
+  public function formRules($values) {
+    $errors = array();
+
+    // Skip validation if the event is not members-only
+    if (empty($values['is_members_only_event'])) {
+      return $errors;
+    }
+
+    switch ($values['purchase_membership_button']) {
+      case self::NO_SELECTED:
+        $this->validateForDisabledPurchaseButton($values, $errors);
+        break;
+      case self::YES_SELECTED:
+        $this->validateForEnabledPurchaseButton($values, $errors);
+        break;
+    }
+
+    return $errors ?: TRUE;
+  }
+
+  /**
+   * Validates form fields when 'purchase membership button'
+   * is disabled.
+   *
+   * @param array $values
+   * @param array $errors
+   */
+  private function validateForDisabledPurchaseButton(&$values, &$errors) {
+    if (empty($values['notice_for_access_denied'])) {
+      $errors['notice_for_access_denied'] = ts('Please set a Notice message for access denied');
+    }
+  }
+
+  /**
+   * Validates form fields when 'purchase membership button'
+   * is enabled.
+   *
+   * @param array $values
+   * @param array $errors
+   */
+  private function validateForEnabledPurchaseButton(&$values, &$errors) {
+    if (empty($values['purchase_membership_button_label'])) {
+      $errors['purchase_membership_button_label'] = ts('Please set Membership Purchase button label');
+    }
+
+    $this->validateMembershipLinkTypeFields($values, $errors);
+  }
+
+  /**
+   * Validates the fields related to 'link type' field.
+   *
+   * @param array $values
+   * @param array $errors
+   */
+  private function validateMembershipLinkTypeFields(&$values, &$errors) {
+    // if contribution page link type is selected
+    if ($values['purchase_membership_link_type'] == MembersOnlyEvent::LINK_TYPE_CONTRIBUTION_PAGE) {
+      if (empty($values['contribution_page_id'])) {
+        $errors['contribution_page_id'] = ts('Please select a contribution page');
+      }
+    }
+
+    // if URL link type is selected
+    if ($values['purchase_membership_link_type'] == MembersOnlyEvent::LINK_TYPE_URL) {
+      if (empty($values['purchase_membership_url'])) {
+        $errors['purchase_membership_url'] = ts('Please enter the Membership purchase URL');
+      }
+      else {
+        if (!CRM_Utils_Rule::url($values['purchase_membership_url'])) {
+          $errors['purchase_membership_url'] = ts('Please enter a valid URL');
+        }
+      }
+    }
   }
 
   /**
@@ -76,17 +198,35 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
    */
   public function setDefaultValues() {
     $defaultValues= array();
-    $defaultValues['purchase_membership_button'] = 0;
+
+    $this->setInitialValues($defaultValues);
 
     $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($this->_id);
     if($membersOnlyEvent) {
-      $defaultValues['is_members_only_event'] = TRUE;
+      $defaultValues['is_members_only_event'] = self::YES_SELECTED;
       $defaultValues['allowed_membership_types'] = EventMembershipType::getAllowedMembershipTypesIDs($membersOnlyEvent->id);
       $defaultValues['purchase_membership_button'] = $membersOnlyEvent->purchase_membership_button;
       $defaultValues['notice_for_access_denied'] = $membersOnlyEvent->notice_for_access_denied;
+      $defaultValues['purchase_membership_button_label'] = $membersOnlyEvent->purchase_membership_button_label;
+      $defaultValues['purchase_membership_link_type'] = $membersOnlyEvent->purchase_membership_link_type;
+      $defaultValues['contribution_page_id'] = $membersOnlyEvent->contribution_page_id;
+      $defaultValues['purchase_membership_url'] = $membersOnlyEvent->purchase_membership_url;
     }
     
     return $defaultValues;
+  }
+
+  /**
+   * Sets the initial form values
+   *
+   * @param $defaultValues
+   */
+  private function setInitialValues(&$defaultValues) {
+    $defaultValues['is_members_only_event'] = self::NO_SELECTED;
+    $defaultValues['purchase_membership_button'] = self::NO_SELECTED;
+    $defaultValues['notice_for_access_denied'] = ts('Access Denied');
+    $defaultValues['purchase_membership_button_label'] = ts('Purchase membership to book the event');
+    $defaultValues['purchase_membership_link_type'] = MembersOnlyEvent::LINK_TYPE_URL;
   }
 
   /**
@@ -96,11 +236,10 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
     $params = $this->exportValues();
     $params['event_id'] = $this->_id;
 
-    $eventSetToMembersOnly = !empty($params['is_members_only_event']) ? TRUE : FALSE;
+    $eventSetToMembersOnly = !empty($params['is_members_only_event']) ? self::YES_SELECTED : self::NO_SELECTED;
     $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($params['event_id']);
-    $operation = $this->getSubmitOperation($eventSetToMembersOnly, $membersOnlyEvent);
-
-    switch ($operation){
+    $submitOperation = $this->getSubmitOperation($eventSetToMembersOnly, $membersOnlyEvent);
+    switch ($submitOperation){
       case self::OPERATION_CREATE:
         $this->saveFormData($params);
         break;
@@ -112,6 +251,8 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
         $this->downgradeToNormalEvent($membersOnlyEvent->id);
         break;
     }
+
+    parent::endPostProcess();
   }
 
   /**
