@@ -3,6 +3,20 @@
 class CRM_MembersOnlyEvent_BAO_MembersOnlyEvent extends CRM_MembersOnlyEvent_DAO_MembersOnlyEvent {
 
   /**
+   * Contribution page link type for 'purchase membership button'.
+   *
+   * @const int
+   */
+  const LINK_TYPE_CONTRIBUTION_PAGE = 0;
+
+  /**
+   * URL link type for 'purchase membership button'.
+   *
+   * @const int
+   */
+  const LINK_TYPE_URL = 1;
+
+  /**
    * Creates a new Members-Only Event record
    * based on array-data
    *
