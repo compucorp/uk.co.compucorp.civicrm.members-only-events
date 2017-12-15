@@ -188,9 +188,17 @@ function membersonlyevent_civicrm_pageRun(&$page) {
 }
 
 /**
- * Alter the event registration and check for the correct permissions.
+ * Implementation of hook_civicrm_preProcess
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_preProcess/
+ *
+ * Handler for preProcess hook.
  */
-function membersonlyevent_civicrm_alterContent(&$content, $context, $tplName, &$object) {
+function membersonlyevent_civicrm_preProcess($formName, &$form) {
+  $f = '_' . __FUNCTION__ . '_' . $formName;
+  if (function_exists($f)) {
+    $f($form);
+  }
 }
 
 function membersonlyevent_civicrm_navigationMenu(&$params) {
@@ -457,6 +465,26 @@ function _membersonlyevent_add_action_button_to_event_info_page($url, $buttonTex
 
   $buttonToAdd['position'] = 'bottom';
   CRM_Core_Region::instance('event-page-eventinfo-actionlinks-bottom')->add($buttonToAdd);
+}
+
+/**
+ * Callback for event registration page
+ *
+ * Hence that users are supposed to register for events
+ * from the info page, so in case the user tired to access
+ * the registration page directly we will just redirect him
+ * to the main page instead of showing any error or buttons to
+ * login or buy membership.
+ * 
+ * @param $form
+ */
+function _membersonlyevent_civicrm_preProcess_CRM_Event_Form_Registration_Register(&$form) {
+  $eventID = $form->_eventId;
+  $userHasEventAccess = _membersonlyevent_user_has_event_access($eventID);
+  if (!$userHasEventAccess) {
+    // if the user has no access, redirect to the main page
+    CRM_Utils_System::redirect('/');
+  }
 }
 
 /**
