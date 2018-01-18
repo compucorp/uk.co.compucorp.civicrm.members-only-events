@@ -355,17 +355,16 @@ function _membersonlyevent_get_contact_active_allowed_memberships($membersOnlyEv
  */
 function _membersonlyevent_is_memberships_duration_valid_during_event($eventID, $activeAllowedMemberships) {
   $configs = Configurations::get();
-  if (!empty($configs['membership_duration_check'])) {
+  if (empty($configs['membership_duration_check'])) {
     // the 'membership duration check' is not enabled
     // so the user should be able to access the event.
     return TRUE;
   }
 
-  $eventInfo = civicrm_api3('event', 'get', array('id' => $eventID, 'return' => array('start_date')))['values'][0];
-  $eventStartDate = !(empty($eventInfo['start_date'])) ? $eventInfo['start_date'] : '';
+  $eventStartDate = _membersonlyevent_get_event_start_date($eventID);
   foreach($activeAllowedMemberships as $membership) {
     $membershipEndDate = !(empty($membership['end_date'])) ? $membership['end_date'] : '';
-    if (empty($membershipEndDate) || empty($eventStartDate) || ($membershipEndDate > $eventStartDate)) {
+    if (empty($membershipEndDate) || empty($eventStartDate) || ($membershipEndDate >= $eventStartDate)) {
       // the user has an active allowed membership for this event
       // so the user should be able to access the event.
       return TRUE;
@@ -376,6 +375,29 @@ function _membersonlyevent_is_memberships_duration_valid_during_event($eventID, 
   // the user does not have any active allowed membership
   // for this event so he will not be able to access the event.
   return FALSE;
+}
+
+/**
+ * Gets the event start date in Y-m-d format if exist.
+ *
+ * @param $eventID
+ *
+ * @return string
+ *   Event start date in y-md format
+ *   or empty string if no start date exist.
+ */
+function _membersonlyevent_get_event_start_date($eventID) {
+  $eventStartDate = '';
+
+  $eventInfo = civicrm_api3('event', 'get',
+    array('id' => $eventID, 'return' => array('start_date'), 'sequential' => 1))['values'][0];
+
+  if (!empty($eventInfo['start_date'])) {
+    $date = new DateTime($eventInfo['start_date']);
+    $eventStartDate = $date->format('Y-m-d');
+  }
+
+  return $eventStartDate;
 }
 
 /**
