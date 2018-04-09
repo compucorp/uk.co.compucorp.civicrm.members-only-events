@@ -245,6 +245,18 @@ function _membersonlyevent_is_tab_valid($eventID) {
  */
 function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
   $eventID = $page->_id;
+
+  if(_membersonly_is_event_for_members_only($eventID)) {
+    $session = CRM_Core_Session::singleton();
+    $statusMessages = $session->get('status');
+    foreach ($statusMessages as $k => $msg) {
+      if (strpos($msg['text'], 'register another participant')) {
+        $statusMessages[$k]['text'] = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've gotten this message in error, please contact the site administrator.");
+      }
+    }
+    $session->set('status', $statusMessages);
+  }
+
   $userHasEventAccess = _membersonlyevent_user_has_event_access($eventID);
   if ($userHasEventAccess) {
     // skip early and show the page if the user has access to the members-only event.
@@ -260,6 +272,7 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
   else {
     _membersonlyevent_handle_access_denied_for_logged_users($eventID);
   }
+  CRM_Core_Session::setStatus('You have already registered for this event!');
 }
 
 /**
@@ -299,6 +312,17 @@ function _membersonlyevent_user_has_event_access($eventID) {
   }
 
   return _membersonlyevent_is_memberships_duration_valid_during_event($eventID, $contactActiveAllowedMemberships);
+}
+
+/**
+ * Checks if the logged-in user has
+ * an access to the specified event or not.
+ *
+ * @param $eventID
+ * @return CRM_MembersOnlyEvent_DAO_MembersOnlyEvent|FALSE
+ */
+function _membersonly_is_event_for_members_only($eventID) {
+  return MembersOnlyEvent::getMembersOnlyEvent($eventID);
 }
 
 /**
@@ -506,6 +530,21 @@ function _membersonlyevent_civicrm_preProcess_CRM_Event_Form_Registration_Regist
   if (!$userHasEventAccess) {
     // if the user has no access, redirect to the main page
     CRM_Utils_System::redirect('/');
+  }
+  if(_membersonly_is_event_for_members_only($eventID)) {
+    $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
+    CRM_Core_Resources::singleton()->addStyle('.crm-not-you-message { display: none; }');
+    if (isset($cid)) {
+      CRM_Core_Session::setStatus('You have already registered for this event! You cannot register other users.');
+      $id = CRM_Utils_Request::retrieve('id', 'Positive');
+      $params = 'id='.$id;
+      if($reset = CRM_Utils_Request::retrieve('reset', 'Positive')) {
+        $params .= '&reset='.$reset;
+      }
+      $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), $params);
+      CRM_Utils_System::redirect($url);
+      $form->_skipDupeRegistrationCheck = TRUE;
+    }
   }
 }
 
