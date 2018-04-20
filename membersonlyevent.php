@@ -272,7 +272,6 @@ function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
   else {
     _membersonlyevent_handle_access_denied_for_logged_users($eventID);
   }
-  CRM_Core_Session::setStatus('You have already registered for this event!');
 }
 
 /**
