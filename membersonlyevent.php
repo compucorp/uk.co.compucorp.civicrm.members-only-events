@@ -620,7 +620,13 @@ function membersonlyevent_civicrm_post($op, $objectName, $objectId, &$objectRef)
         }
         // create membersonlyevent entity for added event
         $params['event_id'] = $objectRef->id;
-        civicrm_api3('MembersOnlyEvent', 'create', $params);
+        $membersOnlyEvent = civicrm_api3('MembersOnlyEvent', 'create', $params)['values'];
+        $membersOnlyEventID = reset($membersOnlyEvent)['id'];
+        // set allowed membership type IDs if applicable
+        $allowedMembershipTypes = EventMembershipType::getAllowedMembershipTypesIDs($fromTemplate);
+        if (!empty($allowedMembershipTypes)) {
+          EventMembershipType::updateAllowedMembershipTypes($membersOnlyEventID, $allowedMembershipTypes);
+        }
       }
     }
   }
