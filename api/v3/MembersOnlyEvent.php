@@ -42,5 +42,5 @@ function civicrm_api3_members_only_event_delete($params) {
  * @throws API_Exception
  */
 function civicrm_api3_members_only_event_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'MembersOnlyEvent');
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

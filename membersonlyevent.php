@@ -577,12 +577,14 @@ function _membersonlyevent_add_configurations_menu(&$params) {
 }
 
 /**
- * Returns the DAO name for MembersOnlyEvent
- *
- * @return string
+ * Implements hook_civicrm_entityTypes().
  */
-function _civicrm_api3_members_only_event_DAO() {
-  return 'CRM_MembersOnlyEvent_DAO_MembersOnlyEvent';
+function membersonlyevent_civicrm_entityTypes(&$entityTypes) {
+  $entityTypes[] = [
+    'name'  => 'MembersOnlyEvent',
+    'class' => 'CRM_MembersOnlyEvent_DAO_MembersOnlyEvent',
+    'table' => 'membersonlyevent',
+  ];
 }
 
 /**
