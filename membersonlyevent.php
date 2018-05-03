@@ -575,3 +575,61 @@ function _membersonlyevent_add_configurations_menu(&$params) {
     );
   }
 }
+
+/**
+ * Implements hook_civicrm_entityTypes().
+ */
+function membersonlyevent_civicrm_entityTypes(&$entityTypes) {
+  $entityTypes[] = [
+    'name'  => 'MembersOnlyEvent',
+    'class' => 'CRM_MembersOnlyEvent_DAO_MembersOnlyEvent',
+    'table' => 'membersonlyevent',
+  ];
+}
+
+/**
+ * Implements hook_civicrm_pre().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_pre/
+ */
+function membersonlyevent_civicrm_pre($op, $objectName, $id, &$params) {
+  if($objectName == 'Event' && $params['template_id']) {
+    CRM_Core_Session::singleton()->set('event_template_'.$params['created_date'], $params['template_id']);
+  }
+}
+
+/**
+ * Implements hook_civicrm_post().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_post/
+ */
+function membersonlyevent_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+  if($objectName == 'Event') {
+    $fromTemplate = CRM_Core_Session::singleton()->get('event_template_'.$objectRef->created_date);
+    if($fromTemplate) {
+      // get membersonlyevent entity
+      $result = civicrm_api3('MembersOnlyEvent', 'get', array(
+        'sequential' => 1,
+        'event_id' => $fromTemplate,
+      ));
+      if(isset($result['values'][0])) {
+        $params = array();
+        foreach($result['values'][0] as $key => $val) {
+          if($key == 'id') {
+            continue;
+          }
+          $params[$key] = $val;
+        }
+        // create membersonlyevent entity for added event
+        $params['event_id'] = $objectRef->id;
+        $membersOnlyEvent = civicrm_api3('MembersOnlyEvent', 'create', $params)['values'];
+        $membersOnlyEventID = reset($membersOnlyEvent)['id'];
+        // set allowed membership type IDs if applicable
+        $allowedMembershipTypes = EventMembershipType::getAllowedMembershipTypesIDs($fromTemplate);
+        if (!empty($allowedMembershipTypes)) {
+          EventMembershipType::updateAllowedMembershipTypes($membersOnlyEventID, $allowedMembershipTypes);
+        }
+      }
+    }
+  }
+}
