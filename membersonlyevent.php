@@ -618,14 +618,19 @@ function membersonlyevent_civicrm_post($op, $objectName, $objectId, &$objectRef)
           if($key == 'id') {
             continue;
           }
-          $params[$key] = $val;
+          if($key == 'notice_for_access_denied') {
+            $params[$key] = strip_tags($val);
+          }
+          else {
+            $params[$key] = $val;
+          }
         }
         // create membersonlyevent entity for added event
         $params['event_id'] = $objectRef->id;
         $membersOnlyEvent = civicrm_api3('MembersOnlyEvent', 'create', $params)['values'];
         $membersOnlyEventID = reset($membersOnlyEvent)['id'];
         // set allowed membership type IDs if applicable
-        $allowedMembershipTypes = EventMembershipType::getAllowedMembershipTypesIDs($fromTemplate);
+        $allowedMembershipTypes = EventMembershipType::getAllowedMembershipTypesIDs($result['values'][0]['id']);
         if (!empty($allowedMembershipTypes)) {
           EventMembershipType::updateAllowedMembershipTypes($membersOnlyEventID, $allowedMembershipTypes);
         }
