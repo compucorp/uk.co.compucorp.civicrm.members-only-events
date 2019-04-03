@@ -12,4 +12,9 @@
     <title>Members-only event extension system-wide configurations</title>
     <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
   </item>
+  <item>
+     <path>civicrm/membersonlyevent/ajax/member</path>
+     <page_callback>CRM_Membersonlyevent_Utils_Calls::getMember</page_callback>
+     <access_arguments>members only event registration</access_arguments>
+  </item>
 </menu>
