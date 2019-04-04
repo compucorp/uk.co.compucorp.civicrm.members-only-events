@@ -169,7 +169,7 @@ function _membersonlyevent_civix_civicrm_managed(&$entities) {
     $es = include $file;
     foreach ($es as $e) {
       if (empty($e['module'])) {
-        $e['module'] = 'com.greg.membersonlyevent';
+        $e['module'] = 'com.compucorp.membersonlyevent';
       }
       $entities[] = $e;
     }

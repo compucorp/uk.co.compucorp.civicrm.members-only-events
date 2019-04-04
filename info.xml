@@ -4,7 +4,7 @@
   <name>Members Only Event</name>
   <description>Allow some events to be accessible only by users with CiviCRM Memberships, you can also allow users with certain membership types to access certain events.</description>
   <maintainer>
-    <author>Guanhuan Chen, Greg Meszaros</author>
+    <author>Compucorp</author>
     <email>info@compucorp.co.uk</email>
   </maintainer>
   <releaseDate>2014-05-23</releaseDate>
