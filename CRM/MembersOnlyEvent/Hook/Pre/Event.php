@@ -20,7 +20,6 @@ class CRM_MembersOnlyEvent_Hook_Pre_Event {
     $this->setSession($params);
   }
 
-
   /**
    * @param $params
    */
