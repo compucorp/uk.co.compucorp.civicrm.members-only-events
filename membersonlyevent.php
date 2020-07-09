@@ -24,7 +24,7 @@ require_once 'membersonlyevent.civix.php';
 //----------------------------------------------------------------------------//
 
 /**
- * Implementation of hook_civicrm_config
+ * Implements hook_civicrm_config().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
  */
@@ -33,9 +33,7 @@ function membersonlyevent_civicrm_config(&$config) {
 }
 
 /**
- * Implementation of hook_civicrm_xmlMenu
- *
- * @param $files array(string)
+ * Implements hook_civicrm_xmlMenu().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
  */
@@ -44,7 +42,7 @@ function membersonlyevent_civicrm_xmlMenu(&$files) {
 }
 
 /**
- * Implementation of hook_civicrm_install
+ * Implements hook_civicrm_install().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
  */
@@ -53,7 +51,7 @@ function membersonlyevent_civicrm_install() {
 }
 
 /**
- * Implementation of hook_civicrm_uninstall
+ * Implements hook_civicrm_uninstall().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_uninstall
  */
@@ -62,7 +60,7 @@ function membersonlyevent_civicrm_uninstall() {
 }
 
 /**
- * Implementation of hook_civicrm_enable
+ * Implements hook_civicrm_enable().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
  */
@@ -71,7 +69,7 @@ function membersonlyevent_civicrm_enable() {
 }
 
 /**
- * Implementation of hook_civicrm_disable
+ * Implements hook_civicrm_disable().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_disable
  */
@@ -80,13 +78,7 @@ function membersonlyevent_civicrm_disable() {
 }
 
 /**
- * Implementation of hook_civicrm_upgrade
- *
- * @param $op string, the type of operation being performed; 'check' or 'enqueue'
- * @param $queue CRM_Queue_Queue, (for 'enqueue') the modifiable list of pending up upgrade tasks
- *
- * @return mixed  based on op. for 'check', returns array(boolean) (TRUE if upgrades are pending)
- *                for 'enqueue', returns void
+ * Implements hook_civicrm_upgrade().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_upgrade
  */
@@ -95,7 +87,7 @@ function membersonlyevent_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
 }
 
 /**
- * Implementation of hook_civicrm_managed
+ * Implements hook_civicrm_managed().
  *
  * Generate a list of entities to create/deactivate/delete when this module
  * is installed, disabled, uninstalled.
@@ -107,7 +99,7 @@ function membersonlyevent_civicrm_managed(&$entities) {
 }
 
 /**
- * Implementation of hook_civicrm_caseTypes
+ * Implements hook_civicrm_caseTypes().
  *
  * Generate a list of case-types
  *
@@ -120,7 +112,7 @@ function membersonlyevent_civicrm_caseTypes(&$caseTypes) {
 }
 
 /**
- * Implementation of hook_civicrm_alterSettingsFolders
+ * Implements hook_civicrm_alterSettingsFolders().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
  */
@@ -174,7 +166,7 @@ function membersonlyevent_civicrm_tabset($tabsetName, &$tabs, $context) {
 }
 
 /**
- * Implementation of hook_civicrm_pageRun
+ * Implements hook_civicrm_pageRun().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_pageRun/
  *
@@ -188,7 +180,7 @@ function membersonlyevent_civicrm_pageRun(&$page) {
 }
 
 /**
- * Implementation of hook_civicrm_preProcess
+ * Implements hook_civicrm_preProcess().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_preProcess/
  *
@@ -201,6 +193,11 @@ function membersonlyevent_civicrm_preProcess($formName, &$form) {
   }
 }
 
+/**
+ * Implements hook_civicrm_navigationMenu().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
+ */
 function membersonlyevent_civicrm_navigationMenu(&$params) {
   _membersonlyevent_add_configurations_menu($params);
 }
@@ -246,7 +243,7 @@ function _membersonlyevent_is_tab_valid($eventID) {
 function _membersonlyevent_civicrm_pageRun_CRM_Event_Page_EventInfo(&$page) {
   $eventID = $page->_id;
 
-  if(_membersonly_is_event_for_members_only($eventID)) {
+  if (_membersonly_is_event_for_members_only($eventID)) {
     $session = CRM_Core_Session::singleton();
     $statusMessages = $session->get('status');
     foreach ($statusMessages as $k => $msg) {
@@ -296,7 +293,7 @@ function _membersonlyevent_user_has_event_access($eventID) {
     return FALSE;
   }
 
-  if(CRM_Core_Permission::check('members only event registration')){
+  if (CRM_Core_Permission::check('members only event registration')) {
     // any user with 'members only event registration' permission
     // can access any members-only event.
     return TRUE;
@@ -385,7 +382,7 @@ function _membersonlyevent_is_memberships_duration_valid_during_event($eventID, 
   }
 
   $eventStartDate = _membersonlyevent_get_event_start_date($eventID);
-  foreach($activeAllowedMemberships as $membership) {
+  foreach ($activeAllowedMemberships as $membership) {
     $membershipEndDate = !(empty($membership['end_date'])) ? $membership['end_date'] : '';
     if (empty($membershipEndDate) || empty($eventStartDate) || ($membershipEndDate >= $eventStartDate)) {
       // the user has an active allowed membership for this event
@@ -441,7 +438,6 @@ function _membersonlyevent_hide_event_info_page_register_button() {
  * user does not have permission to access
  * the event info page.
  *
- * @param int $eventID
  */
 function _membersonlyevent_handle_access_denied_for_guest_users() {
   $loginURL = CRM_Core_Config::singleton()->userSystem->getLoginURL();
@@ -471,7 +467,7 @@ function _membersonlyevent_handle_access_denied_for_logged_users($eventID) {
  * on the members-only event configurations to
  * the header and the footer of the event info page.
  *
- * @param MembersOnlyEvent $membersOnlyEvent
+ * @param \CRM_MembersOnlyEvent_BAO_MembersOnlyEvent $membersOnlyEvent
  */
 function _membersonlyevent_add_membership_purchase_button_to_event_info_page($membersOnlyEvent) {
   switch ($membersOnlyEvent->purchase_membership_link_type) {
@@ -481,8 +477,9 @@ function _membersonlyevent_add_membership_purchase_button_to_event_info_page($me
       $params = 'reset=1&id=' . $contributionPageID;
       $membershipPurchaseURL = CRM_Utils_System::url($path, $params);
       break;
+
     case MembersOnlyEvent::LINK_TYPE_URL:
-    Default:
+    default:
       $membershipPurchaseURL = $membersOnlyEvent->purchase_membership_url;
       break;
   }
@@ -520,7 +517,7 @@ function _membersonlyevent_add_action_button_to_event_info_page($url, $buttonTex
  * the registration page directly we will just redirect him
  * to the main page instead of showing any error or buttons to
  * login or buy membership.
- * 
+ *
  * @param $form
  */
 function _membersonlyevent_civicrm_preProcess_CRM_Event_Form_Registration_Register(&$form) {
@@ -530,15 +527,15 @@ function _membersonlyevent_civicrm_preProcess_CRM_Event_Form_Registration_Regist
     // if the user has no access, redirect to the main page
     CRM_Utils_System::redirect('/');
   }
-  if(_membersonly_is_event_for_members_only($eventID)) {
+  if (_membersonly_is_event_for_members_only($eventID)) {
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
     CRM_Core_Resources::singleton()->addStyle('.crm-not-you-message { display: none; }');
     if (isset($cid)) {
       CRM_Core_Session::setStatus('You have already registered for this event! You cannot register other users.');
       $id = CRM_Utils_Request::retrieve('id', 'Positive');
-      $params = 'id='.$id;
-      if($reset = CRM_Utils_Request::retrieve('reset', 'Positive')) {
-        $params .= '&reset='.$reset;
+      $params = 'id=' . $id;
+      if ($reset = CRM_Utils_Request::retrieve('reset', 'Positive')) {
+        $params .= '&reset=' . $reset;
       }
       $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), $params);
       CRM_Utils_System::redirect($url);
@@ -558,20 +555,20 @@ function _membersonlyevent_add_configurations_menu(&$params) {
   if ($administerMenuId) {
     // get the maximum key under administer menu
     $maxAdminMenuKey = max(array_keys($params[$administerMenuId]['child']));
-    $nextAdminMenuKey = $maxAdminMenuKey+1;
-    $params[$administerMenuId]['child'][$nextAdminMenuKey] =  array(
+    $nextAdminMenuKey = $maxAdminMenuKey + 1;
+    $params[$administerMenuId]['child'][$nextAdminMenuKey] = array(
       'attributes' => array(
         'label' => ts('Members-Only Event Extension Configurations'),
         'name' => 'membersonlyevent_configurations',
         'url' => 'civicrm/admin/membersonlyevent',
         'permission' => 'administer CiviCRM,access CiviEvent',
-        'operator' => null,
+        'operator' => NULL,
         'separator' => 1,
         'parentID' => $administerMenuId,
         'navID' => $nextAdminMenuKey,
-        'active' => 1
+        'active' => 1,
       ),
-      'child' => null
+      'child' => NULL,
     );
   }
 }
@@ -593,8 +590,11 @@ function membersonlyevent_civicrm_entityTypes(&$entityTypes) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_pre/
  */
 function membersonlyevent_civicrm_pre($op, $objectName, $id, &$params) {
-  if($objectName == 'Event' && $params['template_id']) {
-    CRM_Core_Session::singleton()->set('event_template_'.$params['created_date'], $params['template_id']);
+  $listeners = [
+    new CRM_MembersOnlyEvent_Hook_Pre_Event(),
+  ];
+  foreach ($listeners as $currentListener) {
+    $currentListener->handle($op, $objectName, $id, $params);
   }
 }
 
@@ -604,21 +604,21 @@ function membersonlyevent_civicrm_pre($op, $objectName, $id, &$params) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_post/
  */
 function membersonlyevent_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-  if($objectName == 'Event') {
-    $fromTemplate = CRM_Core_Session::singleton()->get('event_template_'.$objectRef->created_date);
-    if($fromTemplate) {
+  if ($objectName == 'Event') {
+    $fromTemplate = CRM_Core_Session::singleton()->get('event_template_' . $objectRef->created_date);
+    if ($fromTemplate) {
       // get membersonlyevent entity
       $result = civicrm_api3('MembersOnlyEvent', 'get', array(
         'sequential' => 1,
         'event_id' => $fromTemplate,
       ));
-      if(isset($result['values'][0])) {
+      if (isset($result['values'][0])) {
         $params = array();
-        foreach($result['values'][0] as $key => $val) {
-          if($key == 'id') {
+        foreach ($result['values'][0] as $key => $val) {
+          if ($key == 'id') {
             continue;
           }
-          if($key == 'notice_for_access_denied') {
+          if ($key == 'notice_for_access_denied') {
             $params[$key] = strip_tags($val);
           }
           else {
