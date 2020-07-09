@@ -53,7 +53,7 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
     $this->add(
       'checkbox',
       'is_members_only_event',
-      ts('Is members-only event ?')
+      ts('Only allow members to register for this event?')
     );
 
     $this->addEntityRef(
@@ -95,7 +95,7 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
       ts('Contribution Page'),
       array(
         'entity' => 'ContributionPage',
-        'multiple' => False,
+        'multiple' => FALSE,
         'placeholder' => ts('- Select -'),
         'select' => array('minimumInputLength' => 0),
       )
@@ -130,6 +130,7 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
       case self::NO_SELECTED:
         $this->validateForDisabledPurchaseButton($values, $errors);
         break;
+
       case self::YES_SELECTED:
         $this->validateForEnabledPurchaseButton($values, $errors);
         break;
@@ -197,12 +198,12 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
    * @inheritdoc
    */
   public function setDefaultValues() {
-    $defaultValues= array();
+    $defaultValues = array();
 
     $this->setInitialValues($defaultValues);
 
     $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($this->_id);
-    if($membersOnlyEvent) {
+    if ($membersOnlyEvent) {
       $defaultValues['is_members_only_event'] = self::YES_SELECTED;
       $defaultValues['allowed_membership_types'] = EventMembershipType::getAllowedMembershipTypesIDs($membersOnlyEvent->id);
       $defaultValues['purchase_membership_button'] = $membersOnlyEvent->purchase_membership_button;
@@ -212,7 +213,7 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
       $defaultValues['contribution_page_id'] = $membersOnlyEvent->contribution_page_id;
       $defaultValues['purchase_membership_url'] = $membersOnlyEvent->purchase_membership_url;
     }
-    
+
     return $defaultValues;
   }
 
@@ -239,14 +240,16 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
     $eventSetToMembersOnly = !empty($params['is_members_only_event']) ? self::YES_SELECTED : self::NO_SELECTED;
     $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($params['event_id']);
     $submitOperation = $this->getSubmitOperation($eventSetToMembersOnly, $membersOnlyEvent);
-    switch ($submitOperation){
+    switch ($submitOperation) {
       case self::OPERATION_CREATE:
         $this->saveFormData($params);
         break;
+
       case self::OPERATION_UPDATE:
         $params['id'] = $membersOnlyEvent->id;
         $this->saveFormData($params);
         break;
+
       case self::OPERATION_DOWNGRADE_TO_NORMAL_EVENT:
         $this->downgradeToNormalEvent($membersOnlyEvent->id);
         break;
@@ -270,7 +273,7 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
    * @param boolean $eventSetToMembersOnly
    *   True if Is members-only event ?' field is checked
    *   or False if it's not.
-   * @param MembersOnlyEvent $membersOnlyEvent
+   * @param \CRM_MembersOnlyEvent_BAO_MembersOnlyEvent $membersOnlyEvent
    *   Contains the members-only event configurations if the event is
    *   members-only event.
    *
@@ -279,15 +282,15 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
    *   defined at the top of this class.
    */
   private function getSubmitOperation($eventSetToMembersOnly, $membersOnlyEvent = NULL) {
-    if(!$membersOnlyEvent && !$eventSetToMembersOnly) {
+    if (!$membersOnlyEvent && !$eventSetToMembersOnly) {
       return self::OPERATION_DO_NOTHING;
     }
 
-    if($membersOnlyEvent && !$eventSetToMembersOnly) {
+    if ($membersOnlyEvent && !$eventSetToMembersOnly) {
       return self::OPERATION_DOWNGRADE_TO_NORMAL_EVENT;
     }
 
-    if($membersOnlyEvent && $eventSetToMembersOnly) {
+    if ($membersOnlyEvent && $eventSetToMembersOnly) {
       return self::OPERATION_UPDATE;
     }
 
@@ -327,4 +330,5 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
     $membersOnlyEvent->id = $membersOnlyEventID;
     $membersOnlyEvent->delete();
   }
+
 }

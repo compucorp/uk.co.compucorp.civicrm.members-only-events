@@ -22,7 +22,7 @@ jQuery(document).ready(function(){
    * the needed fields.
    */
   function setInitialFieldValues() {
-    toggleMembersOnlyEventFields(membersOnlyEventCheckbox.attr("checked"));
+    toggleMembersOnlyEventFields(membersOnlyEventCheckbox.is(':checked'));
 
     var purchaseMembershipButtonEnabled = jQuery("input[name='purchase_membership_button']:checked").val();
     togglePurchaseButtonFields(purchaseMembershipButtonEnabled);
@@ -36,7 +36,7 @@ jQuery(document).ready(function(){
    */
   function setFieldListeners() {
     membersOnlyEventCheckbox.click(function(){
-      toggleMembersOnlyEventFields(jQuery(this).attr("checked"));
+      toggleMembersOnlyEventFields(jQuery(this).is(':checked'));
     });
 
     jQuery("input[name='purchase_membership_button']").click(function(){
