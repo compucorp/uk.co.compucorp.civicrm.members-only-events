@@ -1,6 +1,4 @@
-{* Check if the online registration for this event is allowed, show notification message otherwise *}
-<div class="crm-block crm-form-block crm-event-manage-membersonlyevent-form-block">
-{if $isOnlineRegistration == 1}
+<div class="crm-block crm-form-block crm-event-manage-membersonlyevent-form-block" style="display: none;">
   {* HEADER *}
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="top"}
@@ -51,15 +49,52 @@
       </div>
     </div>
   </div>
-</div>
 
   {* FOOTER *}
   <div class="crm-submit-buttons">
-      {include file="CRM/common/formButtons.tpl" location="bottom"}
+    {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
+</div>
+<div class="crm-event-manage-membersonlyevent-form-help">
+  <div class="help">{ts}Online registration tab needs to be enabled first.{/ts}</div>
+</div>
+{literal}
+<script>
+  CRM.$(function($) {
 
-{else}
-  <div id="help">{ts}Online registration tab needs to be enabled first.{/ts}</div>
-{/if}
+    initialPage();
+    eventListner();
 
+    function initialPage() {
+      //Check if the online registration for this event is allowed, show notification message otherwise
+      toggleForm();
+    }
+
+    function eventListner() {
+      $("#tab_membersonlyevent").click(function(){
+        toggleForm();
+      });
+    }
+
+    function toggleForm() {
+      CRM.api3('Event', 'get', {
+        "sequential": 1,
+        "return": ["is_online_registration"],
+        "id": {/literal}{$id}{literal}
+      }).then(function(result) {
+        if (result['values'][0]['is_online_registration'] == 1) {
+          $(".crm-event-manage-membersonlyevent-form-block").show();
+          $(".crm-event-manage-membersonlyevent-form-help").hide();
+          $("#tab_membersonlyevent").removeClass("disabled");
+        }
+        else {
+          $(".crm-event-manage-membersonlyevent-form-block").hide();
+          $(".crm-event-manage-membersonlyevent-form-help").show();
+          $("#tab_membersonlyevent").addClass("disabled");
+        }
+      });
+    }
+  });
+</script>
+{/literal}
 {crmScript ext="com.compucorp.membersonlyevent" file="js/CRM/Form/MembersOnlyEventTab.js"}
