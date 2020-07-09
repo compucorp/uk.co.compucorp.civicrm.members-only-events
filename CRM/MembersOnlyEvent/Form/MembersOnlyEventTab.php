@@ -53,7 +53,7 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
     $this->add(
       'checkbox',
       'is_members_only_event',
-      ts('Is members-only event ?')
+      ts('Only allow members to register for this event?')
     );
 
     $this->addEntityRef(
@@ -212,7 +212,7 @@ class CRM_MembersOnlyEvent_Form_MembersOnlyEventTab extends CRM_Event_Form_Manag
       $defaultValues['contribution_page_id'] = $membersOnlyEvent->contribution_page_id;
       $defaultValues['purchase_membership_url'] = $membersOnlyEvent->purchase_membership_url;
     }
-    
+
     return $defaultValues;
   }
 

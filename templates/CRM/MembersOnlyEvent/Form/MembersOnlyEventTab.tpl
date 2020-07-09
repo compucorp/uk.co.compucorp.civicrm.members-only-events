@@ -5,8 +5,11 @@
   </div>
 
   <div class="crm-section">
-    <div class="label">{$form.is_members_only_event.label}</div>
-    <div class="content">{$form.is_members_only_event.html}</div>
+    <div class="label"></div>
+    <div class="content">
+      {$form.is_members_only_event.html}
+      {$form.is_members_only_event.label}
+    </div>
     <div class="clear"></div>
   </div>
 
