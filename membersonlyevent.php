@@ -520,7 +520,7 @@ function _membersonlyevent_add_action_button_to_event_info_page($url, $buttonTex
  * the registration page directly we will just redirect him
  * to the main page instead of showing any error or buttons to
  * login or buy membership.
- * 
+ *
  * @param $form
  */
 function _membersonlyevent_civicrm_preProcess_CRM_Event_Form_Registration_Register(&$form) {
@@ -593,8 +593,11 @@ function membersonlyevent_civicrm_entityTypes(&$entityTypes) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_pre/
  */
 function membersonlyevent_civicrm_pre($op, $objectName, $id, &$params) {
-  if($objectName == 'Event' && $params['template_id']) {
-    CRM_Core_Session::singleton()->set('event_template_'.$params['created_date'], $params['template_id']);
+  $listeners = [
+    new CRM_MembersOnlyEvent_Hook_Pre_Event(),
+  ];
+  foreach ($listeners as $currentListener) {
+    $currentListener->handle($op, $objectName, $id, $params);
   }
 }
 
