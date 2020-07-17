@@ -590,6 +590,9 @@ function membersonlyevent_civicrm_entityTypes(&$entityTypes) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_copy/
  */
 function membersonlyevent_civicrm_copy($objectName, &$object) {
+  if ($objectName != 'Event') {
+    return;
+  }
   $listeners = [
     new CRM_MembersOnlyEvent_Hook_Copy_Event(),
   ];
