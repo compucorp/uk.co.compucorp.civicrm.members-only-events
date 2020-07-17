@@ -19,10 +19,10 @@ class CRM_MembersOnlyEvent_Hook_Copy_Event {
     if (!$this->shouldHandle($objectName)) {
       return;
     }
-    $this->createMemberOnlyEventFromEventTemplate($object);
+    $this->createMemberOnlyEventFromEventTemplate($object->id);
   }
 
-  protected function createMemberOnlyEventFromEventTemplate(&$objectRef) {
+  protected function createMemberOnlyEventFromEventTemplate($id) {
 
     $templateId = CRM_Utils_Request::retrieve('template_id', 'Int');
 
@@ -37,7 +37,7 @@ class CRM_MembersOnlyEvent_Hook_Copy_Event {
     }
 
     $params = [
-      'event_id' => $objectRef->id,
+      'event_id' => $id,
       'notice_for_access_denied' => strip_tags($memberOnlyEventTemplate->notice_for_access_denied),
       'contribution_page_id' => $memberOnlyEventTemplate->contribution_page_id,
       'purchase_membership_url' => $memberOnlyEventTemplate->purchase_membership_url,
