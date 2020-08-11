@@ -62,7 +62,7 @@ class CRM_MembersOnlyEvent_Hook_Copy_EventFromTemplateCreator {
     if (empty($allowedMembershipTypes)) {
       return;
     }
-    EventMembershipType::updateAllowedMembershipTypes($memberOnlyEventId->id, $allowedMembershipTypes);
+    EventMembershipType::updateAllowedMembershipTypes($memberOnlyEventId, $allowedMembershipTypes);
   }
 
 }

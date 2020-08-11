@@ -3,6 +3,8 @@
 use CRM_MembersOnlyEvent_Test_Fabricator_Event as EventFabricator;
 use CRM_MembersOnlyEvent_Test_Fabricator_MembersOnlyEvent as MembersOnlyEventFabricator;
 use CRM_MembersOnlyEvent_BAO_MembersOnlyEvent as MembersOnlyEvent;
+use CRM_MembersOnlyEvent_Test_Fabricator_MembershipType as MembershipTypeFabricator;
+use CRM_MembersOnlyEvent_BAO_EventMembershipType as EventMembershipType;
 
 require_once __DIR__ . '/../../../../BaseHeadlessTest.php';
 
@@ -13,25 +15,61 @@ require_once __DIR__ . '/../../../../BaseHeadlessTest.php';
  */
 class CRM_MembersOnlyEvent_Hook_Copy_EventFromTemplateCreatorTest extends BaseHeadlessTest {
 
+  private $eventTemplate;
+  private $membersOnlyEventTemplate;
+  private $event;
+
+  public function setUp() {
+    $this->eventTemplate = EventFabricator::fabricate(['is_template' => TRUE]);
+    $this->membersOnlyEventTemplate = MembersOnlyEventFabricator::fabricate(['event_id' => $this->eventTemplate->id]);
+    $this->event = EventFabricator::fabricate();
+
+  }
+
   /**
    * Tests Create MemberOnlyEvent when new Event was created from template.
    */
-  public function testEventFromTemplate() {
-    $eventTemplate = EventFabricator::fabricate(['is_template' => TRUE]);
-    $membersOnlyEventTemplate = MembersOnlyEventFabricator::fabricate(['event_id' => $eventTemplate->id]);
-    $event = EventFabricator::fabricate();
-
-    $eventFromTemplateCreator = new CRM_MembersOnlyEvent_Hook_Copy_EventFromTemplateCreator($event->id, $eventTemplate->id);
+  public function testCreateEventFromTemplate() {
+    $eventFromTemplateCreator = new CRM_MembersOnlyEvent_Hook_Copy_EventFromTemplateCreator($this->event->id, $this->eventTemplate->id);
     $eventFromTemplateCreator->create();
 
-    $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($event->id);
+    $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($this->event->id);
 
-    $this->assertEquals($membersOnlyEventTemplate->contribution_page_id, $membersOnlyEvent->contribution_page_id);
-    $this->assertEquals($membersOnlyEventTemplate->notice_for_access_denied, $membersOnlyEvent->notice_for_access_denied);
-    $this->assertEquals($membersOnlyEventTemplate->purchase_membership_button, $membersOnlyEvent->purchase_membership_button);
-    $this->assertEquals($membersOnlyEventTemplate->purchase_membership_button_label, $membersOnlyEvent->purchase_membership_button_label);
-    $this->assertEquals($membersOnlyEventTemplate->purchase_membership_link_type, $membersOnlyEvent->purchase_membership_link_type);
-    $this->assertEquals($membersOnlyEventTemplate->purchase_membership_url, $membersOnlyEvent->purchase_membership_url);
+    $templateKeys = [
+      'contribution_page_id',
+      'notice_for_access_denied',
+      'purchase_membership_button',
+      'purchase_membership_button_label',
+      'purchase_membership_link_type',
+      'purchase_membership_url',
+    ];
+    foreach ($templateKeys as $templateKey) {
+      $this->assertEquals($this->membersOnlyEventTemplate->{$templateKey}, $membersOnlyEvent->{$templateKey});
+    }
+  }
+
+  public function testCreateEventFromTemplateWithMembershipType() {
+    $membershipType1 = MembershipTypeFabricator::fabricate([], TRUE);
+    $membershipType2 = MembershipTypeFabricator::fabricate([], TRUE);
+    $membershipTypeIds = [$membershipType1->id, $membershipType2->id];
+    EventMembershipType::updateAllowedMembershipTypes($this->membersOnlyEventTemplate->id, $membershipTypeIds);
+
+    $eventId = $this->event->id;
+    $templateId = $this->eventTemplate->id;
+    $eventFromTemplateCreator = new CRM_MembersOnlyEvent_Hook_Copy_EventFromTemplateCreator($eventId, $templateId);
+    $eventFromTemplateCreator->create();
+
+    $membersOnlyEvent = MembersOnlyEvent::getMembersOnlyEvent($eventId);
+
+    $eventMembershipTypeDAO = new CRM_MembersOnlyEvent_DAO_EventMembershipType();
+    $eventMembershipTypeDAO->members_only_event_id = $membersOnlyEvent->id;
+    $eventMembershipTypeDAO->find();
+    $eventMembershipTypes = [];
+    while ($eventMembershipTypeDAO->fetch()) {
+      $eventMembershipTypes[] = $eventMembershipTypeDAO->membership_type_id;
+    }
+    $this->assertEquals($membershipTypeIds, array_values($eventMembershipTypes));
+
   }
 
 }
