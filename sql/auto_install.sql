@@ -5,7 +5,7 @@
 -- * Stores members-only event configurations
 -- *
 -- *******************************************************/
-CREATE TABLE `membersonlyevent` (
+CREATE TABLE IF NOT EXISTS `membersonlyevent` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  ,
      `event_id` int unsigned NOT NULL   COMMENT 'Foreign key for the Event',
      `purchase_membership_button` tinyint   DEFAULT 0 COMMENT 'Should we provide membership purchase button when access to event denied ?',
@@ -30,7 +30,7 @@ CREATE TABLE `membersonlyevent` (
 -- * event are stored.
 -- *
 -- *******************************************************/
-CREATE TABLE `membersonlyevent_event_membership_type` (
+CREATE TABLE IF NOT EXISTS `membersonlyevent_event_membership_type` (
      `members_only_event_id` int unsigned NOT NULL   COMMENT 'Members-only event ID.',
      `membership_type_id` int unsigned NOT NULL   COMMENT 'Allowed Membership Type ID.',
     INDEX `index_event_id_membership_type_id`(members_only_event_id, membership_type_id),

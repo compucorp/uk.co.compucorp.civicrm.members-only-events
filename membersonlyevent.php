@@ -585,56 +585,18 @@ function membersonlyevent_civicrm_entityTypes(&$entityTypes) {
 }
 
 /**
- * Implements hook_civicrm_pre().
+ * Implements hook_civicrm_copy().
  *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_pre/
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_copy/
  */
-function membersonlyevent_civicrm_pre($op, $objectName, $id, &$params) {
+function membersonlyevent_civicrm_copy($objectName, &$object) {
+  if ($objectName != 'Event') {
+    return;
+  }
   $listeners = [
-    new CRM_MembersOnlyEvent_Hook_Pre_Event(),
+    new CRM_MembersOnlyEvent_Hook_Copy_Event(),
   ];
   foreach ($listeners as $currentListener) {
-    $currentListener->handle($op, $objectName, $id, $params);
-  }
-}
-
-/**
- * Implements hook_civicrm_post().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_post/
- */
-function membersonlyevent_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-  if ($objectName == 'Event') {
-    $fromTemplate = CRM_Core_Session::singleton()->get('event_template_' . $objectRef->created_date);
-    if ($fromTemplate) {
-      // get membersonlyevent entity
-      $result = civicrm_api3('MembersOnlyEvent', 'get', array(
-        'sequential' => 1,
-        'event_id' => $fromTemplate,
-      ));
-      if (isset($result['values'][0])) {
-        $params = array();
-        foreach ($result['values'][0] as $key => $val) {
-          if ($key == 'id') {
-            continue;
-          }
-          if ($key == 'notice_for_access_denied') {
-            $params[$key] = strip_tags($val);
-          }
-          else {
-            $params[$key] = $val;
-          }
-        }
-        // create membersonlyevent entity for added event
-        $params['event_id'] = $objectRef->id;
-        $membersOnlyEvent = civicrm_api3('MembersOnlyEvent', 'create', $params)['values'];
-        $membersOnlyEventID = reset($membersOnlyEvent)['id'];
-        // set allowed membership type IDs if applicable
-        $allowedMembershipTypes = EventMembershipType::getAllowedMembershipTypesIDs($result['values'][0]['id']);
-        if (!empty($allowedMembershipTypes)) {
-          EventMembershipType::updateAllowedMembershipTypes($membersOnlyEventID, $allowedMembershipTypes);
-        }
-      }
-    }
+    $currentListener->handle($object);
   }
 }
