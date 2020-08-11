@@ -597,6 +597,6 @@ function membersonlyevent_civicrm_copy($objectName, &$object) {
     new CRM_MembersOnlyEvent_Hook_Copy_Event(),
   ];
   foreach ($listeners as $currentListener) {
-    $currentListener->handle($objectName, $object);
+    $currentListener->handle($object);
   }
 }
