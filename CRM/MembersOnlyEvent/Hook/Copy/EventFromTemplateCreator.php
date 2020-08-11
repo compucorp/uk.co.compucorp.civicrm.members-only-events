@@ -31,7 +31,6 @@ class CRM_MembersOnlyEvent_Hook_Copy_EventFromTemplateCreator {
    * Creates default membership only setting from Event Template
    */
   public function create() {
-
     $memberOnlyEventTemplate = MemberOnlyEvent::getMembersOnlyEvent($this->templateId);
 
     if (empty($memberOnlyEventTemplate)) {
@@ -49,16 +48,21 @@ class CRM_MembersOnlyEvent_Hook_Copy_EventFromTemplateCreator {
     ];
 
     $membersOnlyEvent = MemberOnlyEvent::create($params);
+    $this->setAllowMembershipTypesIds($membersOnlyEvent->id, $memberOnlyEventTemplate->id);
 
-    // Set allowed membership type IDs if applicable
-    $allowedMembershipTypes = EventMembershipType::getAllowedMembershipTypesIDs($memberOnlyEventTemplate->id);
+  }
 
+  /**
+   * Sets allowed membership type IDs if applicable
+   * @param $memberOnlyEventId
+   * @param $memberOnlyEventTemplateId
+   */
+  private function setAllowMembershipTypesIds($memberOnlyEventId, $memberOnlyEventTemplateId) {
+    $allowedMembershipTypes =  EventMembershipType::getAllowedMembershipTypesIDs($memberOnlyEventTemplateId);
     if (empty($allowedMembershipTypes)) {
       return;
     }
-
-    EventMembershipType::updateAllowedMembershipTypes($membersOnlyEvent->id, $allowedMembershipTypes);
-
+    EventMembershipType::updateAllowedMembershipTypes($memberOnlyEventId->id, $allowedMembershipTypes);
   }
 
 }
