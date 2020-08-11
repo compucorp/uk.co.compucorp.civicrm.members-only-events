@@ -13,7 +13,6 @@ require_once __DIR__ . '/../../../../BaseHeadlessTest.php';
  */
 class CRM_MembersOnlyEvent_Hook_Copy_EventFromTemplateCreatorTest extends BaseHeadlessTest {
 
-
   /**
    * Tests Create MemberOnlyEvent when new Event was created from template.
    */
