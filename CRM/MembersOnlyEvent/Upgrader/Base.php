@@ -39,7 +39,7 @@ class CRM_MembersOnlyEvent_Upgrader_Base {
     if (! self::$instance) {
       // FIXME auto-generate
       self::$instance = new CRM_MembersOnlyEvent_Upgrader(
-        'com.compucorp.membersonlyevent',
+        'uk.co.compucorp.membersonlyevent',
         realpath(__DIR__ .'/../../../')
       );
     }
